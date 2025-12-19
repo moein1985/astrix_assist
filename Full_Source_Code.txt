@@ -1,0 +1,649 @@
+﻿
+============================================================
+FILE: main.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\main.dart)
+============================================================
+
+import 'package:flutter/material.dart';
+import 'core/injection_container.dart';
+import 'core/router.dart';
+
+void main() {
+  setupDependencies();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerConfig: router,
+      title: 'Astrix Assist',
+      theme: ThemeData(primarySwatch: Colors.blue),
+    );
+  }
+}
+
+============================================================
+FILE: test_api.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\test_api.dart)
+============================================================
+
+import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+
+void main() async {
+  // ØªÙ†Ø¸ÛŒÙ…Ø§Øª Ø§ØªØµØ§Ù„ (Ø·Ø¨Ù‚ Ú©Ø§Ù†ÙÛŒÚ¯ÛŒ Ú©Ù‡ Ø§Ù†Ø¬Ø§Ù… Ø¯Ø§Ø¯ÛŒÙ…)
+  const serverIp = '192.168.85.88';
+  const serverPort = 5038;
+  const amiUser = 'moein_api';     // ÛŒÙˆØ²Ø±ÛŒ Ú©Ù‡ Ø³Ø§Ø®ØªÛŒÙ…
+  const amiSecret = '123456';      // Ù¾Ø³ÙˆØ±Ø¯ÛŒ Ú©Ù‡ Ø³Øª Ú©Ø±Ø¯ÛŒÙ…
+
+  if (kDebugMode) {
+    print('ðŸš€ Connecting to AMI at $serverIp:$serverPort ...');
+  }
+
+  try {
+    // 1. Ø§ÛŒØ¬Ø§Ø¯ Ø§ØªØµØ§Ù„ Ø³ÙˆÚ©Øª
+    Socket socket = await Socket.connect(serverIp, serverPort, timeout: Duration(seconds: 5));
+    if (kDebugMode) {
+      print('âœ… Connected!');
+    }
+
+    // 2. Ú¯ÙˆØ´ Ø¯Ø§Ø¯Ù† Ø¨Ù‡ Ù¾ÛŒØ§Ù…â€ŒÙ‡Ø§ÛŒ Ø³Ø±ÙˆØ± (Listening)
+    // Ø³Ø±ÙˆØ± Ù‡Ø± Ù„Ø­Ø¸Ù‡ Ù…Ù…Ú©Ù†Ù‡ Ù¾ÛŒØ§Ù…ÛŒ Ø¨ÙØ±Ø³ØªÙ‡ (Ù…Ø«Ù„ Ø²Ù†Ú¯ Ø®ÙˆØ±Ø¯Ù† ØªÙ„ÙÙ†)
+    socket.listen(
+      (List<int> data) {
+        final message = utf8.decode(data);
+        if (kDebugMode) {
+          print('\nðŸ“© SERVER SAYS:');
+        }
+        if (kDebugMode) {
+          print(message);
+        }
+        
+        // ØªØ´Ø®ÛŒØµ Ø§ÛŒÙ†Ú©Ù‡ Ø¢ÛŒØ§ Ù„Ø§Ú¯ÛŒÙ† Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯Ù‡ ÛŒØ§ Ù†Ù‡
+        if (message.contains('Authentication accepted')) {
+            if (kDebugMode) {
+              print('ðŸŽ‰ LOGIN SUCCESSFUL! Ready for commands.');
+            }
+        }
+      },
+      onError: (error) {
+        if (kDebugMode) {
+          print('âŒ Socket Error: $error');
+        }
+        socket.destroy();
+      },
+      onDone: () {
+        if (kDebugMode) {
+          print('ðŸ”Œ Disconnected from server.');
+        }
+        socket.destroy();
+      },
+    );
+
+    // 3. Ø§Ø±Ø³Ø§Ù„ Ø¯Ø³ØªÙˆØ± Ù„Ø§Ú¯ÛŒÙ† (Ø·Ø¨Ù‚ Ù¾Ø±ÙˆØªÚ©Ù„ AMI)
+    // Ù†Ú©ØªÙ‡: Ù‡Ø± Ø®Ø· Ø¨Ø§ÛŒØ¯ Ø¨Ø§ \r\n ØªÙ…Ø§Ù… Ø´ÙˆØ¯ Ùˆ Ù¾Ø§ÛŒØ§Ù† Ø¯Ø³ØªÙˆØ± Ø¨Ø§ÛŒØ¯ Ø¯Ùˆ Ø¨Ø§Ø± \r\n Ø¯Ø§Ø´ØªÙ‡ Ø¨Ø§Ø´Ø¯
+    final loginAction = 
+        'Action: Login\r\n'
+        'Username: $amiUser\r\n'
+        'Secret: $amiSecret\r\n'
+        '\r\n'; // Ù¾Ø§ÛŒØ§Ù† Ù¾Ú©Øª
+
+    if (kDebugMode) {
+      print('ðŸ“¤ Sending Login Action...');
+    }
+    socket.write(loginAction);
+
+    // Ø¨Ø±Ù†Ø§Ù…Ù‡ Ø±Ø§ Ø¨Ø§Ø² Ù†Ú¯Ù‡ Ù…ÛŒâ€ŒØ¯Ø§Ø±ÛŒÙ… ØªØ§ Ù¾Ø§Ø³Ø®â€ŒÙ‡Ø§ Ø±Ø§ Ø¨Ø¨ÛŒÙ†ÛŒÙ…
+    // Ø¯Ø± Ø¨Ø±Ù†Ø§Ù…Ù‡ ÙˆØ§Ù‚Ø¹ÛŒ ÙÙ„Ø§ØªØ± Ù†ÛŒØ§Ø²ÛŒ Ø¨Ù‡ Ø§ÛŒÙ† Ù†ÛŒØ³Øª Ú†ÙˆÙ† UI Ø¨Ø§Ø² Ù…ÛŒÙ…ÙˆÙ†Ù‡
+    await Future.delayed(Duration(seconds: 10)); 
+    
+    // Ø®Ø±ÙˆØ¬ ØªÙ…ÛŒØ² (Ø§Ø®ØªÛŒØ§Ø±ÛŒ Ø¨Ø±Ø§ÛŒ ØªØ³Øª)
+    // socket.write('Action: Logoff\r\n\r\n');
+    // await socket.close();
+
+  } catch (e) {
+    if (kDebugMode) {
+      print('âŒ Connection Failed: $e');
+    }
+  }
+}
+
+============================================================
+FILE: bloc_observer.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\core\bloc_observer.dart)
+============================================================
+
+import 'package:bloc/bloc.dart';
+import 'package:logger/logger.dart';
+
+class MyBlocObserver extends BlocObserver {
+  final Logger logger = Logger();
+
+  @override
+  void onEvent(Bloc bloc, Object? event) {
+    super.onEvent(bloc, event);
+    logger.i('Bloc: ${bloc.runtimeType}, Event: $event');
+  }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+    logger.i('Bloc: ${bloc.runtimeType}, Transition: $transition');
+  }
+
+  @override
+  void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+    super.onError(bloc, error, stackTrace);
+    logger.e('Bloc: ${bloc.runtimeType}, Error: $error', error: error, stackTrace: stackTrace);
+  }
+}
+
+============================================================
+FILE: injection_container.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\core\injection_container.dart)
+============================================================
+
+import 'package:get_it/get_it.dart';
+import '../domain/usecases/get_extensions_usecase.dart';
+import '../data/datasources/ami_datasource.dart';
+import '../data/repositories/extension_repository_impl.dart';
+import '../presentation/blocs/extension_bloc.dart';
+
+final sl = GetIt.instance;
+
+void setupDependencies() {
+  // Data layer
+  sl.registerFactory(() => AmiDataSource(
+        host: '192.168.85.88', // Default, will be overridden
+        port: 5038,
+        username: 'moein_api',
+        secret: '123456',
+      ));
+  sl.registerFactory(() => ExtensionRepositoryImpl(sl<AmiDataSource>()));
+
+  // Domain layer
+  sl.registerFactory(() => GetExtensionsUseCase(sl<ExtensionRepositoryImpl>()));
+
+  // Presentation layer
+  sl.registerFactory(() => ExtensionBloc(sl<GetExtensionsUseCase>()));
+}
+
+============================================================
+FILE: router.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\core\router.dart)
+============================================================
+
+import 'package:go_router/go_router.dart';
+import '../presentation/pages/login_page.dart';
+import '../presentation/pages/extensions_page.dart';
+
+final GoRouter router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const LoginPage(),
+    ),
+    GoRoute(
+      path: '/extensions',
+      builder: (context, state) => const ExtensionsPage(),
+    ),
+  ],
+);
+
+============================================================
+FILE: ami_datasource.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\data\datasources\ami_datasource.dart)
+============================================================
+
+import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
+import 'package:logger/logger.dart';
+
+class AmiDataSource {
+  Socket? _socket;
+  final String host;
+  final int port;
+  final String username;
+  final String secret;
+  final Logger logger = Logger();
+  StreamSubscription? _subscription;
+  Completer<String>? _loginCompleter;
+  Completer<List<String>>? _queueCompleter;
+  List<String> _queueEvents = [];
+
+  AmiDataSource({required this.host, required this.port, required this.username, required this.secret});
+
+  Future<void> connect() async {
+    logger.i('Connecting to AMI at $host:$port');
+    _socket = await Socket.connect(host, port, timeout: Duration(seconds: 5));
+    logger.i('Connected successfully');
+    _setupListener();
+  }
+
+  void _setupListener() {
+    _subscription = _socket!.listen((data) {
+      final response = utf8.decode(data);
+      logger.d('AMI Response: $response');
+
+      if (_loginCompleter != null && !(_loginCompleter!.isCompleted)) {
+        if (response.contains('Authentication accepted')) {
+          _loginCompleter!.complete('success');
+        } else if (response.contains('Authentication failed')) {
+          _loginCompleter!.complete('failed');
+        }
+      }
+
+      if (_queueCompleter != null && !(_queueCompleter!.isCompleted)) {
+        final events = response.split(RegExp(r'\r\n\r\n|\n\n'));
+        for (final event in events) {
+          if (event.contains('Event: PeerEntry')) {
+            _queueEvents.add(event);
+          }
+          if (event.contains('Event: PeerlistComplete')) {
+            if (!_queueCompleter!.isCompleted) {
+              _queueCompleter!.complete(_queueEvents);
+            }
+          }
+        }
+      }
+    }, onError: (error) {
+      logger.e('Socket error: $error');
+      _loginCompleter?.completeError(error);
+      _queueCompleter?.completeError(error);
+    }, onDone: () {
+      logger.i('Socket done');
+    });
+  }
+
+  Future<String> login() async {
+    _loginCompleter = Completer<String>();
+    final loginCmd = 'Action: Login\r\nUsername: $username\r\nSecret: $secret\r\n\r\n';
+    logger.i('Sending login command');
+    _socket!.write(loginCmd);
+    return _loginCompleter!.future;
+  }
+
+  Future<List<String>> getQueueStatus() async {
+    _queueCompleter = Completer<List<String>>();
+    _queueEvents = [];
+    final cmd = 'Action: SIPpeers\r\n\r\n';  // ØªØºÛŒÛŒØ± Ø¨Ù‡ SIPpeers Ø¨Ø±Ø§ÛŒ Ú¯Ø±ÙØªÙ† extensions
+    logger.i('Sending SIPpeers command');
+    _socket!.write(cmd);
+    return _queueCompleter!.future.timeout(Duration(seconds: 10));
+  }
+
+  void disconnect() {
+    logger.i('Disconnecting from AMI');
+    _subscription?.cancel();
+    _socket?.destroy();
+  }
+}
+
+============================================================
+FILE: extension_model.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\data\models\extension_model.dart)
+============================================================
+
+import '../../domain/entities/extension.dart';
+
+class ExtensionModel extends Extension {
+  ExtensionModel({required super.name, required super.location, required super.status});
+
+  factory ExtensionModel.fromAmi(String amiResponse) {
+    // Parse AMI response for PeerEntry event
+    // Example: Event: PeerEntry\r\nChanneltype: SIP\r\nObjectName: 1001\r\n...
+    final lines = amiResponse.split(RegExp(r'\r\n|\n'));
+    String name = '', location = '', status = '';
+    for (var line in lines) {
+      if (line.startsWith('ObjectName: ')) name = line.substring(12);
+      if (line.startsWith('IPaddress: ')) location = line.substring(11);
+      if (line.startsWith('Status: ')) status = line.substring(8);
+    }
+    return ExtensionModel(name: name, location: location, status: status);
+  }
+}
+
+============================================================
+FILE: extension_repository_impl.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\data\repositories\extension_repository_impl.dart)
+============================================================
+
+import 'package:logger/logger.dart';
+import '../../domain/entities/extension.dart';
+import '../../domain/repositories/iextension_repository.dart';
+import '../datasources/ami_datasource.dart';
+import '../models/extension_model.dart';
+
+class ExtensionRepositoryImpl implements IExtensionRepository {
+  final AmiDataSource dataSource;
+  final Logger logger = Logger();
+
+  ExtensionRepositoryImpl(this.dataSource);
+
+  @override
+  Future<List<Extension>> getExtensions() async {
+    logger.i('Connecting to AMI');
+    await dataSource.connect();
+    logger.i('Logging in');
+    final loginResult = await dataSource.login();
+    if (loginResult != 'success') throw Exception('Login failed');
+    logger.i('Getting queue status (SIPpeers)');
+    final events = await dataSource.getQueueStatus();
+    logger.i('Received ${events.length} events');
+    dataSource.disconnect();
+    final extensions = <Extension>[];
+    for (final e in events) {
+      try {
+        extensions.add(ExtensionModel.fromAmi(e));
+      } catch (ex) {
+        logger.w('Failed to parse extension: $ex');
+      }
+    }
+    logger.i('Parsed ${extensions.length} extensions');
+    return extensions;
+  }
+}
+
+============================================================
+FILE: extension.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\domain\entities\extension.dart)
+============================================================
+
+class Extension {
+  final String name;
+  final String location;
+  final String status;
+
+  Extension({required this.name, required this.location, required this.status});
+}
+
+============================================================
+FILE: iextension_repository.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\domain\repositories\iextension_repository.dart)
+============================================================
+
+import '../../domain/entities/extension.dart';
+
+abstract class IExtensionRepository {
+  Future<List<Extension>> getExtensions();
+}
+
+============================================================
+FILE: get_extensions_usecase.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\domain\usecases\get_extensions_usecase.dart)
+============================================================
+
+import '../entities/extension.dart';
+import '../repositories/iextension_repository.dart';
+
+class GetExtensionsUseCase {
+  final IExtensionRepository repository;
+
+  GetExtensionsUseCase(this.repository);
+
+  Future<List<Extension>> call() async {
+    return await repository.getExtensions();
+  }
+}
+
+============================================================
+FILE: extension_bloc.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\presentation\blocs\extension_bloc.dart)
+============================================================
+
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:logger/logger.dart';
+import '../../domain/entities/extension.dart';
+import '../../domain/usecases/get_extensions_usecase.dart';
+
+part 'extension_event.dart';
+part 'extension_state.dart';
+
+class ExtensionBloc extends Bloc<ExtensionEvent, ExtensionState> {
+  final GetExtensionsUseCase getExtensionsUseCase;
+  final Logger logger = Logger();
+
+  ExtensionBloc(this.getExtensionsUseCase) : super(ExtensionInitial()) {
+    on<LoadExtensions>((event, emit) async {
+      logger.i('Emitting ExtensionLoading');
+      emit(ExtensionLoading());
+      try {
+        logger.i('Calling getExtensionsUseCase');
+        final extensions = await getExtensionsUseCase();
+        logger.i('Received ${extensions.length} extensions, emitting ExtensionLoaded');
+        emit(ExtensionLoaded(extensions));
+      } catch (e) {
+        logger.e('Error in Bloc: $e');
+        emit(ExtensionError(e.toString()));
+      }
+    });
+  }
+}
+
+============================================================
+FILE: extension_event.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\presentation\blocs\extension_event.dart)
+============================================================
+
+part of 'extension_bloc.dart';
+
+abstract class ExtensionEvent extends Equatable {
+  @override
+  List<Object> get props => [];
+}
+
+class LoadExtensions extends ExtensionEvent {}
+
+============================================================
+FILE: extension_state.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\presentation\blocs\extension_state.dart)
+============================================================
+
+part of 'extension_bloc.dart';
+
+abstract class ExtensionState extends Equatable {
+  @override
+  List<Object> get props => [];
+}
+
+class ExtensionInitial extends ExtensionState {}
+
+class ExtensionLoading extends ExtensionState {}
+
+class ExtensionLoaded extends ExtensionState {
+  final List<Extension> extensions;
+
+  ExtensionLoaded(this.extensions);
+
+  @override
+  List<Object> get props => [extensions];
+}
+
+class ExtensionError extends ExtensionState {
+  final String message;
+
+  ExtensionError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
+============================================================
+FILE: extensions_page.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\presentation\pages\extensions_page.dart)
+============================================================
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../blocs/extension_bloc.dart';
+
+class ExtensionsPage extends StatelessWidget {
+  const ExtensionsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = GoRouterState.of(context).extra as ExtensionBloc;
+    return BlocProvider.value(
+      value: bloc..add(LoadExtensions()),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Extensions')),
+        body: BlocBuilder<ExtensionBloc, ExtensionState>(
+          builder: (context, state) {
+            if (state is ExtensionLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ExtensionLoaded) {
+              return ListView.builder(
+                itemCount: state.extensions.length,
+                itemBuilder: (context, index) {
+                  final ext = state.extensions[index];
+                  return ListTile(
+                    title: Text(ext.name),
+                    subtitle: Text('${ext.location} - ${ext.status}'),
+                  );
+                },
+              );
+            } else if (state is ExtensionError) {
+              return Center(child: Text('Error: ${state.message}'));
+            }
+            return const Center(child: Text('Press load to fetch extensions'));
+          },
+        ),
+      ),
+    );
+  }
+}
+
+============================================================
+FILE: login_page.dart  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\lib\presentation\pages\login_page.dart)
+============================================================
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../domain/usecases/get_extensions_usecase.dart';
+import '../../data/datasources/ami_datasource.dart';
+import '../../data/repositories/extension_repository_impl.dart';
+import '../blocs/extension_bloc.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _ipController = TextEditingController();
+  final _portController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    _ipController.text = prefs.getString('ip') ?? '192.168.85.88';
+    _portController.text = prefs.getString('port') ?? '5038';
+    _usernameController.text = prefs.getString('username') ?? 'moein_api';
+    _passwordController.text = prefs.getString('password') ?? '123456';
+  }
+
+  Future<void> _saveCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('ip', _ipController.text);
+    await prefs.setString('port', _portController.text);
+    await prefs.setString('username', _usernameController.text);
+    await prefs.setString('password', _passwordController.text);
+  }
+
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      await _saveCredentials();
+      final dataSource = AmiDataSource(
+        host: _ipController.text,
+        port: int.parse(_portController.text),
+        username: _usernameController.text,
+        secret: _passwordController.text,
+      );
+      final repository = ExtensionRepositoryImpl(dataSource);
+      final useCase = GetExtensionsUseCase(repository);
+      final bloc = ExtensionBloc(useCase);
+      if (mounted) {
+        context.go('/extensions', extra: bloc);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Login to Isabel AMI')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _ipController,
+                decoration: const InputDecoration(labelText: 'IP Address'),
+                validator: (value) => value!.isEmpty ? 'Enter IP' : null,
+              ),
+              TextFormField(
+                controller: _portController,
+                decoration: const InputDecoration(labelText: 'Port'),
+                validator: (value) => value!.isEmpty ? 'Enter Port' : null,
+              ),
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(labelText: 'Username'),
+                validator: (value) => value!.isEmpty ? 'Enter Username' : null,
+              ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) => value!.isEmpty ? 'Enter Password' : null,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(onPressed: _login, child: const Text('Login')),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+============================================================
+FILE: pubspec.yaml  (Path: C:\Users\Moein\Documents\Codes\astrix_assist\pubspec.yaml)
+============================================================
+
+name: astrix_assist
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.9.0
+  bloc: ^9.1.0
+  flutter_bloc: ^9.1.0
+  go_router: ^17.0.1
+  get_it: ^9.2.0
+  equatable: ^2.0.7
+  shared_preferences: ^2.2.2
+  logger: ^2.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
