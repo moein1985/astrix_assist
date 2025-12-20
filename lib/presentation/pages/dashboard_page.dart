@@ -1,14 +1,12 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/refresh_settings.dart';
-import '../../data/datasources/ami_datasource.dart';
-import '../../data/repositories/extension_repository_impl.dart';
-import '../../data/repositories/monitor_repository_impl.dart';
-import '../../domain/usecases/get_dashboard_stats_usecase.dart';
-import '../../domain/usecases/get_active_calls_usecase.dart';
+import '../../core/injection_container.dart';
+import '../../core/locale_manager.dart';
+import '../../domain/services/server_manager.dart';
 import '../blocs/dashboard_bloc.dart';
 import '../blocs/dashboard_event.dart';
 import '../blocs/dashboard_state.dart';
@@ -35,22 +33,12 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _initBloc() async {
-    final prefs = await SharedPreferences.getInstance();
-    final host = prefs.getString('ip') ?? '192.168.85.88';
-    final port = int.tryParse(prefs.getString('port') ?? '5038') ?? 5038;
-    final user = prefs.getString('username') ?? 'moein_api';
-    final secret = prefs.getString('password') ?? '123456';
-
     final settings = await RefreshSettings.load();
     _autoRefreshEnabled = settings.enabled;
     _refreshSeconds = settings.intervalSeconds;
 
-    final dataSource = AmiDataSource(host: host, port: port, username: user, secret: secret);
-    final extensionRepo = ExtensionRepositoryImpl(dataSource);
-    final monitorRepo = MonitorRepositoryImpl(dataSource);
-    final getDashboardStatsUseCase = GetDashboardStatsUseCase(extensionRepo, monitorRepo);
-    final getActiveCallsUseCase = GetActiveCallsUseCase(monitorRepo);
-    final bloc = DashboardBloc(getDashboardStatsUseCase, getActiveCallsUseCase);
+    // Use GetIt to get the bloc (which uses the correct repository based on AppConfig)
+    final bloc = sl<DashboardBloc>();
 
     setState(() => _bloc = bloc);
     bloc.add(LoadDashboard());
@@ -77,64 +65,103 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final bloc = _bloc;
+    final l10n = AppLocalizations.of(context)!;
+    final isRTL = LocaleManager.isFarsi();
+    
     if (bloc == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return BlocProvider.value(
       value: bloc,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('داشبورد'),
-          actions: [
-            const ConnectionStatusWidget(),
-            const ThemeToggleButton(),
-            IconButton(
-              icon: const Icon(Icons.timer_outlined),
-              tooltip: 'Auto-refresh',
-              onPressed: _showRefreshSettings,
-            ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () => bloc.add(RefreshDashboard()),
-            ),
-          ],
-        ),
-        body: BlocBuilder<DashboardBloc, DashboardState>(
-          builder: (context, state) => switch (state) {
-            DashboardInitial() => const SizedBox.shrink(),
-            DashboardLoading() => const Center(child: CircularProgressIndicator()),
-            DashboardLoaded() => RefreshIndicator(
-              onRefresh: () async => bloc.add(RefreshDashboard()),
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _buildStatsGrid(state),
-                  const SizedBox(height: 24),
-                  _buildRecentCallsSection(state),
-                ],
+      child: Directionality(
+        textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.dashboard),
+            actions: [
+              const ConnectionStatusWidget(),
+              const ThemeToggleButton(),
+              IconButton(
+                icon: const Icon(Icons.timer_outlined),
+                tooltip: l10n.autoRefresh,
+                onPressed: _showRefreshSettings,
               ),
-            ),
-            DashboardError() => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('خطا: ${state.message}', style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => bloc.add(LoadDashboard()),
-                    child: const Text('تلاش مجدد'),
-                  ),
-                ],
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                tooltip: l10n.refresh,
+                onPressed: () => bloc.add(RefreshDashboard()),
               ),
-            ),
-          },
+              IconButton(
+                icon: const Icon(Icons.logout),
+                tooltip: l10n.logout,
+                onPressed: () => _showLogoutDialog(context, l10n),
+              ),
+            ],
+          ),
+          body: BlocBuilder<DashboardBloc, DashboardState>(
+            builder: (context, state) => switch (state) {
+              DashboardInitial() => const SizedBox.shrink(),
+              DashboardLoading() => const Center(child: CircularProgressIndicator()),
+              DashboardLoaded() => RefreshIndicator(
+                onRefresh: () async => bloc.add(RefreshDashboard()),
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _buildStatsGrid(state, l10n),
+                    const SizedBox(height: 24),
+                    _buildRecentCallsSection(state, l10n),
+                  ],
+                ),
+              ),
+              DashboardError() => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('${l10n.error}: ${state.message}', style: const TextStyle(color: Colors.red)),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => bloc.add(LoadDashboard()),
+                      child: Text(l10n.retryButton),
+                    ),
+                  ],
+                ),
+              ),
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStatsGrid(DashboardLoaded state) {
+  void _showLogoutDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.logout),
+        content: Text(l10n.logoutConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await ServerManager.clearActiveServer();
+              if (context.mounted) {
+                context.go('/');
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(l10n.logout, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid(DashboardLoaded state, AppLocalizations l10n) {
     final stats = state.stats;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,10 +170,10 @@ class _DashboardPageState extends State<DashboardPage> {
           children: [
             const Icon(Icons.bar_chart, size: 24),
             const SizedBox(width: 8),
-            const Text('آمار کلی', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(l10n.overallStats, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const Spacer(),
             Text(
-              'آخرین به‌روزرسانی: ${_formatTime(stats.lastUpdate)}',
+              '${l10n.lastUpdated}: ${_formatTime(stats.lastUpdate)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
@@ -161,30 +188,30 @@ class _DashboardPageState extends State<DashboardPage> {
           childAspectRatio: 1.5,
           children: [
             _buildStatCard(
-              'داخلی‌ها',
+              l10n.extensions,
               '${stats.onlineExtensions}/${stats.totalExtensions}',
-              'آنلاین',
+              l10n.online,
               Icons.phone,
               Colors.blue,
             ),
             _buildStatCard(
-              'تماس‌های فعال',
+              l10n.activeCalls,
               '${stats.activeCalls}',
-              'تماس',
+              l10n.call,
               Icons.call,
               Colors.green,
             ),
             _buildStatCard(
-              'صف‌ها',
+              l10n.queues,
               '${stats.queuedCalls}',
-              'در انتظار',
+              l10n.waiting,
               Icons.queue,
               Colors.orange,
             ),
             _buildStatCard(
-              'میانگین انتظار',
+              l10n.averageWait,
               stats.averageWaitTime.toStringAsFixed(1),
-              'ثانیه',
+              l10n.seconds,
               Icons.timer,
               Colors.purple,
             ),
@@ -230,33 +257,33 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildRecentCallsSection(DashboardLoaded state) {
+  Widget _buildRecentCallsSection(DashboardLoaded state, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.phone_in_talk, size: 24),
-                SizedBox(width: 8),
-                Text('تماس‌های اخیر', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Icon(Icons.phone_in_talk, size: 24),
+                const SizedBox(width: 8),
+                Text(l10n.recentCalls, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               ],
             ),
             TextButton(
               onPressed: () => context.go('/calls'),
-              child: const Text('مشاهده همه'),
+              child: Text(l10n.viewAll),
             ),
           ],
         ),
         const SizedBox(height: 12),
         if (state.recentCalls.isEmpty)
-          const Card(
+          Card(
             child: Padding(
-              padding: EdgeInsets.all(32),
+              padding: const EdgeInsets.all(32),
               child: Center(
-                child: Text('تماس فعالی وجود ندارد', style: TextStyle(color: Colors.grey)),
+                child: Text(l10n.noActiveCalls, style: const TextStyle(color: Colors.grey)),
               ),
             ),
           )
@@ -285,6 +312,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _showRefreshSettings() async {
+    final l10n = AppLocalizations.of(context)!;
     final newSettings = await showModalBottomSheet<RefreshSettings>(
       context: context,
       builder: (context) {
@@ -301,7 +329,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('به‌روزرسانی خودکار'),
+                      Text(l10n.autoRefresh),
                       Switch(
                         value: enabled,
                         onChanged: (val) => setModalState(() => enabled = val),
@@ -309,7 +337,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Text('فاصله زمانی: ${seconds.round()} ثانیه'),
+                  Text('${l10n.interval}: ${seconds.round()} ${l10n.seconds}'),
                   Slider(
                     min: 5,
                     max: 60,
@@ -326,7 +354,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           RefreshSettings(enabled: enabled, intervalSeconds: seconds.round()),
                         );
                       },
-                      child: const Text('ذخیره'),
+                      child: Text(l10n.save),
                     ),
                   ),
                 ],

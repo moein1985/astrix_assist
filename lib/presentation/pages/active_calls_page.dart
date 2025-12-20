@@ -2,13 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../data/datasources/ami_datasource.dart';
-import '../../data/repositories/monitor_repository_impl.dart';
-import '../../domain/usecases/get_active_calls_usecase.dart';
-import '../../domain/usecases/hangup_call_usecase.dart';
-import '../../domain/usecases/transfer_call_usecase.dart';
 import '../../core/refresh_settings.dart';
+import '../../core/injection_container.dart';
 import '../blocs/active_call_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
@@ -35,22 +30,12 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
   }
 
   Future<void> _initBloc() async {
-    final prefs = await SharedPreferences.getInstance();
-    final host = prefs.getString('ip') ?? '192.168.85.88';
-    final port = int.tryParse(prefs.getString('port') ?? '5038') ?? 5038;
-    final user = prefs.getString('username') ?? 'moein_api';
-    final secret = prefs.getString('password') ?? '123456';
-
     final settings = await RefreshSettings.load();
     _autoRefreshEnabled = settings.enabled;
     _refreshSeconds = settings.intervalSeconds;
 
-    final dataSource = AmiDataSource(host: host, port: port, username: user, secret: secret);
-    final repo = MonitorRepositoryImpl(dataSource);
-    final getCallsUseCase = GetActiveCallsUseCase(repo);
-    final hangupUseCase = HangupCallUseCase(repo);
-    final transferUseCase = TransferCallUseCase(repo);
-    final bloc = ActiveCallBloc(getCallsUseCase, hangupUseCase, transferUseCase);
+    // Use GetIt to get the bloc (which uses the correct repository based on AppConfig)
+    final bloc = sl<ActiveCallBloc>();
 
     setState(() => _bloc = bloc);
     bloc.add(LoadActiveCalls());

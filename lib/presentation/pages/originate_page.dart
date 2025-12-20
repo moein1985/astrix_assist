@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../data/datasources/ami_datasource.dart';
-import '../../data/repositories/monitor_repository_impl.dart';
+import '../../core/injection_container.dart';
 import '../../domain/usecases/originate_call_usecase.dart';
 import '../widgets/theme_toggle_button.dart';
 
@@ -31,15 +29,8 @@ class _OriginatePageState extends State<OriginatePage> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _submitting = true);
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final host = prefs.getString('ip') ?? '192.168.85.88';
-      final port = int.tryParse(prefs.getString('port') ?? '5038') ?? 5038;
-      final user = prefs.getString('username') ?? 'moein_api';
-      final secret = prefs.getString('password') ?? '123456';
-
-      final dataSource = AmiDataSource(host: host, port: port, username: user, secret: secret);
-      final repo = MonitorRepositoryImpl(dataSource);
-      final useCase = OriginateCallUseCase(repo);
+      // Use GetIt to get the use case (which uses the correct repository based on AppConfig)
+      final useCase = sl<OriginateCallUseCase>();
       await useCase.call(
         from: 'SIP/${_fromController.text}',
         to: _toController.text,

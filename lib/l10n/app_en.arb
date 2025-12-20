@@ -1,0 +1,448 @@
+{
+  "@@locale": "en",
+  
+  "appTitle": "Astrix Assist",
+  "@appTitle": {
+    "description": "Application title"
+  },
+
+  "savedServers": "Saved Servers",
+  "@savedServers": {
+    "description": "Title for saved servers list"
+  },
+
+  "addServer": "Add Server",
+  "@addServer": {
+    "description": "Button to add a new server"
+  },
+
+  "noServers": "No servers saved",
+  "@noServers": {
+    "description": "Message when no servers are saved"
+  },
+
+  "addServerToStart": "Add a server to get started",
+  "@addServerToStart": {
+    "description": "Instruction to add first server"
+  },
+
+  "serverName": "Server Name",
+  "@serverName": {
+    "description": "Label for server name field"
+  },
+
+  "ipAddress": "IP Address",
+  "@ipAddress": {
+    "description": "Label for IP address field"
+  },
+
+  "port": "Port",
+  "@port": {
+    "description": "Label for port field"
+  },
+
+  "username": "Username",
+  "@username": {
+    "description": "Label for username field"
+  },
+
+  "password": "Password",
+  "@password": {
+    "description": "Label for password field"
+  },
+
+  "addNewServer": "Add New Server",
+  "@addNewServer": {
+    "description": "Title for add server dialog"
+  },
+
+  "editServer": "Edit Server",
+  "@editServer": {
+    "description": "Title for edit server dialog"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "deleteServer": "Delete Server",
+  "@deleteServer": {
+    "description": "Delete server button text"
+  },
+
+  "deleteConfirm": "Are you sure you want to delete",
+  "@deleteConfirm": {
+    "description": "Confirmation message for deletion"
+  },
+
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+
+  "active": "Active",
+  "@active": {
+    "description": "Active status text"
+  },
+
+  "mockMode": "Test Mode (Mock Data)",
+  "@mockMode": {
+    "description": "Mock mode button text"
+  },
+
+  "mockModeDesc": "Login without Asterisk server",
+  "@mockModeDesc": {
+    "description": "Mock mode description"
+  },
+
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+
+  "logoutConfirm": "Are you sure you want to logout?",
+  "@logoutConfirm": {
+    "description": "Logout confirmation message"
+  },
+
+  "navDashboard": "Dashboard",
+  "@navDashboard": {
+    "description": "Navigation item for dashboard"
+  },
+
+  "navExtensions": "Extensions",
+  "@navExtensions": {
+    "description": "Navigation item for extensions"
+  },
+
+  "navCalls": "Calls",
+  "@navCalls": {
+    "description": "Navigation item for calls"
+  },
+
+  "navQueues": "Queues",
+  "@navQueues": {
+    "description": "Navigation item for queues"
+  },
+
+  "navReports": "Reports",
+  "@navReports": {
+    "description": "Navigation item for reports"
+  },
+
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard page title"
+  },
+
+  "extensions": "Extensions",
+  "@extensions": {
+    "description": "Extensions page title"
+  },
+
+  "activeCalls": "Active Calls",
+  "@activeCalls": {
+    "description": "Active calls section title"
+  },
+
+  "queues": "Queues",
+  "@queues": {
+    "description": "Queues page title"
+  },
+
+  "waiting": "Waiting",
+  "@waiting": {
+    "description": "Waiting status text"
+  },
+
+  "available": "Available",
+  "@available": {
+    "description": "Available status text"
+  },
+
+  "call": "Call",
+  "@call": {
+    "description": "Call text"
+  },
+
+  "online": "Online",
+  "@online": {
+    "description": "Online status text"
+  },
+
+  "offline": "Offline",
+  "@offline": {
+    "description": "Offline status text"
+  },
+
+  "recentCalls": "Recent Calls",
+  "@recentCalls": {
+    "description": "Recent calls section title"
+  },
+
+  "noActiveCalls": "No active calls",
+  "@noActiveCalls": {
+    "description": "Message when no active calls"
+  },
+
+  "duration": "Duration",
+  "@duration": {
+    "description": "Duration label"
+  },
+
+  "cdrTitle": "Call History",
+  "@cdrTitle": {
+    "description": "CDR page title"
+  },
+
+  "recordCount": "Count",
+  "@recordCount": {
+    "description": "Record count label"
+  },
+
+  "records": "records",
+  "@records": {
+    "description": "Records text"
+  },
+
+  "exportCsv": "Export CSV",
+  "@exportCsv": {
+    "description": "Export CSV button text"
+  },
+
+  "answered": "Answered",
+  "@answered": {
+    "description": "Answered call status"
+  },
+
+  "noAnswer": "No Answer",
+  "@noAnswer": {
+    "description": "No answer call status"
+  },
+
+  "busy": "Busy",
+  "@busy": {
+    "description": "Busy call status"
+  },
+
+  "failed": "Failed",
+  "@failed": {
+    "description": "Failed call status"
+  },
+
+  "status": "Status",
+  "@status": {
+    "description": "Status label"
+  },
+
+  "noRecords": "No records found",
+  "@noRecords": {
+    "description": "Message when no records found"
+  },
+
+  "loadingError": "Error loading data",
+  "@loadingError": {
+    "description": "Error message for loading data"
+  },
+
+  "retryButton": "Retry",
+  "@retryButton": {
+    "description": "Retry button text"
+  },
+
+  "filterCalls": "Filter Calls",
+  "@filterCalls": {
+    "description": "Filter dialog title"
+  },
+
+  "dateRange": "Date Range",
+  "@dateRange": {
+    "description": "Date range label"
+  },
+
+  "fromDate": "From Date",
+  "@fromDate": {
+    "description": "From date label"
+  },
+
+  "toDate": "To Date",
+  "@toDate": {
+    "description": "To date label"
+  },
+
+  "sourceNumber": "Source Number",
+  "@sourceNumber": {
+    "description": "Source number label"
+  },
+
+  "destinationNumber": "Destination Number",
+  "@destinationNumber": {
+    "description": "Destination number label"
+  },
+
+  "callStatus": "Call Status",
+  "@callStatus": {
+    "description": "Call status label"
+  },
+
+  "all": "All",
+  "@all": {
+    "description": "All option text"
+  },
+
+  "applyFilter": "Apply Filter",
+  "@applyFilter": {
+    "description": "Apply filter button text"
+  },
+
+  "saved": "Saved",
+  "@saved": {
+    "description": "Saved status text"
+  },
+
+  "saveError": "Save Error",
+  "@saveError": {
+    "description": "Save error text"
+  },
+
+  "fileSaved": "File saved successfully",
+  "@fileSaved": {
+    "description": "File saved success message"
+  },
+
+  "path": "Path",
+  "@path": {
+    "description": "Path label"
+  },
+
+  "fileSaveError": "Error saving file",
+  "@fileSaveError": {
+    "description": "File save error message"
+  },
+
+  "saving": "Saving...",
+  "@saving": {
+    "description": "Saving status text"
+  },
+
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter text"
+  },
+
+  "fieldRequired": "This field is required",
+  "@fieldRequired": {
+    "description": "Required field validation message"
+  },
+
+  "nameRequired": "Name is required",
+  "@nameRequired": {
+    "description": "Name required validation message"
+  },
+
+  "ipRequired": "IP address is required",
+  "@ipRequired": {
+    "description": "IP required validation message"
+  },
+
+  "portRequired": "Port is required",
+  "@portRequired": {
+    "description": "Port required validation message"
+  },
+
+  "overallStats": "Overall Stats",
+  "@overallStats": {
+    "description": "Overall stats title"
+  },
+
+  "lastUpdated": "Last update",
+  "@lastUpdated": {
+    "description": "Last updated label"
+  },
+
+  "averageWait": "Avg Wait",
+  "@averageWait": {
+    "description": "Average wait label"
+  },
+
+  "seconds": "seconds",
+  "@seconds": {
+    "description": "Seconds unit text"
+  },
+
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+
+  "autoRefresh": "Auto Refresh",
+  "@autoRefresh": {
+    "description": "Auto refresh label"
+  },
+
+  "interval": "Interval",
+  "@interval": {
+    "description": "Interval label"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry text"
+  },
+
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading status text"
+  },
+
+  "error": "Error",
+  "@error": {
+    "description": "Error text"
+  },
+
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh text"
+  },
+
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings text"
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Language label"
+  },
+
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme label"
+  },
+
+  "light": "Light",
+  "@light": {
+    "description": "Light theme text"
+  },
+
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark theme text"
+  },
+
+  "system": "System",
+  "@system": {
+    "description": "System theme text"
+  }
+}

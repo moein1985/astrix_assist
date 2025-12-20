@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/locale_manager.dart';
 
 class LanguageSwitcher extends StatelessWidget {
@@ -28,7 +28,7 @@ class LanguageSwitcher extends StatelessWidget {
   }
 
   void _showLanguageDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRTL = LocaleManager.isFarsi();
 
     showDialog(
@@ -36,7 +36,7 @@ class LanguageSwitcher extends StatelessWidget {
       builder: (context) => Directionality(
         textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          title: Text(l10n.t('language')),
+          title: Text(l10n.language),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -65,7 +65,7 @@ class LanguageSwitcher extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(l10n.t('cancel')),
+              child: Text(l10n.cancel),
             ),
           ],
         ),

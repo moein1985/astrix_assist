@@ -1,11 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../data/datasources/cdr_datasource.dart';
-import '../../data/repositories/cdr_repository_impl.dart';
-import '../../domain/usecases/get_cdr_records_usecase.dart';
-import '../../domain/usecases/export_cdr_to_csv_usecase.dart';
+import '../../l10n/app_localizations.dart';
+import '../../core/injection_container.dart';
 import '../blocs/cdr_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
@@ -38,29 +35,8 @@ class _CdrPageState extends State<CdrPage> {
   }
 
   Future<void> _initBloc() async {
-    final prefs = await SharedPreferences.getInstance();
-    // MySQL connection info - adjust these based on your setup
-    final mysqlHost = prefs.getString('mysql_host') ?? '192.168.85.88';
-    final mysqlPort =
-        int.tryParse(prefs.getString('mysql_port') ?? '3306') ?? 3306;
-    final mysqlUser = prefs.getString('mysql_user') ?? 'root';
-    final mysqlPassword = prefs.getString('mysql_password') ?? '';
-    final mysqlDb = prefs.getString('mysql_db') ?? 'asteriskcdrdb';
-
-    final dataSource = CdrDataSource(
-      host: mysqlHost,
-      port: mysqlPort,
-      user: mysqlUser,
-      password: mysqlPassword,
-      db: mysqlDb,
-    );
-    final repo = CdrRepositoryImpl(dataSource);
-    final getCdrUseCase = GetCdrRecordsUseCase(repo);
-    final exportUseCase = ExportCdrToCsvUseCase();
-    final bloc = CdrBloc(
-      getCdrRecordsUseCase: getCdrUseCase,
-      exportCdrToCsvUseCase: exportUseCase,
-    );
+    // Use GetIt to get the bloc (which uses the correct repository based on AppConfig)
+    final bloc = sl<CdrBloc>();
 
     setState(() => _bloc = bloc);
     _loadRecords();
@@ -88,6 +64,7 @@ class _CdrPageState extends State<CdrPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bloc = _bloc;
     if (bloc == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -99,14 +76,14 @@ class _CdrPageState extends State<CdrPage> {
           if (state is CdrExported) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('ذخیره شد: ${state.filePath}'),
+                content: Text('${l10n.saved}: ${state.filePath}'),
                 duration: const Duration(seconds: 3),
               ),
             );
           } else if (state is CdrExportError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('خطا در ذخیره: ${state.message}'),
+                content: Text('${l10n.saveError}: ${state.message}'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -114,13 +91,13 @@ class _CdrPageState extends State<CdrPage> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('تاریخچه تماس‌ها (CDR)'),
+            title: Text(l10n.cdrTitle),
             actions: [
               const ConnectionStatusWidget(),
               const ThemeToggleButton(),
               IconButton(
                 icon: const Icon(Icons.filter_list),
-                tooltip: 'فیلتر',
+                tooltip: l10n.filter,
                 onPressed: _showFilterDialog,
               ),
               IconButton(
@@ -130,185 +107,190 @@ class _CdrPageState extends State<CdrPage> {
             ],
           ),
           body: BlocBuilder<CdrBloc, CdrState>(
-            builder: (context, state) => switch (state) {
-              CdrInitial() => const SizedBox.shrink(),
-              CdrLoading() => const Center(child: CircularProgressIndicator()),
-              CdrExporting() => const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('در حال ذخیره...'),
-                  ],
-                ),
-              ),
-              CdrLoaded() => () {
-                if (state.records.isEmpty) {
-                  return const Center(child: Text('هیچ رکوردی یافت نشد'));
-                }
-                return Column(
-                  children: [
-                    // Export button
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'تعداد: ${state.records.length} رکورد',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () =>
-                                bloc.add(ExportCdrRecords(state.records)),
-                            icon: const Icon(Icons.download),
-                            label: const Text('Export CSV'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: state.records.length,
-                        itemBuilder: (context, index) {
-                          final record = state.records[index];
-                          final duration = int.tryParse(record.billsec) ?? 0;
-                          final durationStr = _formatDuration(duration);
-
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: ListTile(
-                              leading: Icon(
-                                _getDispositionIcon(record.disposition),
-                                color: _getDispositionColor(record.disposition),
-                              ),
-                              title: Text('${record.src} ➜ ${record.dst}'),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(_formatCallDate(record.callDate)),
-                                  Text(
-                                    'مدت: $durationStr • وضعیت: ${_translateDisposition(record.disposition)}',
-                                  ),
-                                ],
-                              ),
-                              trailing: Text(
-                                _translateDisposition(record.disposition),
-                                style: TextStyle(
-                                  color: _getDispositionColor(
-                                    record.disposition,
-                                  ),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              }(),
-              CdrError() => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'خطا در بارگذاری داده‌ها',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        state.message,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _loadRecords,
-                      child: const Text('تلاش مجدد'),
-                    ),
-                  ],
-                ),
-              ),
-              CdrExported() => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.check_circle,
-                      size: 48,
-                      color: Colors.green,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'فایل با موفقیت ذخیره شد',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'مسیر: ${state.filePath}',
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              CdrExportError() => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'خطا در ذخیره فایل',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      state.message,
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            },
+            builder: (context, state) => _buildBody(context, state, l10n, bloc),
           ),
         ),
       ),
     );
   }
 
+  Widget _buildBody(BuildContext context, CdrState state, AppLocalizations l10n, CdrBloc bloc) {
+    return switch (state) {
+      CdrInitial() => const SizedBox.shrink(),
+      CdrLoading() => const Center(child: CircularProgressIndicator()),
+      CdrExporting() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(l10n.saving),
+          ],
+        ),
+      ),
+      CdrLoaded() => () {
+        if (state.records.isEmpty) {
+          return Center(child: Text(l10n.noRecords));
+        }
+        return Column(
+          children: [
+            // Export button
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${l10n.recordCount}: ${state.records.length} ${l10n.records}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () =>
+                        bloc.add(ExportCdrRecords(state.records)),
+                    icon: const Icon(Icons.download),
+                    label: Text(l10n.exportCsv),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: state.records.length,
+                itemBuilder: (context, index) {
+                  final record = state.records[index];
+                  final duration = int.tryParse(record.billsec) ?? 0;
+                  final durationStr = _formatDuration(duration);
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: ListTile(
+                      leading: Icon(
+                        _getDispositionIcon(record.disposition),
+                        color: _getDispositionColor(record.disposition),
+                      ),
+                      title: Text('${record.src} ➜ ${record.dst}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_formatCallDate(record.callDate)),
+                          Text(
+                            '${l10n.duration}: $durationStr • ${l10n.status}: ${_translateDisposition(record.disposition, l10n)}',
+                          ),
+                        ],
+                      ),
+                      trailing: Text(
+                        _translateDisposition(record.disposition, l10n),
+                        style: TextStyle(
+                          color: _getDispositionColor(
+                            record.disposition,
+                          ),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      }(),
+      CdrError() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.loadingError,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                state.message,
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadRecords,
+              child: Text(l10n.retryButton),
+            ),
+          ],
+        ),
+      ),
+      CdrExported() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.check_circle,
+              size: 48,
+              color: Colors.green,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.fileSaved,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${l10n.path}: ${state.filePath}',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+      CdrExportError() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.fileSaveError,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              state.message,
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    };
+  }
+
   Future<void> _showFilterDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       builder: (context) {
@@ -319,16 +301,16 @@ class _CdrPageState extends State<CdrPage> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('فیلتر تماس‌ها'),
+              title: Text(l10n.filterCalls),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Date range
-                    const Text(
-                      'بازه زمانی:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Text(
+                      '${l10n.dateRange}:',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -351,7 +333,7 @@ class _CdrPageState extends State<CdrPage> {
                                   ? DateFormat(
                                       'yyyy-MM-dd',
                                     ).format(tempStartDate!)
-                                  : 'از تاریخ',
+                                  : l10n.fromDate,
                             ),
                           ),
                         ),
@@ -374,7 +356,7 @@ class _CdrPageState extends State<CdrPage> {
                                   ? DateFormat(
                                       'yyyy-MM-dd',
                                     ).format(tempEndDate!)
-                                  : 'تا تاریخ',
+                                  : l10n.toDate,
                             ),
                           ),
                         ),
@@ -385,9 +367,9 @@ class _CdrPageState extends State<CdrPage> {
                     // Source number
                     TextField(
                       controller: _srcController,
-                      decoration: const InputDecoration(
-                        labelText: 'شماره مبدا',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.sourceNumber,
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -395,17 +377,17 @@ class _CdrPageState extends State<CdrPage> {
                     // Destination number
                     TextField(
                       controller: _dstController,
-                      decoration: const InputDecoration(
-                        labelText: 'شماره مقصد',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.destinationNumber,
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     // Disposition filter
-                    const Text(
-                      'وضعیت تماس:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Text(
+                      '${l10n.callStatus}:',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
@@ -413,20 +395,20 @@ class _CdrPageState extends State<CdrPage> {
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                       ),
-                      items: const [
-                        DropdownMenuItem(value: 'ALL', child: Text('همه')),
+                      items: [
+                        DropdownMenuItem(value: 'ALL', child: Text(l10n.all)),
                         DropdownMenuItem(
                           value: 'ANSWERED',
-                          child: Text('پاسخ داده شده'),
+                          child: Text(l10n.answered),
                         ),
                         DropdownMenuItem(
                           value: 'NO ANSWER',
-                          child: Text('بدون پاسخ'),
+                          child: Text(l10n.noAnswer),
                         ),
-                        DropdownMenuItem(value: 'BUSY', child: Text('مشغول')),
+                        DropdownMenuItem(value: 'BUSY', child: Text(l10n.busy)),
                         DropdownMenuItem(
                           value: 'FAILED',
-                          child: Text('ناموفق'),
+                          child: Text(l10n.failed),
                         ),
                       ],
                       onChanged: (value) {
@@ -441,7 +423,7 @@ class _CdrPageState extends State<CdrPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('انصراف'),
+                  child: Text(l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -459,7 +441,7 @@ class _CdrPageState extends State<CdrPage> {
                     Navigator.of(context).pop();
                     _loadRecords();
                   },
-                  child: const Text('اعمال فیلتر'),
+                  child: Text(l10n.applyFilter),
                 ),
               ],
             );
@@ -521,16 +503,16 @@ class _CdrPageState extends State<CdrPage> {
     }
   }
 
-  String _translateDisposition(String disposition) {
+  String _translateDisposition(String disposition, AppLocalizations l10n) {
     switch (disposition.toUpperCase()) {
       case 'ANSWERED':
-        return 'پاسخ داده شده';
+        return l10n.answered;
       case 'NO ANSWER':
-        return 'بدون پاسخ';
+        return l10n.noAnswer;
       case 'BUSY':
-        return 'مشغول';
+        return l10n.busy;
       case 'FAILED':
-        return 'ناموفق';
+        return l10n.failed;
       default:
         return disposition;
     }

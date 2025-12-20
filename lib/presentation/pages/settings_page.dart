@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/theme_manager.dart';
 import '../../core/locale_manager.dart';
-import '../../core/app_localizations.dart';
 import '../../core/background_service_manager.dart';
 import '../../domain/services/server_manager.dart';
 import '../widgets/theme_toggle_button.dart';
@@ -84,24 +84,24 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRTL = LocaleManager.isFarsi();
 
     return Directionality(
       textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n.t('settings')),
+          title: Text(l10n.settings),
           actions: const [ThemeToggleButton()],
         ),
         body: ListView(
           children: [
             const SizedBox(height: 8),
             // Language Section
-            _buildSection(l10n.t('language')),
+            _buildSection(l10n.language),
             ListTile(
               leading: const Icon(Icons.language),
-              title: Text(l10n.t('language')),
+              title: Text(l10n.language),
               subtitle: Text(LocaleManager.isEnglish() ? 'English' : 'فارسی'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => _showLanguageDialog(),
@@ -150,18 +150,18 @@ class _SettingsPageState extends State<SettingsPage> {
             const Divider(),
             
             // Display Section
-            _buildSection(l10n.t('theme')),
+            _buildSection(l10n.theme),
             ListTile(
               leading: Icon(
                 ThemeManager.themeMode.value == ThemeMode.dark
                     ? Icons.dark_mode
                     : Icons.light_mode,
               ),
-              title: Text(l10n.t('theme')),
+              title: Text(l10n.theme),
               subtitle: Text(
                 ThemeManager.themeMode.value == ThemeMode.dark 
-                  ? l10n.t('dark')
-                  : l10n.t('light'),
+                  ? l10n.dark
+                  : l10n.light,
               ),
               trailing: Switch(
                 value: ThemeManager.themeMode.value == ThemeMode.dark,
@@ -205,7 +205,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: ElevatedButton.icon(
                 onPressed: () => _showLogoutDialog(),
                 icon: const Icon(Icons.logout),
-                label: Text(l10n.t('logout')),
+                label: Text(l10n.logout),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
@@ -234,7 +234,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showLanguageDialog() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRTL = LocaleManager.isFarsi();
 
     showDialog(
@@ -242,7 +242,7 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (context) => Directionality(
         textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          title: Text(l10n.t('language')),
+          title: Text(l10n.language),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -274,7 +274,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showLogoutDialog() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRTL = LocaleManager.isFarsi();
     
     showDialog(
@@ -282,12 +282,12 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (context) => Directionality(
         textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          title: Text(l10n.t('logout')),
-          content: Text(l10n.t('logout_confirm')),
+          title: Text(l10n.logout),
+          content: Text(l10n.logoutConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(l10n.t('cancel')),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -301,7 +301,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 }
               },
               child: Text(
-                l10n.t('logout'),
+                l10n.logout,
                 style: const TextStyle(color: Colors.red),
               ),
             ),

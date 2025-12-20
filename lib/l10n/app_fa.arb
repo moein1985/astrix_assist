@@ -1,0 +1,448 @@
+{
+  "@@locale": "fa",
+  
+  "appTitle": "دستیار استریکس",
+  "@appTitle": {
+    "description": "Application title"
+  },
+
+  "savedServers": "سرورهای ذخیره شده",
+  "@savedServers": {
+    "description": "Title for saved servers list"
+  },
+
+  "addServer": "افزودن سرور",
+  "@addServer": {
+    "description": "Button to add a new server"
+  },
+
+  "noServers": "هیچ سروری ذخیره نشده",
+  "@noServers": {
+    "description": "Message when no servers are saved"
+  },
+
+  "addServerToStart": "برای شروع یک سرور اضافه کنید",
+  "@addServerToStart": {
+    "description": "Instruction to add first server"
+  },
+
+  "serverName": "نام سرور",
+  "@serverName": {
+    "description": "Label for server name field"
+  },
+
+  "ipAddress": "آدرس IP",
+  "@ipAddress": {
+    "description": "Label for IP address field"
+  },
+
+  "port": "پورت",
+  "@port": {
+    "description": "Label for port field"
+  },
+
+  "username": "نام کاربری",
+  "@username": {
+    "description": "Label for username field"
+  },
+
+  "password": "رمز عبور",
+  "@password": {
+    "description": "Label for password field"
+  },
+
+  "addNewServer": "افزودن سرور جدید",
+  "@addNewServer": {
+    "description": "Title for add server dialog"
+  },
+
+  "editServer": "ویرایش سرور",
+  "@editServer": {
+    "description": "Title for edit server dialog"
+  },
+
+  "save": "ذخیره",
+  "@save": {
+    "description": "Save button text"
+  },
+
+  "cancel": "لغو",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "deleteServer": "حذف سرور",
+  "@deleteServer": {
+    "description": "Delete server button text"
+  },
+
+  "deleteConfirm": "آیا از حذف اطمینان دارید",
+  "@deleteConfirm": {
+    "description": "Confirmation message for deletion"
+  },
+
+  "delete": "حذف",
+  "@delete": {
+    "description": "Delete button text"
+  },
+
+  "edit": "ویرایش",
+  "@edit": {
+    "description": "Edit button text"
+  },
+
+  "active": "فعال",
+  "@active": {
+    "description": "Active status text"
+  },
+
+  "mockMode": "حالت آزمایشی (Mock Data)",
+  "@mockMode": {
+    "description": "Mock mode button text"
+  },
+
+  "mockModeDesc": "ورود بدون نیاز به سرور Asterisk",
+  "@mockModeDesc": {
+    "description": "Mock mode description"
+  },
+
+  "logout": "خروج",
+  "@logout": {
+    "description": "Logout button text"
+  },
+
+  "logoutConfirm": "آیا از خروج اطمینان دارید؟",
+  "@logoutConfirm": {
+    "description": "Logout confirmation message"
+  },
+
+  "navDashboard": "داشبورد",
+  "@navDashboard": {
+    "description": "Navigation item for dashboard"
+  },
+
+  "navExtensions": "داخلی‌ها",
+  "@navExtensions": {
+    "description": "Navigation item for extensions"
+  },
+
+  "navCalls": "تماس‌ها",
+  "@navCalls": {
+    "description": "Navigation item for calls"
+  },
+
+  "navQueues": "صف‌ها",
+  "@navQueues": {
+    "description": "Navigation item for queues"
+  },
+
+  "navReports": "گزارشات",
+  "@navReports": {
+    "description": "Navigation item for reports"
+  },
+
+  "dashboard": "داشبورد",
+  "@dashboard": {
+    "description": "Dashboard page title"
+  },
+
+  "extensions": "داخلی‌ها",
+  "@extensions": {
+    "description": "Extensions page title"
+  },
+
+  "activeCalls": "تماس‌های فعال",
+  "@activeCalls": {
+    "description": "Active calls section title"
+  },
+
+  "queues": "صف‌ها",
+  "@queues": {
+    "description": "Queues page title"
+  },
+
+  "waiting": "در انتظار",
+  "@waiting": {
+    "description": "Waiting status text"
+  },
+
+  "available": "آزاد",
+  "@available": {
+    "description": "Available status text"
+  },
+
+  "call": "تماس",
+  "@call": {
+    "description": "Call text"
+  },
+
+  "online": "آنلاین",
+  "@online": {
+    "description": "Online status text"
+  },
+
+  "offline": "آفلاین",
+  "@offline": {
+    "description": "Offline status text"
+  },
+
+  "recentCalls": "تماس‌های اخیر",
+  "@recentCalls": {
+    "description": "Recent calls section title"
+  },
+
+  "noActiveCalls": "تماس فعالی وجود ندارد",
+  "@noActiveCalls": {
+    "description": "Message when no active calls"
+  },
+
+  "duration": "مدت",
+  "@duration": {
+    "description": "Duration label"
+  },
+
+  "cdrTitle": "تاریخچه تماس",
+  "@cdrTitle": {
+    "description": "CDR page title"
+  },
+
+  "recordCount": "تعداد",
+  "@recordCount": {
+    "description": "Record count label"
+  },
+
+  "records": "رکورد",
+  "@records": {
+    "description": "Records text"
+  },
+
+  "exportCsv": "خروجی CSV",
+  "@exportCsv": {
+    "description": "Export CSV button text"
+  },
+
+  "answered": "پاسخ داده شده",
+  "@answered": {
+    "description": "Answered call status"
+  },
+
+  "noAnswer": "بدون پاسخ",
+  "@noAnswer": {
+    "description": "No answer call status"
+  },
+
+  "busy": "مشغول",
+  "@busy": {
+    "description": "Busy call status"
+  },
+
+  "failed": "ناموفق",
+  "@failed": {
+    "description": "Failed call status"
+  },
+
+  "status": "وضعیت",
+  "@status": {
+    "description": "Status label"
+  },
+
+  "noRecords": "هیچ رکوردی یافت نشد",
+  "@noRecords": {
+    "description": "Message when no records found"
+  },
+
+  "loadingError": "خطا در بارگذاری داده‌ها",
+  "@loadingError": {
+    "description": "Error message for loading data"
+  },
+
+  "retryButton": "تلاش مجدد",
+  "@retryButton": {
+    "description": "Retry button text"
+  },
+
+  "filterCalls": "فیلتر تماس‌ها",
+  "@filterCalls": {
+    "description": "Filter dialog title"
+  },
+
+  "dateRange": "بازه زمانی",
+  "@dateRange": {
+    "description": "Date range label"
+  },
+
+  "fromDate": "از تاریخ",
+  "@fromDate": {
+    "description": "From date label"
+  },
+
+  "toDate": "تا تاریخ",
+  "@toDate": {
+    "description": "To date label"
+  },
+
+  "sourceNumber": "شماره مبدا",
+  "@sourceNumber": {
+    "description": "Source number label"
+  },
+
+  "destinationNumber": "شماره مقصد",
+  "@destinationNumber": {
+    "description": "Destination number label"
+  },
+
+  "callStatus": "وضعیت تماس",
+  "@callStatus": {
+    "description": "Call status label"
+  },
+
+  "all": "همه",
+  "@all": {
+    "description": "All option text"
+  },
+
+  "applyFilter": "اعمال فیلتر",
+  "@applyFilter": {
+    "description": "Apply filter button text"
+  },
+
+  "saved": "ذخیره شد",
+  "@saved": {
+    "description": "Saved status text"
+  },
+
+  "saveError": "خطا در ذخیره",
+  "@saveError": {
+    "description": "Save error text"
+  },
+
+  "fileSaved": "فایل با موفقیت ذخیره شد",
+  "@fileSaved": {
+    "description": "File saved success message"
+  },
+
+  "path": "مسیر",
+  "@path": {
+    "description": "Path label"
+  },
+
+  "fileSaveError": "خطا در ذخیره فایل",
+  "@fileSaveError": {
+    "description": "File save error message"
+  },
+
+  "saving": "در حال ذخیره...",
+  "@saving": {
+    "description": "Saving status text"
+  },
+
+  "filter": "فیلتر",
+  "@filter": {
+    "description": "Filter text"
+  },
+
+  "fieldRequired": "این فیلد الزامی است",
+  "@fieldRequired": {
+    "description": "Required field validation message"
+  },
+
+  "nameRequired": "نام الزامی است",
+  "@nameRequired": {
+    "description": "Name required validation message"
+  },
+
+  "ipRequired": "آدرس IP الزامی است",
+  "@ipRequired": {
+    "description": "IP required validation message"
+  },
+
+  "portRequired": "پورت الزامی است",
+  "@portRequired": {
+    "description": "Port required validation message"
+  },
+
+  "overallStats": "آمار کلی",
+  "@overallStats": {
+    "description": "Overall stats title"
+  },
+
+  "lastUpdated": "آخرین به‌روزرسانی",
+  "@lastUpdated": {
+    "description": "Last updated label"
+  },
+
+  "averageWait": "میانگین انتظار",
+  "@averageWait": {
+    "description": "Average wait label"
+  },
+
+  "seconds": "ثانیه",
+  "@seconds": {
+    "description": "Seconds unit text"
+  },
+
+  "viewAll": "مشاهده همه",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+
+  "autoRefresh": "به‌روزرسانی خودکار",
+  "@autoRefresh": {
+    "description": "Auto refresh label"
+  },
+
+  "interval": "فاصله زمانی",
+  "@interval": {
+    "description": "Interval label"
+  },
+
+  "retry": "تلاش مجدد",
+  "@retry": {
+    "description": "Retry text"
+  },
+
+  "loading": "در حال بارگذاری...",
+  "@loading": {
+    "description": "Loading status text"
+  },
+
+  "error": "خطا",
+  "@error": {
+    "description": "Error text"
+  },
+
+  "refresh": "بروزرسانی",
+  "@refresh": {
+    "description": "Refresh text"
+  },
+
+  "settings": "تنظیمات",
+  "@settings": {
+    "description": "Settings text"
+  },
+
+  "language": "زبان",
+  "@language": {
+    "description": "Language label"
+  },
+
+  "theme": "پوسته",
+  "@theme": {
+    "description": "Theme label"
+  },
+
+  "light": "روشن",
+  "@light": {
+    "description": "Light theme text"
+  },
+
+  "dark": "تیره",
+  "@dark": {
+    "description": "Dark theme text"
+  },
+
+  "system": "سیستم",
+  "@system": {
+    "description": "System theme text"
+  }
+}

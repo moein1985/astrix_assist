@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../data/datasources/ami_datasource.dart';
-import '../../data/repositories/monitor_repository_impl.dart';
+import '../../core/injection_container.dart';
 import '../../domain/usecases/get_agent_details_usecase.dart';
 import '../../domain/usecases/pause_agent_usecase.dart';
 import '../../domain/usecases/unpause_agent_usecase.dart';
@@ -35,22 +33,11 @@ class _AgentDetailPageState extends State<AgentDetailPage> {
   }
 
   Future<void> _initBloc() async {
-    final prefs = await SharedPreferences.getInstance();
-    final host = prefs.getString('ip') ?? '192.168.85.88';
-    final port = int.tryParse(prefs.getString('port') ?? '5038') ?? 5038;
-    final user = prefs.getString('username') ?? 'moein_api';
-    final secret = prefs.getString('password') ?? '123456';
-
-    final dataSource = AmiDataSource(host: host, port: port, username: user, secret: secret);
-    final repo = MonitorRepositoryImpl(dataSource);
-    final getDetailsUseCase = GetAgentDetailsUseCase(repo);
-    final pauseUseCase = PauseAgentUseCase(repo);
-    final unpauseUseCase = UnpauseAgentUseCase(repo);
-    
+    // Use GetIt to get the bloc (which uses the correct repository based on AppConfig)
     final bloc = AgentDetailBloc(
-      getAgentDetailsUseCase: getDetailsUseCase,
-      pauseAgentUseCase: pauseUseCase,
-      unpauseAgentUseCase: unpauseUseCase,
+      getAgentDetailsUseCase: sl<GetAgentDetailsUseCase>(),
+      pauseAgentUseCase: sl<PauseAgentUseCase>(),
+      unpauseAgentUseCase: sl<UnpauseAgentUseCase>(),
     );
 
     setState(() => _bloc = bloc);

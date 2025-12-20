@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/locale_manager.dart';
 import '../../domain/entities/server_config.dart';
 import '../../domain/services/server_manager.dart';
@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
     final passController = TextEditingController(text: existing?.password ?? '');
     final formKey = GlobalKey<FormState>();
 
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRTL = LocaleManager.isFarsi();
 
     final result = await showDialog<bool>(
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (dialogContext) => Directionality(
         textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          title: Text(existing == null ? l10n.t('add_new_server') : l10n.t('edit_server')),
+          title: Text(existing == null ? l10n.addNewServer : l10n.editServer),
           content: SingleChildScrollView(
             child: Form(
               key: formKey,
@@ -75,35 +75,35 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: nameController,
                     decoration: InputDecoration(
-                      labelText: l10n.t('server_name'),
+                      labelText: l10n.serverName,
                       prefixIcon: const Icon(Icons.label),
                     ),
-                    validator: (v) => v == null || v.isEmpty ? l10n.t('name_required') : null,
+                    validator: (v) => v == null || v.isEmpty ? l10n.nameRequired : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: hostController,
                     decoration: InputDecoration(
-                      labelText: l10n.t('ip_address'),
+                      labelText: l10n.ipAddress,
                       prefixIcon: const Icon(Icons.dns),
                     ),
-                    validator: (v) => v == null || v.isEmpty ? l10n.t('ip_required') : null,
+                    validator: (v) => v == null || v.isEmpty ? l10n.ipRequired : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: portController,
                     decoration: InputDecoration(
-                      labelText: l10n.t('port'),
+                      labelText: l10n.port,
                       prefixIcon: const Icon(Icons.settings_ethernet),
                     ),
                     keyboardType: TextInputType.number,
-                    validator: (v) => v == null || v.isEmpty ? l10n.t('port_required') : null,
+                    validator: (v) => v == null || v.isEmpty ? l10n.portRequired : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: userController,
                     decoration: InputDecoration(
-                      labelText: l10n.t('username'),
+                      labelText: l10n.username,
                       prefixIcon: const Icon(Icons.person),
                     ),
                   ),
@@ -111,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: passController,
                     decoration: InputDecoration(
-                      labelText: l10n.t('password'),
+                      labelText: l10n.password,
                       prefixIcon: const Icon(Icons.lock),
                     ),
                     obscureText: true,
@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text(l10n.t('cancel')),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -131,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text(l10n.t('save')),
+              child: Text(l10n.save),
             ),
           ],
         ),
@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _deleteServer(ServerConfig config) async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRTL = LocaleManager.isFarsi();
 
     final confirm = await showDialog<bool>(
@@ -161,17 +161,17 @@ class _LoginPageState extends State<LoginPage> {
       builder: (dialogContext) => Directionality(
         textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          title: Text(l10n.t('delete_server')),
-          content: Text('${l10n.t('delete_confirm')} "${config.name}"?'),
+          title: Text(l10n.deleteServer),
+          content: Text('${l10n.deleteConfirm} "${config.name}"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(l10n.t('cancel')),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(l10n.t('delete')),
+              child: Text(l10n.delete),
             ),
           ],
         ),
@@ -186,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRTL = LocaleManager.isFarsi();
 
     return Directionality(
@@ -197,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
             : CustomScrollView(
                 slivers: [
                   SliverAppBar.large(
-                    title: Text(l10n.t('app_title')),
+                    title: Text(l10n.appTitle),
                     actions: const [
                       LanguageSwitcher(),
                       ThemeToggleButton(),
@@ -214,13 +214,13 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                l10n.t('saved_servers'),
+                                l10n.savedServers,
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               FilledButton.icon(
                                 onPressed: () => _showAddEditDialog(),
                                 icon: const Icon(Icons.add),
-                                label: Text(l10n.t('add_server')),
+                                label: Text(l10n.addServer),
                               ),
                             ],
                           ),
@@ -234,12 +234,12 @@ class _LoginPageState extends State<LoginPage> {
                                     Icon(Icons.dns_outlined, size: 64, color: Colors.grey[400]),
                                     const SizedBox(height: 16),
                                     Text(
-                                      l10n.t('no_servers'),
+                                      l10n.noServers,
                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      l10n.t('add_server_to_start'),
+                                      l10n.addServerToStart,
                                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
                                     ),
                                   ],
@@ -272,49 +272,47 @@ class _LoginPageState extends State<LoginPage> {
                                       server.name,
                                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                     ),
-                                    subtitle: Flexible(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.computer, size: 14, color: Colors.grey),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                              child: Text(
+                                                '${server.host}:${server.port}',
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.person, size: 14, color: Colors.grey),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                              child: Text(
+                                                server.username,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      if (isActive) ...[
                                           const SizedBox(height: 4),
                                           Row(
                                             children: [
-                                              const Icon(Icons.computer, size: 14, color: Colors.grey),
+                                              Icon(Icons.check_circle, size: 14, color: Colors.green[700]),
                                               const SizedBox(width: 4),
-                                              Flexible(
-                                                child: Text(
-                                                  '${server.host}:${server.port}',
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
+                                              Text(l10n.active, style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold)),
                                             ],
                                           ),
-                                          const SizedBox(height: 2),
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.person, size: 14, color: Colors.grey),
-                                              const SizedBox(width: 4),
-                                              Flexible(
-                                                child: Text(
-                                                  server.username,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          if (isActive) ...[
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Icon(Icons.check_circle, size: 14, color: Colors.green[700]),
-                                                const SizedBox(width: 4),
-                                                Text(l10n.t('active'), style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold)),
-                                              ],
-                                            ),
-                                          ],
                                         ],
-                                      ),
+                                      ],
                                     ),
                                     trailing: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -322,12 +320,12 @@ class _LoginPageState extends State<LoginPage> {
                                         IconButton(
                                           icon: const Icon(Icons.edit),
                                           onPressed: () => _showAddEditDialog(server),
-                                          tooltip: l10n.t('edit'),
+                                          tooltip: l10n.edit,
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.delete, color: Colors.red),
                                           onPressed: () => _deleteServer(server),
-                                          tooltip: l10n.t('delete'),
+                                          tooltip: l10n.delete,
                                         ),
                                       ],
                                     ),

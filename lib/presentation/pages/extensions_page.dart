@@ -3,11 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/refresh_settings.dart';
-import '../../data/datasources/ami_datasource.dart';
-import '../../data/repositories/extension_repository_impl.dart';
-import '../../domain/usecases/get_extensions_usecase.dart';
+import '../../core/injection_container.dart';
 import '../blocs/extension_bloc.dart';
 import '../../domain/entities/extension.dart';
 import '../widgets/theme_toggle_button.dart';
@@ -35,20 +32,12 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
   }
 
   Future<void> _initBloc() async {
-    final prefs = await SharedPreferences.getInstance();
-    final host = prefs.getString('ip') ?? '192.168.85.88';
-    final port = int.tryParse(prefs.getString('port') ?? '5038') ?? 5038;
-    final user = prefs.getString('username') ?? 'moein_api';
-    final secret = prefs.getString('password') ?? '123456';
-
     final settings = await RefreshSettings.load();
     _autoRefreshEnabled = settings.enabled;
     _refreshSeconds = settings.intervalSeconds;
 
-    final dataSource = AmiDataSource(host: host, port: port, username: user, secret: secret);
-    final repository = ExtensionRepositoryImpl(dataSource);
-    final useCase = GetExtensionsUseCase(repository);
-    final bloc = ExtensionBloc(useCase);
+    // Use GetIt to get the bloc (which uses the correct repository based on AppConfig)
+    final bloc = sl<ExtensionBloc>();
 
     setState(() => _bloc = bloc);
     bloc.add(LoadExtensions());

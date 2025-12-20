@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../l10n/app_localizations.dart';
 import 'responsive_helper.dart';
 
 class MainShell extends StatefulWidget {
@@ -52,6 +53,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isMobile = ResponsiveHelper.isMobile(context);
     final isTablet = ResponsiveHelper.isTablet(context);
 
@@ -62,17 +64,26 @@ class _MainShellState extends State<MainShell> {
           currentIndex: _currentIndex,
           onTap: _onNavigation,
           type: BottomNavigationBarType.fixed,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: 'داشبورد',
+              icon: const Icon(Icons.dashboard),
+              label: l10n.navDashboard,
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.phone), label: 'داخلی‌ها'),
-            BottomNavigationBarItem(icon: Icon(Icons.call), label: 'تماس‌ها'),
-            BottomNavigationBarItem(icon: Icon(Icons.queue), label: 'صف‌ها'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.description),
-              label: 'گزارشات',
+              icon: const Icon(Icons.phone),
+              label: l10n.navExtensions,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.call),
+              label: l10n.navCalls,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.queue),
+              label: l10n.navQueues,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.description),
+              label: l10n.navReports,
             ),
           ],
         ),
@@ -85,26 +96,26 @@ class _MainShellState extends State<MainShell> {
               selectedIndex: _currentIndex,
               onDestinationSelected: _onNavigation,
               labelType: NavigationRailLabelType.all,
-              destinations: const [
+              destinations: [
                 NavigationRailDestination(
-                  icon: Icon(Icons.dashboard),
-                  label: Text('داشبورد'),
+                  icon: const Icon(Icons.dashboard),
+                  label: Text(l10n.navDashboard),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.phone),
-                  label: Text('داخلی‌ها'),
+                  icon: const Icon(Icons.phone),
+                  label: Text(l10n.navExtensions),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.call),
-                  label: Text('تماس‌ها'),
+                  icon: const Icon(Icons.call),
+                  label: Text(l10n.navCalls),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.queue),
-                  label: Text('صف‌ها'),
+                  icon: const Icon(Icons.queue),
+                  label: Text(l10n.navQueues),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.description),
-                  label: Text('گزارشات'),
+                  icon: const Icon(Icons.description),
+                  label: Text(l10n.navReports),
                 ),
               ],
             ),
@@ -123,29 +134,29 @@ class _MainShellState extends State<MainShell> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'Astrix Assist',
+                    l10n.appTitle,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
-                const NavigationDrawerDestination(
-                  icon: Icon(Icons.dashboard),
-                  label: Text('داشبورد'),
+                NavigationDrawerDestination(
+                  icon: const Icon(Icons.dashboard),
+                  label: Text(l10n.navDashboard),
                 ),
-                const NavigationDrawerDestination(
-                  icon: Icon(Icons.phone),
-                  label: Text('داخلی‌ها'),
+                NavigationDrawerDestination(
+                  icon: const Icon(Icons.phone),
+                  label: Text(l10n.navExtensions),
                 ),
-                const NavigationDrawerDestination(
-                  icon: Icon(Icons.call),
-                  label: Text('تماس‌ها'),
+                NavigationDrawerDestination(
+                  icon: const Icon(Icons.call),
+                  label: Text(l10n.navCalls),
                 ),
-                const NavigationDrawerDestination(
-                  icon: Icon(Icons.queue),
-                  label: Text('صف‌ها'),
+                NavigationDrawerDestination(
+                  icon: const Icon(Icons.queue),
+                  label: Text(l10n.navQueues),
                 ),
-                const NavigationDrawerDestination(
-                  icon: Icon(Icons.description),
-                  label: Text('گزارشات'),
+                NavigationDrawerDestination(
+                  icon: const Icon(Icons.description),
+                  label: Text(l10n.navReports),
                 ),
               ],
             ),

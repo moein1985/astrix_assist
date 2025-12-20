@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'core/injection_container.dart';
 import 'core/router.dart';
 import 'core/theme_manager.dart';
 import 'core/locale_manager.dart';
-import 'core/app_localizations.dart';
 import 'core/notification_service.dart';
 import 'core/background_service_manager.dart';
 
@@ -45,13 +44,8 @@ class MyApp extends StatelessWidget {
               darkTheme: ThemeManager.darkTheme,
               themeMode: themeMode,
               locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
             );
           },
         );
