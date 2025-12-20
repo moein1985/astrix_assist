@@ -44,6 +44,14 @@ class AmiDataSource {
   }
 
   Future<void> connect() async {
+    // If already connected, disconnect first
+    if (_socket != null) {
+      logger.w('Socket already exists, disconnecting first...');
+      disconnect();
+      // Wait a bit for socket to fully close
+      await Future.delayed(Duration(milliseconds: 100));
+    }
+    
     _updateStatus(ConnectionStatus.connecting);
     try {
       logger.i('Connecting to AMI at $host:$port');

@@ -232,9 +232,10 @@ class _LoginPageState extends State<LoginPage> {
                             return Card(
                               elevation: isActive ? 4 : 1,
                               margin: const EdgeInsets.only(bottom: 12),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(16),
-                                leading: Container(
+                              child: IntrinsicHeight(
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.all(16),
+                                  leading: Container(
                                   width: 48,
                                   height: 48,
                                   decoration: BoxDecoration(
@@ -250,53 +251,67 @@ class _LoginPageState extends State<LoginPage> {
                                   server.name,
                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.computer, size: 14, color: Colors.grey),
-                                        const SizedBox(width: 4),
-                                        Text('${server.host}:${server.port}'),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.person, size: 14, color: Colors.grey),
-                                        const SizedBox(width: 4),
-                                        Text(server.username),
-                                      ],
-                                    ),
-                                    if (isActive) ...[
+                                subtitle: Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
                                       const SizedBox(height: 4),
                                       Row(
                                         children: [
-                                          Icon(Icons.check_circle, size: 14, color: Colors.green[700]),
+                                          const Icon(Icons.computer, size: 14, color: Colors.grey),
                                           const SizedBox(width: 4),
-                                          Text('فعال', style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold)),
+                                          Flexible(
+                                            child: Text(
+                                              '${server.host}:${server.port}',
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
                                         ],
                                       ),
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.person, size: 14, color: Colors.grey),
+                                          const SizedBox(width: 4),
+                                          Flexible(
+                                            child: Text(
+                                              server.username,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (isActive) ...[
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.check_circle, size: 14, color: Colors.green[700]),
+                                            const SizedBox(width: 4),
+                                            Text('فعال', style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold)),
+                                          ],
+                                        ),
+                                      ],
                                     ],
-                                  ],
+                                  ),
                                 ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.edit),
-                                      onPressed: () => _showAddEditDialog(server),
-                                      tooltip: 'ویرایش',
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => _deleteServer(server),
-                                      tooltip: 'حذف',
-                                    ),
-                                  ],
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () => _showAddEditDialog(server),
+                                        tooltip: 'ویرایش',
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () => _deleteServer(server),
+                                        tooltip: 'حذف',
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () => _connectToServer(server),
                                 ),
-                                onTap: () => _connectToServer(server),
                               ),
                             );
                           }),

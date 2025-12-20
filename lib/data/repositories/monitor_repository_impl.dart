@@ -22,7 +22,67 @@ class MonitorRepositoryImpl implements IMonitorRepository {
     if (loginResult != 'success') throw Exception('Login failed');
     final events = await dataSource.getActiveCalls();
     dataSource.disconnect();
-    return events.map((e) => ActiveCallModel.fromAmi(e)).toList();
+    
+    print('📞 [ActiveCalls] Raw events count: ${events.length}');
+    
+    // لاگ کردن رویداد کامل برای دیباگ
+    for (int i = 0; i < events.length; i++) {
+      print('📞 ========== Event $i RAW START ==========');
+      print(events[i]);
+      print('📞 ========== Event $i RAW END ==========');
+      
+      final lines = events[i].split(RegExp(r'\r\n|\n'));
+      String channel = '';
+      String state = '';
+      String channelStateDesc = '';
+      
+      for (final line in lines) {
+        if (line.startsWith('Channel: ')) channel = line.substring(9);
+        if (line.startsWith('ChannelState: ')) state = line.substring(14);
+        if (line.startsWith('ChannelStateDesc: ')) channelStateDesc = line.substring(18);
+      }
+      
+      print('📞 [Parsed] Event $i:');
+      print('   Channel: $channel');
+      print('   State: $state');
+      print('   StateDesc: $channelStateDesc');
+    }
+    
+    // فیلتر کردن کانال‌های غیر کاربری (internal channels)
+    final filtered = events.where((e) {
+      final lowerCase = e.toLowerCase();
+      
+      // بررسی Channel name
+      final lines = e.split(RegExp(r'\r\n|\n'));
+      String channel = '';
+      String channelState = '';
+      
+      for (final line in lines) {
+        if (line.startsWith('Channel: ')) channel = line.substring(9);
+        if (line.startsWith('ChannelStateDesc: ')) channelState = line.substring(18);
+      }
+      
+      // فیلتر کانال‌های سیستمی بر اساس نام کانال
+      bool isSystemChannel = channel.toLowerCase().contains('voicemail') ||
+                             channel.toLowerCase().contains('parked') ||
+                             channel.toLowerCase().contains('confbridge') ||
+                             channel.toLowerCase().contains('meetme') ||
+                             channel.toLowerCase().contains('local@');
+      
+      // اگر کانال در حالت Up باشد و SIP/PJSIP باشد، احتمالاً تماس واقعی است
+      bool isProbablyRealCall = (channel.startsWith('SIP/') || channel.startsWith('PJSIP/')) &&
+                                channelState.toLowerCase() == 'up';
+      
+      bool keep = !isSystemChannel && isProbablyRealCall;
+      
+      print('📞 [Filter] Channel: $channel, Keep: $keep, IsSystem: $isSystemChannel, IsRealCall: $isProbablyRealCall');
+      
+      return keep;
+    }).toList();
+    
+    print('📞 [ActiveCalls] Filtered count: ${filtered.length}');
+    
+    return filtered.map((e) => ActiveCallModel.fromAmi(e)).toList();
   }
 
   @override

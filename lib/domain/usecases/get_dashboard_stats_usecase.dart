@@ -11,16 +11,20 @@ class GetDashboardStatsUseCase {
 
   Future<DashboardStats> call() async {
     try {
-      // Fetch all data in parallel
-      final results = await Future.wait([
-        extensionRepository.getExtensions(),
-        monitorRepository.getActiveCalls(),
-        monitorRepository.getQueueStatuses(),
-      ]);
-
-      final extensions = results[0] as List;
-      final calls = results[1] as List;
-      final queues = results[2] as List;
+      print('🟡 [GetDashboardStatsUseCase] Starting to fetch stats...');
+      
+      // Fetch data sequentially to avoid AMI connection conflicts
+      print('🟡 [GetDashboardStatsUseCase] Fetching extensions...');
+      final extensions = await extensionRepository.getExtensions();
+      print('🟡 [GetDashboardStatsUseCase] Received ${extensions.length} extensions');
+      
+      print('🟡 [GetDashboardStatsUseCase] Fetching active calls...');
+      final calls = await monitorRepository.getActiveCalls();
+      print('🟡 [GetDashboardStatsUseCase] Received ${calls.length} active calls');
+      
+      print('🟡 [GetDashboardStatsUseCase] Fetching queue statuses...');
+      final queues = await monitorRepository.getQueueStatuses();
+      print('🟡 [GetDashboardStatsUseCase] Received ${queues.length} queues');
 
       final totalExtensions = extensions.length;
       final onlineExtensions = extensions.where((e) => e.isOnline).length;
@@ -41,7 +45,8 @@ class GetDashboardStatsUseCase {
 
       final averageWaitTime = queueCount > 0 ? totalWaitTime / queueCount : 0.0;
 
-      return DashboardStatsModel(
+      print('🟡 [GetDashboardStatsUseCase] Creating DashboardStats model...');
+      final dashboardStats = DashboardStatsModel(
         totalExtensions: totalExtensions,
         onlineExtensions: onlineExtensions,
         offlineExtensions: offlineExtensions,
@@ -51,7 +56,11 @@ class GetDashboardStatsUseCase {
         averageWaitTime: averageWaitTime,
         lastUpdate: DateTime.now(),
       );
+      
+      print('🟡 [GetDashboardStatsUseCase] Stats calculation complete!');
+      return dashboardStats;
     } catch (e) {
+      print('⛔ [GetDashboardStatsUseCase] Error: $e');
       throw Exception('Failed to fetch dashboard stats: $e');
     }
   }

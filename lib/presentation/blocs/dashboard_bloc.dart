@@ -33,19 +33,22 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
   Future<void> _fetchDashboard(Emitter<DashboardState> emit) async {
     try {
-      final results = await Future.wait([
-        getDashboardStatsUseCase.call(),
-        getActiveCallsUseCase.call(),
-      ]);
-
-      final stats = results[0] as DashboardStats;
-      final allCalls = results[1] as List;
+      print('🔵 [DashboardBloc] Starting to fetch dashboard data...');
+      
+      print('🔵 [DashboardBloc] Fetching dashboard stats...');
+      final stats = await getDashboardStatsUseCase.call();
+      print('🔵 [DashboardBloc] Dashboard stats received: $stats');
+      
+      print('🔵 [DashboardBloc] Fetching active calls...');
+      final allCalls = await getActiveCallsUseCase.call();
+      print('🔵 [DashboardBloc] Active calls received: ${allCalls.length} calls');
       
       // Get last 5 calls
       final recentCalls = allCalls.take(5).cast<ActiveCall>().toList();
-
+      print('🔵 [DashboardBloc] Emitting DashboardLoaded state');
       emit(DashboardLoaded(stats, recentCalls));
     } catch (e) {
+      print('⛔ [DashboardBloc] Error fetching dashboard: $e');
       emit(DashboardError(e.toString()));
     }
   }
