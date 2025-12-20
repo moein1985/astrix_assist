@@ -204,6 +204,50 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                         const SizedBox(height: 16),
+                        // دکمه ورود با Mock Data
+                        const bool.fromEnvironment('USE_MOCK', defaultValue: false)
+                            ? Card(
+                                color: Colors.orange[50],
+                                child: InkWell(
+                                  onTap: () {
+                                    // در حالت Mock مستقیم به Dashboard برو
+                                    context.go('/dashboard');
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.science, size: 48, color: Colors.orange[700]),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'حالت آزمایشی (Mock Data)',
+                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                      color: Colors.orange[900],
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'ورود بدون نیاز به سرور Asterisk',
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                      color: Colors.orange[700],
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Icon(Icons.arrow_forward, color: Colors.orange[700]),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                        const SizedBox(height: 16),
                         if (_servers.isEmpty)
                           Center(
                             child: Padding(

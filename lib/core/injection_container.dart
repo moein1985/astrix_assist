@@ -29,6 +29,14 @@ final sl = GetIt.instance;
 void setupDependencies() {
   // تشخیص محیط
   const useMock = bool.fromEnvironment('USE_MOCK', defaultValue: false);
+  
+  print('🎯 [DI] USE_MOCK = $useMock');
+  
+  if (useMock) {
+    print('✅ [DI] Using MOCK repositories');
+  } else {
+    print('❌ [DI] Using REAL repositories (Asterisk AMI)');
+  }
 
   // Data layer
   sl.registerFactory(
