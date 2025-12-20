@@ -1,5 +1,5 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/result.dart';
 import '../../domain/entities/parked_call.dart';
 import '../../domain/usecases/get_parked_calls_usecase.dart';
 
@@ -10,7 +10,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
   final GetParkedCallsUseCase getParkedCallsUseCase;
 
   ParkingBloc({required this.getParkedCallsUseCase})
-    : super(const ParkingInitial()) {
+    : super(ParkingInitial()) {
     on<LoadParkedCalls>(_onLoadParkedCalls);
     on<RefreshParkedCalls>(_onRefreshParkedCalls);
     on<PickupCall>(_onPickupCall);
@@ -20,12 +20,14 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
     LoadParkedCalls event,
     Emitter<ParkingState> emit,
   ) async {
-    try {
-      emit(const ParkingLoading());
-      final parkedCalls = await getParkedCallsUseCase();
-      emit(ParkingLoaded(parkedCalls));
-    } catch (e) {
-      emit(ParkingError(e.toString()));
+    emit(ParkingLoading());
+    final result = await getParkedCallsUseCase();
+    switch (result) {
+      case Success(:final data):
+        final parkedCalls = data;
+        emit(ParkingLoaded(parkedCalls));
+      case Failure(:final message):
+        emit(ParkingError(message));
     }
   }
 
@@ -33,11 +35,13 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
     RefreshParkedCalls event,
     Emitter<ParkingState> emit,
   ) async {
-    try {
-      final parkedCalls = await getParkedCallsUseCase();
-      emit(ParkingLoaded(parkedCalls));
-    } catch (e) {
-      emit(ParkingError(e.toString()));
+    final result = await getParkedCallsUseCase();
+    switch (result) {
+      case Success(:final data):
+        final parkedCalls = data;
+        emit(ParkingLoaded(parkedCalls));
+      case Failure(:final message):
+        emit(ParkingError(message));
     }
   }
 
@@ -50,7 +54,7 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
       // For now, we just emit the state
       emit(ParkedCallPickedUp(event.exten));
       // Refresh the list after pickup
-      add(const RefreshParkedCalls());
+      add(RefreshParkedCalls());
     } catch (e) {
       emit(ParkingError(e.toString()));
     }

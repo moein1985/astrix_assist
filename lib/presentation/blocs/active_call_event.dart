@@ -1,31 +1,26 @@
 part of 'active_call_bloc.dart';
 
-abstract class ActiveCallEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
+sealed class ActiveCallEvent {
+  const ActiveCallEvent();
 }
 
-class LoadActiveCalls extends ActiveCallEvent {}
+final class LoadActiveCalls extends ActiveCallEvent {
+  const LoadActiveCalls();
+}
 
-class HangupCall extends ActiveCallEvent {
+final class HangupCall extends ActiveCallEvent {
   final String channel;
-  HangupCall(this.channel);
-
-  @override
-  List<Object?> get props => [channel];
+  const HangupCall(this.channel);
 }
 
-class TransferCall extends ActiveCallEvent {
+final class TransferCall extends ActiveCallEvent {
   final String channel;
   final String destination;
   final String context;
-  
-  TransferCall({
+
+  const TransferCall({
     required this.channel,
     required this.destination,
     this.context = 'from-internal',
   });
-
-  @override
-  List<Object?> get props => [channel, destination, context];
 }

@@ -1,5 +1,6 @@
 import '../../domain/entities/cdr_record.dart';
 import '../../domain/repositories/icdr_repository.dart';
+import '../../core/result.dart';
 import '../datasources/cdr_datasource.dart';
 
 class CdrRepositoryImpl implements ICdrRepository {
@@ -8,7 +9,7 @@ class CdrRepositoryImpl implements ICdrRepository {
   CdrRepositoryImpl(this.dataSource);
 
   @override
-  Future<List<CdrRecord>> getCdrRecords({
+  Future<Result<List<CdrRecord>>> getCdrRecords({
     DateTime? startDate,
     DateTime? endDate,
     String? src,
@@ -16,13 +17,18 @@ class CdrRepositoryImpl implements ICdrRepository {
     String? disposition,
     int limit = 100,
   }) async {
-    return await dataSource.getCdrRecords(
-      startDate: startDate,
-      endDate: endDate,
-      src: src,
-      dst: dst,
-      disposition: disposition,
-      limit: limit,
-    );
+    try {
+      final records = await dataSource.getCdrRecords(
+        startDate: startDate,
+        endDate: endDate,
+        src: src,
+        dst: dst,
+        disposition: disposition,
+        limit: limit,
+      );
+      return Success(records);
+    } catch (e) {
+      return Failure(e.toString());
+    }
   }
 }

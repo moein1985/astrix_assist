@@ -18,7 +18,7 @@ class BackgroundServiceManager {
 
   Future<void> initialize() async {
     try {
-      await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+      await Workmanager().initialize(callbackDispatcher);
       logger.i('BackgroundServiceManager initialized successfully');
     } catch (e) {
       logger.e('Failed to initialize BackgroundServiceManager: $e');

@@ -16,7 +16,7 @@ class _TrunksPageState extends State<TrunksPage> {
   @override
   void initState() {
     super.initState();
-    context.read<TrunkBloc>().add(const LoadTrunks());
+    context.read<TrunkBloc>().add(LoadTrunks());
   }
 
   @override
@@ -32,15 +32,15 @@ class _TrunksPageState extends State<TrunksPage> {
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () =>
-                  context.read<TrunkBloc>().add(const RefreshTrunks()),
+                  context.read<TrunkBloc>().add(RefreshTrunks()),
             ),
           ],
         ),
         body: BlocBuilder<TrunkBloc, TrunkState>(
-          builder: (context, state) {
-            if (state is TrunkLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is TrunkLoaded) {
+          builder: (context, state) => switch (state) {
+            TrunkInitial() => const SizedBox.shrink(),
+            TrunkLoading() => const Center(child: CircularProgressIndicator()),
+            TrunkLoaded() => () {
               if (state.trunks.isEmpty) {
                 return const Center(child: Text('هیچ Trunk یافت نشد'));
               }
@@ -83,29 +83,27 @@ class _TrunksPageState extends State<TrunksPage> {
                   );
                 },
               );
-            } else if (state is TrunkError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () =>
-                          context.read<TrunkBloc>().add(const RefreshTrunks()),
-                      child: const Text('تلاش مجدد'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+            }(),
+            TrunkError() => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(state.message),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () =>
+                        context.read<TrunkBloc>().add(RefreshTrunks()),
+                    child: const Text('تلاش مجدد'),
+                  ),
+                ],
+              ),
+            ),
           },
         ),
       ),

@@ -1,34 +1,19 @@
 part of 'trunk_bloc.dart';
 
-abstract class TrunkState extends Equatable {
-  const TrunkState();
+sealed class TrunkState {}
 
-  @override
-  List<Object?> get props => [];
-}
+final class TrunkInitial extends TrunkState {}
 
-class TrunkInitial extends TrunkState {
-  const TrunkInitial();
-}
+final class TrunkLoading extends TrunkState {}
 
-class TrunkLoading extends TrunkState {
-  const TrunkLoading();
-}
-
-class TrunkLoaded extends TrunkState {
+final class TrunkLoaded extends TrunkState {
   final List<Trunk> trunks;
 
-  const TrunkLoaded(this.trunks);
-
-  @override
-  List<Object?> get props => [trunks];
+  TrunkLoaded(this.trunks);
 }
 
-class TrunkError extends TrunkState {
+final class TrunkError extends TrunkState {
   final String message;
 
-  const TrunkError(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  TrunkError(this.message);
 }

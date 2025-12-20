@@ -1,8 +1,9 @@
 part of 'extension_bloc.dart';
 
-abstract class ExtensionEvent extends Equatable {
-  @override
-  List<Object> get props => [];
+sealed class ExtensionEvent {
+  const ExtensionEvent();
 }
 
-class LoadExtensions extends ExtensionEvent {}
+final class LoadExtensions extends ExtensionEvent {
+  const LoadExtensions();
+}

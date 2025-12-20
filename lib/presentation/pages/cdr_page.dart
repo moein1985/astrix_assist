@@ -130,21 +130,20 @@ class _CdrPageState extends State<CdrPage> {
             ],
           ),
           body: BlocBuilder<CdrBloc, CdrState>(
-            builder: (context, state) {
-              if (state is CdrLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is CdrExporting) {
-                return const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text('در حال ذخیره...'),
-                    ],
-                  ),
-                );
-              } else if (state is CdrLoaded) {
+            builder: (context, state) => switch (state) {
+              CdrInitial() => const SizedBox.shrink(),
+              CdrLoading() => const Center(child: CircularProgressIndicator()),
+              CdrExporting() => const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('در حال ذخیره...'),
+                  ],
+                ),
+              ),
+              CdrLoaded() => () {
                 if (state.records.isEmpty) {
                   return const Center(child: Text('هیچ رکوردی یافت نشد'));
                 }
@@ -216,43 +215,92 @@ class _CdrPageState extends State<CdrPage> {
                     ),
                   ],
                 );
-              } else if (state is CdrError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.red,
+              }(),
+              CdrError() => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'خطا در بارگذاری داده‌ها',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'خطا در بارگذاری داده‌ها',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        state.message,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          state.message,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _loadRecords,
+                      child: const Text('تلاش مجدد'),
+                    ),
+                  ],
+                ),
+              ),
+              CdrExported() => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      size: 48,
+                      color: Colors.green,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'فایل با موفقیت ذخیره شد',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadRecords,
-                        child: const Text('تلاش مجدد'),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'مسیر: ${state.filePath}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              CdrExportError() => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'خطا در ذخیره فایل',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.message,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
             },
           ),
         ),

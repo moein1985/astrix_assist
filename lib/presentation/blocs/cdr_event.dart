@@ -1,11 +1,8 @@
 part of 'cdr_bloc.dart';
 
-abstract class CdrEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+sealed class CdrEvent {}
 
-class LoadCdrRecords extends CdrEvent {
+final class LoadCdrRecords extends CdrEvent {
   final DateTime? startDate;
   final DateTime? endDate;
   final String? src;
@@ -21,12 +18,9 @@ class LoadCdrRecords extends CdrEvent {
     this.disposition,
     this.limit = 100,
   });
-
-  @override
-  List<Object?> get props => [startDate, endDate, src, dst, disposition, limit];
 }
 
-class FilterCdrRecords extends CdrEvent {
+final class FilterCdrRecords extends CdrEvent {
   final DateTime? startDate;
   final DateTime? endDate;
   final String? src;
@@ -42,16 +36,10 @@ class FilterCdrRecords extends CdrEvent {
     this.disposition,
     this.limit = 100,
   });
-
-  @override
-  List<Object?> get props => [startDate, endDate, src, dst, disposition, limit];
 }
 
-class ExportCdrRecords extends CdrEvent {
+final class ExportCdrRecords extends CdrEvent {
   final List<CdrRecord> records;
 
   ExportCdrRecords(this.records);
-
-  @override
-  List<Object?> get props => [records];
 }

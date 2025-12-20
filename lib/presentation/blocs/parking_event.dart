@@ -1,26 +1,14 @@
 part of 'parking_bloc.dart';
 
-abstract class ParkingEvent extends Equatable {
-  const ParkingEvent();
+sealed class ParkingEvent {}
 
-  @override
-  List<Object?> get props => [];
-}
+final class LoadParkedCalls extends ParkingEvent {}
 
-class LoadParkedCalls extends ParkingEvent {
-  const LoadParkedCalls();
-}
+final class RefreshParkedCalls extends ParkingEvent {}
 
-class RefreshParkedCalls extends ParkingEvent {
-  const RefreshParkedCalls();
-}
-
-class PickupCall extends ParkingEvent {
+final class PickupCall extends ParkingEvent {
   final String exten;
   final String extension;
 
-  const PickupCall({required this.exten, required this.extension});
-
-  @override
-  List<Object?> get props => [exten, extension];
+  PickupCall({required this.exten, required this.extension});
 }

@@ -1,26 +1,23 @@
 part of 'active_call_bloc.dart';
 
-abstract class ActiveCallState extends Equatable {
-  @override
-  List<Object?> get props => [];
+sealed class ActiveCallState {
+  const ActiveCallState();
 }
 
-class ActiveCallInitial extends ActiveCallState {}
+final class ActiveCallInitial extends ActiveCallState {
+  const ActiveCallInitial();
+}
 
-class ActiveCallLoading extends ActiveCallState {}
+final class ActiveCallLoading extends ActiveCallState {
+  const ActiveCallLoading();
+}
 
-class ActiveCallLoaded extends ActiveCallState {
+final class ActiveCallLoaded extends ActiveCallState {
   final List<ActiveCall> calls;
-  ActiveCallLoaded(this.calls);
-
-  @override
-  List<Object?> get props => [calls];
+  const ActiveCallLoaded(this.calls);
 }
 
-class ActiveCallError extends ActiveCallState {
+final class ActiveCallError extends ActiveCallState {
   final String message;
-  ActiveCallError(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  const ActiveCallError(this.message);
 }

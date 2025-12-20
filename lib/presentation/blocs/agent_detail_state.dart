@@ -1,28 +1,19 @@
 part of 'agent_detail_bloc.dart';
 
-abstract class AgentDetailState extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+sealed class AgentDetailState {}
 
-class AgentDetailInitial extends AgentDetailState {}
+final class AgentDetailInitial extends AgentDetailState {}
 
-class AgentDetailLoading extends AgentDetailState {}
+final class AgentDetailLoading extends AgentDetailState {}
 
-class AgentDetailLoaded extends AgentDetailState {
+final class AgentDetailLoaded extends AgentDetailState {
   final AgentDetails details;
 
   AgentDetailLoaded(this.details);
-
-  @override
-  List<Object?> get props => [details];
 }
 
-class AgentDetailError extends AgentDetailState {
+final class AgentDetailError extends AgentDetailState {
   final String message;
 
   AgentDetailError(this.message);
-
-  @override
-  List<Object?> get props => [message];
 }

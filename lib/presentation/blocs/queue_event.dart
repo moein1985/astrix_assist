@@ -1,29 +1,24 @@
 part of 'queue_bloc.dart';
 
-abstract class QueueEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
+sealed class QueueEvent {
+  const QueueEvent();
 }
 
-class LoadQueues extends QueueEvent {}
+final class LoadQueues extends QueueEvent {
+  const LoadQueues();
+}
 
-class PauseAgent extends QueueEvent {
+final class PauseAgent extends QueueEvent {
   final String queue;
   final String interface;
   final String? reason;
 
-  PauseAgent({required this.queue, required this.interface, this.reason});
-
-  @override
-  List<Object?> get props => [queue, interface, reason];
+  const PauseAgent({required this.queue, required this.interface, this.reason});
 }
 
-class UnpauseAgent extends QueueEvent {
+final class UnpauseAgent extends QueueEvent {
   final String queue;
   final String interface;
 
-  UnpauseAgent({required this.queue, required this.interface});
-
-  @override
-  List<Object?> get props => [queue, interface];
+  const UnpauseAgent({required this.queue, required this.interface});
 }

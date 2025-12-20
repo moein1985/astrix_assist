@@ -97,10 +97,10 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
           ],
         ),
         body: BlocBuilder<ActiveCallBloc, ActiveCallState>(
-          builder: (context, state) {
-            if (state is ActiveCallLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ActiveCallLoaded) {
+          builder: (context, state) => switch (state) {
+            ActiveCallInitial() => const SizedBox.shrink(),
+            ActiveCallLoading() => const Center(child: CircularProgressIndicator()),
+            ActiveCallLoaded() => () {
               if (state.calls.isEmpty) {
                 return const Center(child: Text('No active calls'));
               }
@@ -140,22 +140,20 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
                   );
                 },
               );
-            } else if (state is ActiveCallError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () => bloc.add(LoadActiveCalls()),
-                      child: const Text('Retry'),
-                    )
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+            }(),
+            ActiveCallError() => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () => bloc.add(LoadActiveCalls()),
+                    child: const Text('Retry'),
+                  )
+                ],
+              ),
+            ),
           },
         ),
       ),

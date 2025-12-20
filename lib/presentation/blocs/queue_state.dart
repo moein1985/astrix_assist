@@ -1,26 +1,23 @@
 part of 'queue_bloc.dart';
 
-abstract class QueueState extends Equatable {
-  @override
-  List<Object?> get props => [];
+sealed class QueueState {
+  const QueueState();
 }
 
-class QueueInitial extends QueueState {}
+final class QueueInitial extends QueueState {
+  const QueueInitial();
+}
 
-class QueueLoading extends QueueState {}
+final class QueueLoading extends QueueState {
+  const QueueLoading();
+}
 
-class QueueLoaded extends QueueState {
+final class QueueLoaded extends QueueState {
   final List<QueueStatus> queues;
-  QueueLoaded(this.queues);
-
-  @override
-  List<Object?> get props => [queues];
+  const QueueLoaded(this.queues);
 }
 
-class QueueError extends QueueState {
+final class QueueError extends QueueState {
   final String message;
-  QueueError(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  const QueueError(this.message);
 }

@@ -1,20 +1,14 @@
 part of 'agent_detail_bloc.dart';
 
-abstract class AgentDetailEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+sealed class AgentDetailEvent {}
 
-class LoadAgentDetails extends AgentDetailEvent {
+final class LoadAgentDetails extends AgentDetailEvent {
   final String agentInterface;
 
   LoadAgentDetails(this.agentInterface);
-
-  @override
-  List<Object?> get props => [agentInterface];
 }
 
-class PauseAgentFromDetail extends AgentDetailEvent {
+final class PauseAgentFromDetail extends AgentDetailEvent {
   final String queue;
   final String interface;
   final String? reason;
@@ -24,12 +18,9 @@ class PauseAgentFromDetail extends AgentDetailEvent {
     required this.interface,
     this.reason,
   });
-
-  @override
-  List<Object?> get props => [queue, interface, reason];
 }
 
-class UnpauseAgentFromDetail extends AgentDetailEvent {
+final class UnpauseAgentFromDetail extends AgentDetailEvent {
   final String queue;
   final String interface;
 
@@ -37,7 +28,4 @@ class UnpauseAgentFromDetail extends AgentDetailEvent {
     required this.queue,
     required this.interface,
   });
-
-  @override
-  List<Object?> get props => [queue, interface];
 }

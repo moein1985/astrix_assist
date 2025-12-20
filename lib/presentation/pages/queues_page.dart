@@ -101,10 +101,10 @@ class _QueuesPageState extends State<QueuesPage> {
           ],
         ),
         body: BlocBuilder<QueueBloc, QueueState>(
-          builder: (context, state) {
-            if (state is QueueLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is QueueLoaded) {
+          builder: (context, state) => switch (state) {
+            QueueInitial() => const SizedBox.shrink(),
+            QueueLoading() => const Center(child: CircularProgressIndicator()),
+            QueueLoaded() => () {
               if (state.queues.isEmpty) {
                 return const Center(child: Text('No queues found'));
               }
@@ -196,22 +196,20 @@ class _QueuesPageState extends State<QueuesPage> {
                   );
                 },
               );
-            } else if (state is QueueError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () => bloc.add(LoadQueues()),
-                      child: const Text('Retry'),
-                    )
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+            }(),
+            QueueError() => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () => bloc.add(LoadQueues()),
+                    child: const Text('Retry'),
+                  )
+                ],
+              ),
+            ),
           },
         ),
       ),

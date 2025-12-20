@@ -1,10 +1,5 @@
-import 'package:equatable/equatable.dart';
+sealed class DashboardEvent {}
 
-abstract class DashboardEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+final class LoadDashboard extends DashboardEvent {}
 
-class LoadDashboard extends DashboardEvent {}
-
-class RefreshDashboard extends DashboardEvent {}
+final class RefreshDashboard extends DashboardEvent {}

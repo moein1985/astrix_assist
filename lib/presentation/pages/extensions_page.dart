@@ -112,10 +112,10 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
             ),
           ),
           body: BlocBuilder<ExtensionBloc, ExtensionState>(
-            builder: (context, state) {
-              if (state is ExtensionLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is ExtensionLoaded) {
+            builder: (context, state) => switch (state) {
+              ExtensionInitial() => const Center(child: Text('Press refresh to load')),
+              ExtensionLoading() => const Center(child: CircularProgressIndicator()),
+              ExtensionLoaded() => () {
                 final allExtensions = _applyFilter(state.extensions);
                 final onlineExtensions = allExtensions.where((e) => e.isOnline).toList();
                 final total = allExtensions.length;
@@ -136,22 +136,20 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
                     ),
                   ],
                 );
-              } else if (state is ExtensionError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => bloc.add(LoadExtensions()),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return const Center(child: Text('Press refresh to load'));
+              }(),
+              ExtensionError() => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => bloc.add(LoadExtensions()),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
             },
           ),
         ),

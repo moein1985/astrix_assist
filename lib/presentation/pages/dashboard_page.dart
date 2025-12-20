@@ -101,37 +101,33 @@ class _DashboardPageState extends State<DashboardPage> {
           ],
         ),
         body: BlocBuilder<DashboardBloc, DashboardState>(
-          builder: (context, state) {
-            if (state is DashboardLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is DashboardLoaded) {
-              return RefreshIndicator(
-                onRefresh: () async => bloc.add(RefreshDashboard()),
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildStatsGrid(state),
-                    const SizedBox(height: 24),
-                    _buildRecentCallsSection(state),
-                  ],
-                ),
-              );
-            } else if (state is DashboardError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('خطا: ${state.message}', style: const TextStyle(color: Colors.red)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => bloc.add(LoadDashboard()),
-                      child: const Text('تلاش مجدد'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+          builder: (context, state) => switch (state) {
+            DashboardInitial() => const SizedBox.shrink(),
+            DashboardLoading() => const Center(child: CircularProgressIndicator()),
+            DashboardLoaded() => RefreshIndicator(
+              onRefresh: () async => bloc.add(RefreshDashboard()),
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _buildStatsGrid(state),
+                  const SizedBox(height: 24),
+                  _buildRecentCallsSection(state),
+                ],
+              ),
+            ),
+            DashboardError() => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('خطا: ${state.message}', style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => bloc.add(LoadDashboard()),
+                    child: const Text('تلاش مجدد'),
+                  ),
+                ],
+              ),
+            ),
           },
         ),
       ),

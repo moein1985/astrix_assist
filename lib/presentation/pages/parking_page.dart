@@ -16,7 +16,7 @@ class _ParkingPageState extends State<ParkingPage> {
   @override
   void initState() {
     super.initState();
-    context.read<ParkingBloc>().add(const LoadParkedCalls());
+    context.read<ParkingBloc>().add(LoadParkedCalls());
   }
 
   String _formatParkedTime(int seconds) {
@@ -38,15 +38,15 @@ class _ParkingPageState extends State<ParkingPage> {
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () =>
-                  context.read<ParkingBloc>().add(const RefreshParkedCalls()),
+                  context.read<ParkingBloc>().add(RefreshParkedCalls()),
             ),
           ],
         ),
         body: BlocBuilder<ParkingBloc, ParkingState>(
-          builder: (context, state) {
-            if (state is ParkingLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ParkingLoaded) {
+          builder: (context, state) => switch (state) {
+            ParkingInitial() => const SizedBox.shrink(),
+            ParkingLoading() => const Center(child: CircularProgressIndicator()),
+            ParkingLoaded() => () {
               if (state.parkedCalls.isEmpty) {
                 return const Center(child: Text('هیچ تماس Parked نیست'));
               }
@@ -101,30 +101,49 @@ class _ParkingPageState extends State<ParkingPage> {
                   );
                 },
               );
-            } else if (state is ParkingError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
+            }(),
+            ParkingError() => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(state.message),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.read<ParkingBloc>().add(
+                      RefreshParkedCalls(),
                     ),
-                    const SizedBox(height: 16),
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => context.read<ParkingBloc>().add(
-                        const RefreshParkedCalls(),
-                      ),
-                      child: const Text('تلاش مجدد'),
+                    child: const Text('تلاش مجدد'),
+                  ),
+                ],
+              ),
+            ),
+            ParkedCallPickedUp() => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.check_circle,
+                    size: 48,
+                    color: Colors.green,
+                  ),
+                  const SizedBox(height: 16),
+                  Text('تماس ${state.exten} برداشته شد'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.read<ParkingBloc>().add(
+                      RefreshParkedCalls(),
                     ),
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+                    child: const Text('بازگشت'),
+                  ),
+                ],
+              ),
+            ),
           },
         ),
       ),

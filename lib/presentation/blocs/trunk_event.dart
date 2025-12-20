@@ -1,16 +1,7 @@
 part of 'trunk_bloc.dart';
 
-abstract class TrunkEvent extends Equatable {
-  const TrunkEvent();
+sealed class TrunkEvent {}
 
-  @override
-  List<Object?> get props => [];
-}
+final class LoadTrunks extends TrunkEvent {}
 
-class LoadTrunks extends TrunkEvent {
-  const LoadTrunks();
-}
-
-class RefreshTrunks extends TrunkEvent {
-  const RefreshTrunks();
-}
+final class RefreshTrunks extends TrunkEvent {}

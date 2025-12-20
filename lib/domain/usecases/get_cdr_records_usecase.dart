@@ -1,12 +1,13 @@
 import '../entities/cdr_record.dart';
 import '../repositories/icdr_repository.dart';
+import '../../core/result.dart';
 
 class GetCdrRecordsUseCase {
   final ICdrRepository repository;
 
   GetCdrRecordsUseCase(this.repository);
 
-  Future<List<CdrRecord>> call({
+  Future<Result<List<CdrRecord>>> call({
     DateTime? startDate,
     DateTime? endDate,
     String? src,

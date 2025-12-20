@@ -1,7 +1,8 @@
 import '../../domain/entities/cdr_record.dart';
+import '../../core/result.dart';
 
 abstract class ICdrRepository {
-  Future<List<CdrRecord>> getCdrRecords({
+  Future<Result<List<CdrRecord>>> getCdrRecords({
     DateTime? startDate,
     DateTime? endDate,
     String? src,

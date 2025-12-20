@@ -1,5 +1,6 @@
 import '../../domain/entities/extension.dart';
+import '../../core/result.dart';
 
 abstract class IExtensionRepository {
-  Future<List<Extension>> getExtensions();
+  Future<Result<List<Extension>>> getExtensions();
 }

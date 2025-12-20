@@ -1,43 +1,25 @@
 part of 'parking_bloc.dart';
 
-abstract class ParkingState extends Equatable {
-  const ParkingState();
+sealed class ParkingState {}
 
-  @override
-  List<Object?> get props => [];
-}
+final class ParkingInitial extends ParkingState {}
 
-class ParkingInitial extends ParkingState {
-  const ParkingInitial();
-}
+final class ParkingLoading extends ParkingState {}
 
-class ParkingLoading extends ParkingState {
-  const ParkingLoading();
-}
-
-class ParkingLoaded extends ParkingState {
+final class ParkingLoaded extends ParkingState {
   final List<ParkedCall> parkedCalls;
 
-  const ParkingLoaded(this.parkedCalls);
-
-  @override
-  List<Object?> get props => [parkedCalls];
+  ParkingLoaded(this.parkedCalls);
 }
 
-class ParkingError extends ParkingState {
+final class ParkingError extends ParkingState {
   final String message;
 
-  const ParkingError(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  ParkingError(this.message);
 }
 
-class ParkedCallPickedUp extends ParkingState {
+final class ParkedCallPickedUp extends ParkingState {
   final String exten;
 
-  const ParkedCallPickedUp(this.exten);
-
-  @override
-  List<Object?> get props => [exten];
+  ParkedCallPickedUp(this.exten);
 }

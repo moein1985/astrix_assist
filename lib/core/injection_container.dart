@@ -13,6 +13,10 @@ import '../data/datasources/cdr_datasource.dart';
 import '../data/repositories/extension_repository_impl.dart';
 import '../data/repositories/monitor_repository_impl.dart';
 import '../data/repositories/cdr_repository_impl.dart';
+import '../data/repositories/mock/extension_repository_mock.dart';
+import '../data/repositories/mock/monitor_repository_mock.dart';
+import '../domain/repositories/iextension_repository.dart';
+import '../domain/repositories/imonitor_repository.dart';
 import '../presentation/blocs/extension_bloc.dart';
 import '../presentation/blocs/queue_bloc.dart';
 import '../presentation/blocs/agent_detail_bloc.dart';
@@ -23,6 +27,9 @@ import '../presentation/blocs/parking_bloc.dart';
 final sl = GetIt.instance;
 
 void setupDependencies() {
+  // تشخیص محیط
+  const useMock = bool.fromEnvironment('USE_MOCK', defaultValue: false);
+
   // Data layer
   sl.registerFactory(
     () => AmiDataSource(
@@ -41,20 +48,38 @@ void setupDependencies() {
       db: 'asteriskcdrdb',
     ),
   );
-  sl.registerFactory(() => ExtensionRepositoryImpl(sl<AmiDataSource>()));
-  sl.registerFactory(() => MonitorRepositoryImpl(sl<AmiDataSource>()));
-  sl.registerFactory(() => CdrRepositoryImpl(sl<CdrDataSource>()));
+
+  // Repositories با شرط
+  if (useMock) {
+    sl.registerLazySingleton<IExtensionRepository>(
+      () => ExtensionRepositoryMock(),
+    );
+    sl.registerLazySingleton<IMonitorRepository>(
+      () => MonitorRepositoryMock(),
+    );
+  } else {
+    sl.registerLazySingleton<IExtensionRepository>(
+      () => ExtensionRepositoryImpl(sl<AmiDataSource>()),
+    );
+    sl.registerLazySingleton<IMonitorRepository>(
+      () => MonitorRepositoryImpl(sl<AmiDataSource>()),
+    );
+  }
+
+  sl.registerLazySingleton<CdrRepositoryImpl>(
+    () => CdrRepositoryImpl(sl<CdrDataSource>()),
+  );
 
   // Domain layer
-  sl.registerFactory(() => GetExtensionsUseCase(sl<ExtensionRepositoryImpl>()));
-  sl.registerFactory(() => PauseAgentUseCase(sl<MonitorRepositoryImpl>()));
-  sl.registerFactory(() => UnpauseAgentUseCase(sl<MonitorRepositoryImpl>()));
-  sl.registerFactory(() => GetQueueStatusUseCase(sl<MonitorRepositoryImpl>()));
-  sl.registerFactory(() => GetAgentDetailsUseCase(sl<MonitorRepositoryImpl>()));
+  sl.registerFactory(() => GetExtensionsUseCase(sl<IExtensionRepository>()));
+  sl.registerFactory(() => PauseAgentUseCase(sl<IMonitorRepository>()));
+  sl.registerFactory(() => UnpauseAgentUseCase(sl<IMonitorRepository>()));
+  sl.registerFactory(() => GetQueueStatusUseCase(sl<IMonitorRepository>()));
+  sl.registerFactory(() => GetAgentDetailsUseCase(sl<IMonitorRepository>()));
   sl.registerFactory(() => GetCdrRecordsUseCase(sl<CdrRepositoryImpl>()));
   sl.registerFactory(() => ExportCdrToCsvUseCase());
-  sl.registerFactory(() => GetTrunksUseCase(sl<MonitorRepositoryImpl>()));
-  sl.registerFactory(() => GetParkedCallsUseCase(sl<MonitorRepositoryImpl>()));
+  sl.registerFactory(() => GetTrunksUseCase(sl<IMonitorRepository>()));
+  sl.registerFactory(() => GetParkedCallsUseCase(sl<IMonitorRepository>()));
 
   // Presentation layer
   sl.registerFactory(() => ExtensionBloc(sl<GetExtensionsUseCase>()));

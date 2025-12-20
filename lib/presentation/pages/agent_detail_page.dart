@@ -85,10 +85,10 @@ class _AgentDetailPageState extends State<AgentDetailPage> {
           ],
         ),
         body: BlocBuilder<AgentDetailBloc, AgentDetailState>(
-          builder: (context, state) {
-            if (state is AgentDetailLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is AgentDetailLoaded) {
+          builder: (context, state) => switch (state) {
+            AgentDetailInitial() => const SizedBox.shrink(),
+            AgentDetailLoading() => const Center(child: CircularProgressIndicator()),
+            AgentDetailLoaded() => () {
               final details = state.details;
               return RefreshIndicator(
                 onRefresh: () async {
@@ -265,29 +265,27 @@ class _AgentDetailPageState extends State<AgentDetailPage> {
                   ],
                 ),
               );
-            } else if (state is AgentDetailError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text(
-                      'خطا در بارگذاری اطلاعات',
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(state.message, style: const TextStyle(color: Colors.red)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => bloc.add(LoadAgentDetails(widget.agentInterface)),
-                      child: const Text('تلاش مجدد'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+            }(),
+            AgentDetailError() => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'خطا در بارگذاری اطلاعات',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(state.message, style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => bloc.add(LoadAgentDetails(widget.agentInterface)),
+                    child: const Text('تلاش مجدد'),
+                  ),
+                ],
+              ),
+            ),
           },
         ),
       ),

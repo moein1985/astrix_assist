@@ -1,11 +1,12 @@
 import '../repositories/imonitor_repository.dart';
+import '../../core/result.dart';
 
 class PauseAgentUseCase {
   final IMonitorRepository repository;
 
   PauseAgentUseCase(this.repository);
 
-  Future<void> call({
+  Future<Result<void>> call({
     required String queue,
     required String interface,
     String? reason,
