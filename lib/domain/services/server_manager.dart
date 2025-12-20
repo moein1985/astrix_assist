@@ -55,4 +55,9 @@ class ServerManager {
       return null;
     }
   }
+
+  static Future<void> clearActiveServer() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_activeServerKey);
+  }
 }

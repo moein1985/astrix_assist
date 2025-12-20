@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/app_localizations.dart';
+import '../../core/locale_manager.dart';
 import '../../domain/entities/server_config.dart';
 import '../../domain/services/server_manager.dart';
+import '../widgets/language_switcher.dart';
 import '../widgets/theme_toggle_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -54,80 +57,84 @@ class _LoginPageState extends State<LoginPage> {
     final passController = TextEditingController(text: existing?.password ?? '');
     final formKey = GlobalKey<FormState>();
 
+    final l10n = AppLocalizations.of(context);
+    final isRTL = LocaleManager.isFarsi();
+
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(existing == null ? 'افزودن سرور جدید' : 'ویرایش سرور'),
-        content: SingleChildScrollView(
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'نام سرور',
-                    prefixIcon: Icon(Icons.label),
+      builder: (dialogContext) => Directionality(
+        textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+        child: AlertDialog(
+          title: Text(existing == null ? l10n.t('add_new_server') : l10n.t('edit_server')),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: l10n.t('server_name'),
+                      prefixIcon: const Icon(Icons.label),
+                    ),
+                    validator: (v) => v == null || v.isEmpty ? l10n.t('name_required') : null,
                   ),
-                  validator: (v) => v == null || v.isEmpty ? 'نام الزامی است' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: hostController,
-                  decoration: const InputDecoration(
-                    labelText: 'آدرس IP',
-                    prefixIcon: Icon(Icons.dns),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: hostController,
+                    decoration: InputDecoration(
+                      labelText: l10n.t('ip_address'),
+                      prefixIcon: const Icon(Icons.dns),
+                    ),
+                    validator: (v) => v == null || v.isEmpty ? l10n.t('ip_required') : null,
                   ),
-                  validator: (v) => v == null || v.isEmpty ? 'آدرس IP الزامی است' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: portController,
-                  decoration: const InputDecoration(
-                    labelText: 'پورت',
-                    prefixIcon: Icon(Icons.settings_ethernet),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: portController,
+                    decoration: InputDecoration(
+                      labelText: l10n.t('port'),
+                      prefixIcon: const Icon(Icons.settings_ethernet),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (v) => v == null || v.isEmpty ? l10n.t('port_required') : null,
                   ),
-                  keyboardType: TextInputType.number,
-                  validator: (v) => v == null || v.isEmpty ? 'پورت الزامی است' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: userController,
-                  decoration: const InputDecoration(
-                    labelText: 'نام کاربری',
-                    prefixIcon: Icon(Icons.person),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: userController,
+                    decoration: InputDecoration(
+                      labelText: l10n.t('username'),
+                      prefixIcon: const Icon(Icons.person),
+                    ),
                   ),
-                  validator: (v) => v == null || v.isEmpty ? 'نام کاربری الزامی است' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: passController,
-                  decoration: const InputDecoration(
-                    labelText: 'رمز عبور',
-                    prefixIcon: Icon(Icons.lock),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: passController,
+                    decoration: InputDecoration(
+                      labelText: l10n.t('password'),
+                      prefixIcon: const Icon(Icons.lock),
+                    ),
+                    obscureText: true,
                   ),
-                  obscureText: true,
-                  validator: (v) => v == null || v.isEmpty ? 'رمز عبور الزامی است' : null,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.t('cancel')),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  Navigator.pop(dialogContext, true);
+                }
+              },
+              child: Text(l10n.t('save')),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('لغو'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.pop(context, true);
-              }
-            },
-            child: const Text('ذخیره'),
-          ),
-        ],
       ),
     );
 
@@ -146,22 +153,28 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _deleteServer(ServerConfig config) async {
+    final l10n = AppLocalizations.of(context);
+    final isRTL = LocaleManager.isFarsi();
+
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('حذف سرور'),
-        content: Text('آیا از حذف "${config.name}" اطمینان دارید؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('لغو'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('حذف'),
-          ),
-        ],
+      builder: (dialogContext) => Directionality(
+        textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+        child: AlertDialog(
+          title: Text(l10n.t('delete_server')),
+          content: Text('${l10n.t('delete_confirm')} "${config.name}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.t('cancel')),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(l10n.t('delete')),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -173,198 +186,163 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              slivers: [
-                SliverAppBar.large(
-                  title: const Text('Astrix Assist'),
-                  actions: const [ThemeToggleButton()],
-                  floating: true,
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'سرورهای ذخیره شده',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            FilledButton.icon(
-                              onPressed: () => _showAddEditDialog(),
-                              icon: const Icon(Icons.add),
-                              label: const Text('افزودن سرور'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        // دکمه ورود با Mock Data
-                        const bool.fromEnvironment('USE_MOCK', defaultValue: false)
-                            ? Card(
-                                color: Colors.orange[50],
-                                child: InkWell(
-                                  onTap: () {
-                                    // در حالت Mock مستقیم به Dashboard برو
-                                    context.go('/dashboard');
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.science, size: 48, color: Colors.orange[700]),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+    final l10n = AppLocalizations.of(context);
+    final isRTL = LocaleManager.isFarsi();
+
+    return Directionality(
+      textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : CustomScrollView(
+                slivers: [
+                  SliverAppBar.large(
+                    title: Text(l10n.t('app_title')),
+                    actions: const [
+                      LanguageSwitcher(),
+                      ThemeToggleButton(),
+                    ],
+                    floating: true,
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                l10n.t('saved_servers'),
+                                style: Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              FilledButton.icon(
+                                onPressed: () => _showAddEditDialog(),
+                                icon: const Icon(Icons.add),
+                                label: Text(l10n.t('add_server')),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          if (_servers.isEmpty)
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(32.0),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.dns_outlined, size: 64, color: Colors.grey[400]),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      l10n.t('no_servers'),
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      l10n.t('add_server_to_start'),
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          else
+                            ...List.generate(_servers.length, (index) {
+                              final server = _servers[index];
+                              final isActive = _selectedServer?.id == server.id;
+                              return Card(
+                                elevation: isActive ? 4 : 1,
+                                margin: const EdgeInsets.only(bottom: 12),
+                                child: IntrinsicHeight(
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.all(16),
+                                    leading: Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: isActive ? Colors.blue : Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        Icons.dns,
+                                        color: isActive ? Colors.white : Colors.grey[600],
+                                      ),
+                                    ),
+                                    title: Text(
+                                      server.name,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    ),
+                                    subtitle: Flexible(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const SizedBox(height: 4),
+                                          Row(
                                             children: [
-                                              Text(
-                                                'حالت آزمایشی (Mock Data)',
-                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                      color: Colors.orange[900],
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                'ورود بدون نیاز به سرور Asterisk',
-                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                      color: Colors.orange[700],
-                                                    ),
+                                              const Icon(Icons.computer, size: 14, color: Colors.grey),
+                                              const SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text(
+                                                  '${server.host}:${server.port}',
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
                                               ),
                                             ],
                                           ),
+                                          const SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.person, size: 14, color: Colors.grey),
+                                              const SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text(
+                                                  server.username,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          if (isActive) ...[
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.check_circle, size: 14, color: Colors.green[700]),
+                                                const SizedBox(width: 4),
+                                                Text(l10n.t('active'), style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold)),
+                                              ],
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () => _showAddEditDialog(server),
+                                          tooltip: l10n.t('edit'),
                                         ),
-                                        Icon(Icons.arrow_forward, color: Colors.orange[700]),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete, color: Colors.red),
+                                          onPressed: () => _deleteServer(server),
+                                          tooltip: l10n.t('delete'),
+                                        ),
                                       ],
                                     ),
+                                    onTap: () => _connectToServer(server),
                                   ),
                                 ),
-                              )
-                            : const SizedBox.shrink(),
-                        const SizedBox(height: 16),
-                        if (_servers.isEmpty)
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(32.0),
-                              child: Column(
-                                children: [
-                                  Icon(Icons.dns_outlined, size: 64, color: Colors.grey[400]),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'هیچ سروری ذخیره نشده',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'برای شروع یک سرور اضافه کنید',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        else
-                          ...List.generate(_servers.length, (index) {
-                            final server = _servers[index];
-                            final isActive = _selectedServer?.id == server.id;
-                            return Card(
-                              elevation: isActive ? 4 : 1,
-                              margin: const EdgeInsets.only(bottom: 12),
-                              child: IntrinsicHeight(
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.all(16),
-                                  leading: Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: isActive ? Colors.blue : Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    Icons.dns,
-                                    color: isActive ? Colors.white : Colors.grey[600],
-                                  ),
-                                ),
-                                title: Text(
-                                  server.name,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                ),
-                                subtitle: Flexible(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.computer, size: 14, color: Colors.grey),
-                                          const SizedBox(width: 4),
-                                          Flexible(
-                                            child: Text(
-                                              '${server.host}:${server.port}',
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.person, size: 14, color: Colors.grey),
-                                          const SizedBox(width: 4),
-                                          Flexible(
-                                            child: Text(
-                                              server.username,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      if (isActive) ...[
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.check_circle, size: 14, color: Colors.green[700]),
-                                            const SizedBox(width: 4),
-                                            Text('فعال', style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold)),
-                                          ],
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.edit),
-                                        onPressed: () => _showAddEditDialog(server),
-                                        tooltip: 'ویرایش',
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red),
-                                        onPressed: () => _deleteServer(server),
-                                        tooltip: 'حذف',
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () => _connectToServer(server),
-                                ),
-                              ),
-                            );
-                          }),
-                      ],
+                              );
+                            }),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 }

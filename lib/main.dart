@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/injection_container.dart';
 import 'core/router.dart';
 import 'core/theme_manager.dart';
+import 'core/locale_manager.dart';
+import 'core/app_localizations.dart';
 import 'core/notification_service.dart';
 import 'core/background_service_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupDependencies();
+  
+  // Load settings
   await ThemeManager.load();
+  await LocaleManager.load();
+  
+  // Setup dependencies (uses AppConfig.useMockRepositories)
+  setupDependencies();
 
   // Initialize notification service
   await NotificationService().initialize();
@@ -26,13 +34,26 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: ThemeManager.themeMode,
-      builder: (context, mode, _) {
-        return MaterialApp.router(
-          routerConfig: router,
-          title: 'Astrix Assist',
-          theme: ThemeManager.lightTheme,
-          darkTheme: ThemeManager.darkTheme,
-          themeMode: mode,
+      builder: (context, themeMode, _) {
+        return ValueListenableBuilder(
+          valueListenable: LocaleManager.locale,
+          builder: (context, locale, _) {
+            return MaterialApp.router(
+              routerConfig: router,
+              title: 'Astrix Assist',
+              theme: ThemeManager.lightTheme,
+              darkTheme: ThemeManager.darkTheme,
+              themeMode: themeMode,
+              locale: locale,
+              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+            );
+          },
         );
       },
     );

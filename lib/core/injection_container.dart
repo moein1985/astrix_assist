@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'app_config.dart';
 import '../domain/usecases/get_extensions_usecase.dart';
 import '../domain/usecases/pause_agent_usecase.dart';
 import '../domain/usecases/unpause_agent_usecase.dart';
@@ -27,8 +28,14 @@ import '../presentation/blocs/parking_bloc.dart';
 final sl = GetIt.instance;
 
 void setupDependencies() {
-  // تشخیص محیط
-  const useMock = bool.fromEnvironment('USE_MOCK', defaultValue: false);
+  // جلوگیری از ثبت مجدد
+  if (sl.isRegistered<IExtensionRepository>()) {
+    print('⚠️ [DI] Dependencies already registered, skipping...');
+    return;
+  }
+  
+  // استفاده از AppConfig برای تعیین Mock یا Real
+  const useMock = AppConfig.useMockRepositories;
   
   print('🎯 [DI] USE_MOCK = $useMock');
   
@@ -41,19 +48,19 @@ void setupDependencies() {
   // Data layer
   sl.registerFactory(
     () => AmiDataSource(
-      host: '192.168.85.88', // Default, will be overridden
-      port: 5038,
-      username: 'moein_api',
-      secret: '123456',
+      host: AppConfig.defaultAmiHost,
+      port: AppConfig.defaultAmiPort,
+      username: AppConfig.defaultAmiUsername,
+      secret: AppConfig.defaultAmiSecret,
     ),
   );
   sl.registerFactory(
     () => CdrDataSource(
-      host: '192.168.85.88',
-      port: 3306,
-      user: 'root',
-      password: '',
-      db: 'asteriskcdrdb',
+      host: AppConfig.defaultDbHost,
+      port: AppConfig.defaultDbPort,
+      user: AppConfig.defaultDbUser,
+      password: AppConfig.defaultDbPassword,
+      db: AppConfig.defaultDbName,
     ),
   );
 
