@@ -11,6 +11,7 @@ import '../../domain/usecases/get_extensions_usecase.dart';
 import '../blocs/extension_bloc.dart';
 import '../../domain/entities/extension.dart';
 import '../widgets/theme_toggle_button.dart';
+import '../widgets/connection_status_widget.dart';
 
 class ExtensionsPage extends StatefulWidget {
   const ExtensionsPage({super.key});
@@ -86,6 +87,7 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
           appBar: AppBar(
             title: const Text('داخلی‌ها'),
             actions: [
+              const ConnectionStatusWidget(),
               const ThemeToggleButton(),
               IconButton(
                 icon: const Icon(Icons.phone_forwarded),
@@ -274,7 +276,7 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
     return Expanded(
       child: Card(
         elevation: 4,
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

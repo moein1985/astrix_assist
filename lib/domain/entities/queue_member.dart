@@ -1,5 +1,6 @@
 class QueueMember {
   final String name;
+  final String interface; // e.g., "SIP/301"
   final String state;
   final bool paused;
   final int callsTaken;
@@ -7,6 +8,7 @@ class QueueMember {
 
   QueueMember({
     required this.name,
+    required this.interface,
     required this.state,
     required this.paused,
     required this.callsTaken,

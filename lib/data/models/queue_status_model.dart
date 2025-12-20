@@ -28,12 +28,14 @@ class QueueStatusModel extends QueueStatus {
         completed = _intForPrefix(lines, 'Completed: ');
       } else if (type == 'QueueMember') {
         final name = _valueForPrefix(lines, 'Name: ');
+        final location = _valueForPrefix(lines, 'Location: ');
         final paused = _intForPrefix(lines, 'Paused: ') == 1;
         final statusCode = _intForPrefix(lines, 'Status: ');
         final callsTaken = _intForPrefix(lines, 'CallsTaken: ');
         final lastCall = _intForPrefix(lines, 'LastCall: ');
         members.add(QueueMember(
-          name: name.isNotEmpty ? name : _valueForPrefix(lines, 'Location: '),
+          name: name.isNotEmpty ? name : location,
+          interface: location,
           state: _mapStatus(statusCode, paused),
           paused: paused,
           callsTaken: callsTaken,

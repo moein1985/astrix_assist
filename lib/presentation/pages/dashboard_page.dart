@@ -13,6 +13,7 @@ import '../blocs/dashboard_bloc.dart';
 import '../blocs/dashboard_event.dart';
 import '../blocs/dashboard_state.dart';
 import '../widgets/theme_toggle_button.dart';
+import '../widgets/connection_status_widget.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -86,6 +87,7 @@ class _DashboardPageState extends State<DashboardPage> {
         appBar: AppBar(
           title: const Text('داشبورد'),
           actions: [
+            const ConnectionStatusWidget(),
             const ThemeToggleButton(),
             IconButton(
               icon: const Icon(Icons.timer_outlined),
@@ -185,7 +187,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             _buildStatCard(
               'میانگین انتظار',
-              '${stats.averageWaitTime.toStringAsFixed(1)}',
+              stats.averageWaitTime.toStringAsFixed(1),
               'ثانیه',
               Icons.timer,
               Colors.purple,

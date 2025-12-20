@@ -7,9 +7,13 @@ import '../../data/datasources/ami_datasource.dart';
 import '../../data/repositories/monitor_repository_impl.dart';
 import '../../domain/usecases/get_active_calls_usecase.dart';
 import '../../domain/usecases/hangup_call_usecase.dart';
+import '../../domain/usecases/transfer_call_usecase.dart';
 import '../../core/refresh_settings.dart';
 import '../blocs/active_call_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
+import '../widgets/connection_status_widget.dart';
+import '../widgets/call_duration_widget.dart';
+import '../widgets/transfer_dialog.dart';
 
 class ActiveCallsPage extends StatefulWidget {
   const ActiveCallsPage({super.key});
@@ -45,7 +49,8 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
     final repo = MonitorRepositoryImpl(dataSource);
     final getCallsUseCase = GetActiveCallsUseCase(repo);
     final hangupUseCase = HangupCallUseCase(repo);
-    final bloc = ActiveCallBloc(getCallsUseCase, hangupUseCase);
+    final transferUseCase = TransferCallUseCase(repo);
+    final bloc = ActiveCallBloc(getCallsUseCase, hangupUseCase, transferUseCase);
 
     setState(() => _bloc = bloc);
     bloc.add(LoadActiveCalls());
@@ -78,6 +83,7 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
         appBar: AppBar(
           title: const Text('تماس‌های فعال'),
           actions: [
+            const ConnectionStatusWidget(),
             const ThemeToggleButton(),
             IconButton(
               icon: const Icon(Icons.timer_outlined),
@@ -107,11 +113,28 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
                     child: ListTile(
                       leading: const Icon(Icons.call, color: Colors.green),
                       title: Text('${call.caller} ➜ ${call.callee}'),
-                      subtitle: Text('${call.channel}\nDuration: ${call.duration}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.call_end, color: Colors.red),
-                        tooltip: 'Hangup',
-                        onPressed: () => bloc.add(HangupCall(call.channel)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(call.channel),
+                          const SizedBox(height: 4),
+                          CallDurationWidget(durationString: call.duration),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.phone_forwarded, color: Colors.blue),
+                            tooltip: 'انتقال',
+                            onPressed: () => _showTransferDialog(context, call.channel),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.call_end, color: Colors.red),
+                            tooltip: 'قطع',
+                            onPressed: () => bloc.add(HangupCall(call.channel)),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -199,6 +222,30 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
         _refreshSeconds = newSettings.intervalSeconds;
       });
       _startTimer();
+    }
+  }
+
+  Future<void> _showTransferDialog(BuildContext context, String channel) async {
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) => TransferDialog(currentChannel: channel),
+    );
+
+    if (result != null && _bloc != null) {
+      _bloc!.add(TransferCall(
+        channel: channel,
+        destination: result['destination']!,
+        context: result['context']!,
+      ));
+      
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('در حال انتقال به ${result['destination']}...'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 }

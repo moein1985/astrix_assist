@@ -6,3 +6,24 @@ abstract class QueueEvent extends Equatable {
 }
 
 class LoadQueues extends QueueEvent {}
+
+class PauseAgent extends QueueEvent {
+  final String queue;
+  final String interface;
+  final String? reason;
+
+  PauseAgent({required this.queue, required this.interface, this.reason});
+
+  @override
+  List<Object?> get props => [queue, interface, reason];
+}
+
+class UnpauseAgent extends QueueEvent {
+  final String queue;
+  final String interface;
+
+  UnpauseAgent({required this.queue, required this.interface});
+
+  @override
+  List<Object?> get props => [queue, interface];
+}

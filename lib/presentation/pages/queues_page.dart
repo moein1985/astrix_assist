@@ -3,12 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart';
 import '../../data/datasources/ami_datasource.dart';
 import '../../data/repositories/monitor_repository_impl.dart';
 import '../../domain/usecases/get_queue_status_usecase.dart';
+import '../../domain/usecases/pause_agent_usecase.dart';
+import '../../domain/usecases/unpause_agent_usecase.dart';
 import '../../core/refresh_settings.dart';
 import '../blocs/queue_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
+import '../widgets/connection_status_widget.dart';
+import '../widgets/pause_reason_dialog.dart';
 
 class QueuesPage extends StatefulWidget {
   const QueuesPage({super.key});
@@ -42,8 +47,14 @@ class _QueuesPageState extends State<QueuesPage> {
 
     final dataSource = AmiDataSource(host: host, port: port, username: user, secret: secret);
     final repo = MonitorRepositoryImpl(dataSource);
-    final useCase = GetQueueStatusUseCase(repo);
-    final bloc = QueueBloc(useCase);
+    final getQueueUseCase = GetQueueStatusUseCase(repo);
+    final pauseUseCase = PauseAgentUseCase(repo);
+    final unpauseUseCase = UnpauseAgentUseCase(repo);
+    final bloc = QueueBloc(
+      getQueueStatusUseCase: getQueueUseCase,
+      pauseAgentUseCase: pauseUseCase,
+      unpauseAgentUseCase: unpauseUseCase,
+    );
 
     setState(() => _bloc = bloc);
     bloc.add(LoadQueues());
@@ -76,6 +87,7 @@ class _QueuesPageState extends State<QueuesPage> {
         appBar: AppBar(
           title: const Text('صف‌ها'),
           actions: [
+            const ConnectionStatusWidget(),
             const ThemeToggleButton(),
             IconButton(
               icon: const Icon(Icons.timer_outlined),
@@ -125,23 +137,57 @@ class _QueuesPageState extends State<QueuesPage> {
                           if (q.members.isNotEmpty) ...[
                             const Text('Agents:'),
                             const SizedBox(height: 6),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
-                              children: q.members
-                                  .map(
-                                    (m) => Chip(
-                                      avatar: Icon(
-                                        Icons.person,
-                                        size: 16,
-                                        color: _memberColor(m.state),
-                                      ),
-                                      label: Text('${m.name} • ${m.state}'),
-                                      backgroundColor: _memberColor(m.state).withOpacity(0.12),
+                            ...q.members.map((m) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.person,
+                                      size: 18,
+                                      color: _memberColor(m.state),
                                     ),
-                                  )
-                                  .toList(),
-                            ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () => context.push(
+                                          '/agent/${Uri.encodeComponent(m.interface)}?name=${Uri.encodeComponent(m.name)}',
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${m.name} • ${m.state}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                            ),
+                                            if (m.paused)
+                                              Text(
+                                                'توقف',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.red[700],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        m.paused ? Icons.play_arrow : Icons.pause,
+                                        size: 20,
+                                        color: m.paused ? Colors.green : Colors.orange,
+                                      ),
+                                      tooltip: m.paused ? 'فعال‌سازی' : 'توقف',
+                                      onPressed: () => _toggleAgentPause(context, q.queue, m.name, m.interface, m.paused),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
                           ] else
                             const Text('No agents reported'),
                         ],
@@ -251,6 +297,36 @@ class _QueuesPageState extends State<QueuesPage> {
         return Colors.purple;
       default:
         return Colors.grey;
+    }
+  }
+
+  Future<void> _toggleAgentPause(BuildContext context, String queue, String agentName, String interface, bool currentlyPaused) async {
+    final bloc = _bloc;
+    if (bloc == null) return;
+
+    if (currentlyPaused) {
+      // Unpause the agent
+      bloc.add(UnpauseAgent(queue: queue, interface: interface));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$agentName فعال شد')),
+        );
+      }
+    } else {
+      // Pause the agent - show dialog to ask for reason
+      final reason = await showDialog<String>(
+        context: context,
+        builder: (context) => const PauseReasonDialog(),
+      );
+      
+      if (reason != null) {
+        bloc.add(PauseAgent(queue: queue, interface: interface, reason: reason));
+        if (mounted && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$agentName متوقف شد')),
+          );
+        }
+      }
     }
   }
 }

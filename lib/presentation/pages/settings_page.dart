@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme_manager.dart';
+import '../../core/background_service_manager.dart';
 import '../../domain/services/server_manager.dart';
 import '../widgets/theme_toggle_button.dart';
 
@@ -13,11 +15,14 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String? _currentServerName;
+  bool _notificationsEnabled = true;
+  bool _backgroundServiceEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _loadCurrentServer();
+    _loadNotificationSettings();
   }
 
   Future<void> _loadCurrentServer() async {
@@ -28,6 +33,50 @@ class _SettingsPageState extends State<SettingsPage> {
         final server = servers.firstWhere((s) => s.id == activeId);
         setState(() => _currentServerName = server.name);
       } catch (_) {}
+    }
+  }
+
+  Future<void> _loadNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+      _backgroundServiceEnabled =
+          prefs.getBool('background_service_enabled') ?? false;
+    });
+  }
+
+  Future<void> _setNotificationsEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notifications_enabled', value);
+    setState(() => _notificationsEnabled = value);
+  }
+
+  Future<void> _setBackgroundServiceEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('background_service_enabled', value);
+    setState(() => _backgroundServiceEnabled = value);
+
+    if (value) {
+      await BackgroundServiceManager().scheduleConnectionCheck();
+      await BackgroundServiceManager().scheduleQueueStatusCheck();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('سرویس پس‌زمینه فعال شد'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      await BackgroundServiceManager().cancelAllBackgroundTasks();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('سرویس پس‌زمینه غیرفعال شد'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -56,6 +105,25 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: () => _disconnectAndGoToLogin(),
           ),
           const Divider(),
+          _buildSection('اطلاع‌رسانی'),
+          SwitchListTile(
+            title: const Text('اطلاع‌رسانی‌های محلی'),
+            subtitle: const Text('دریافت اطلاع‌رسانی برای رویدادهای سیستم'),
+            value: _notificationsEnabled,
+            onChanged: _setNotificationsEnabled,
+          ),
+          SwitchListTile(
+            title: const Text('سرویس پس‌زمینه'),
+            subtitle: const Text('بررسی وضعیت سرور در پس‌زمینه'),
+            value: _backgroundServiceEnabled,
+            onChanged: _setBackgroundServiceEnabled,
+          ),
+          if (_backgroundServiceEnabled)
+            ListTile(
+              title: const Text('اطلاعات'),
+              subtitle: const Text('هر 5 دقیقه صف‌ها بررسی می‌شود'),
+            ),
+          const Divider(),
           _buildSection('نمایش'),
           ListTile(
             leading: Icon(
@@ -74,6 +142,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               },
             ),
+          ),
+          const Divider(),
+          _buildSection('گزارشات'),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text('تاریخچه تماس‌ها (CDR)'),
+            subtitle: const Text('مشاهده رکوردهای تماس'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/cdr'),
           ),
           const Divider(),
           _buildSection('درباره برنامه'),
