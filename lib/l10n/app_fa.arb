@@ -201,6 +201,11 @@
     "description": "Recent calls section title"
   },
 
+  "callHistory": "تاریخچه تماس‌ها",
+  "@callHistory": {
+    "description": "Call history section title"
+  },
+
   "noActiveCalls": "تماس فعالی وجود ندارد",
   "@noActiveCalls": {
     "description": "Message when no active calls"

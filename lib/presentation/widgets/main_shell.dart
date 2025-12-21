@@ -60,33 +60,6 @@ class _MainShellState extends State<MainShell> {
     if (isMobile) {
       return Scaffold(
         body: widget.child,
-        bottomNavigationBar: _currentIndex == 0 ? null : BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onNavigation,
-          type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.dashboard),
-              label: l10n.navDashboard,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.phone),
-              label: l10n.navExtensions,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.call),
-              label: l10n.navCalls,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.queue),
-              label: l10n.navQueues,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.description),
-              label: l10n.navReports,
-            ),
-          ],
-        ),
       );
     } else if (isTablet) {
       return Scaffold(

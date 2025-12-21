@@ -82,24 +82,9 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Scaffold(
           appBar: AppBar(
             title: Text(l10n.dashboard),
-            actions: [
+            actions: const [
               ConnectionStatusWidget(),
               ThemeToggleButton(),
-              IconButton(
-                icon: const Icon(Icons.timer_outlined),
-                tooltip: l10n.autoRefresh,
-                onPressed: _showRefreshSettings,
-              ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                tooltip: l10n.refresh,
-                onPressed: () => bloc.add(RefreshDashboard()),
-              ),
-              IconButton(
-                icon: const Icon(Icons.logout),
-                tooltip: l10n.logout,
-                onPressed: () => _showLogoutDialog(context, l10n),
-              ),
             ],
           ),
           body: BlocBuilder<DashboardBloc, DashboardState>(
@@ -208,6 +193,31 @@ class _DashboardPageState extends State<DashboardPage> {
                                   Icons.settings,
                                   Colors.grey.shade100,
                                   () => context.push('/settings'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Call History Section
+                            _buildDashboardSection(
+                              context,
+                              l10n.callHistory ?? 'Call History',
+                              Icons.history,
+                              Colors.purple,
+                              [
+                                _buildSectionCard(
+                                  context,
+                                  l10n.callHistory ?? 'Call History',
+                                  Icons.history,
+                                  Colors.purple.shade100,
+                                  () => context.push('/cdr'),
+                                ),
+                                _buildSectionCard(
+                                  context,
+                                  l10n.activeCalls,
+                                  Icons.call,
+                                  Colors.orange.shade100,
+                                  () => context.push('/calls'),
                                 ),
                               ],
                             ),

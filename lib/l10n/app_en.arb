@@ -201,6 +201,11 @@
     "description": "Recent calls section title"
   },
 
+  "callHistory": "Call History",
+  "@callHistory": {
+    "description": "Call history section title"
+  },
+
   "noActiveCalls": "No active calls",
   "@noActiveCalls": {
     "description": "Message when no active calls"

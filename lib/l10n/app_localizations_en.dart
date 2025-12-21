@@ -130,6 +130,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentCalls => 'Recent Calls';
 
   @override
+  String get callHistory => 'Call History';
+
+  @override
   String get noActiveCalls => 'No active calls';
 
   @override

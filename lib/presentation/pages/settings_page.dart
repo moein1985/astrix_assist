@@ -173,17 +173,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const Divider(),
             
-            // Reports Section
-            _buildSection(isRTL ? 'گزارشات' : 'Reports'),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: Text(isRTL ? 'تاریخچه تماس‌ها (CDR)' : 'Call History (CDR)'),
-              subtitle: Text(isRTL ? 'مشاهده رکوردهای تماس' : 'View call records'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/cdr'),
-            ),
-            const Divider(),
-            
             // About Section
             _buildSection(isRTL ? 'درباره برنامه' : 'About'),
             ListTile(

@@ -130,6 +130,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get recentCalls => 'تماس‌های اخیر';
 
   @override
+  String get callHistory => 'تاریخچه تماس‌ها';
+
+  @override
   String get noActiveCalls => 'تماس فعالی وجود ندارد';
 
   @override

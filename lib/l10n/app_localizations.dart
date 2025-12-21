@@ -338,6 +338,12 @@ abstract class AppLocalizations {
   /// **'Recent Calls'**
   String get recentCalls;
 
+  /// Call history section title
+  ///
+  /// In en, this message translates to:
+  /// **'Call History'**
+  String get callHistory;
+
   /// Message when no active calls
   ///
   /// In en, this message translates to:
