@@ -272,6 +272,12 @@ abstract class AppLocalizations {
   /// **'Dashboard'**
   String get dashboard;
 
+  /// Quick tip shown on dashboard
+  ///
+  /// In en, this message translates to:
+  /// **'Click on cards to view detailed information and manage your PBX system'**
+  String get dashboardQuickTip;
+
   /// Extensions page title
   ///
   /// In en, this message translates to:

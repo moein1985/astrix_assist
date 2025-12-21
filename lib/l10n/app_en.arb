@@ -146,6 +146,11 @@
     "description": "Dashboard page title"
   },
 
+  "dashboardQuickTip": "Click on cards to view detailed information and manage your PBX system",
+  "@dashboardQuickTip": {
+    "description": "Quick tip shown on dashboard"
+  },
+
   "extensions": "Extensions",
   "@extensions": {
     "description": "Extensions page title"

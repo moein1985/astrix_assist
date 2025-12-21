@@ -96,6 +96,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard => 'Dashboard';
 
   @override
+  String get dashboardQuickTip =>
+      'Click on cards to view detailed information and manage your PBX system';
+
+  @override
   String get extensions => 'Extensions';
 
   @override

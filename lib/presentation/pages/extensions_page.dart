@@ -9,6 +9,10 @@ import '../blocs/extension_bloc.dart';
 import '../../domain/entities/extension.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
+import '../widgets/modern_card.dart';
+import '../widgets/collapsible_section.dart';
+import '../widgets/quick_tip_card.dart';
+import '../widgets/help_icon_button.dart';
 
 class ExtensionsPage extends StatefulWidget {
   const ExtensionsPage({super.key});
@@ -101,44 +105,48 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
             ),
           ),
           body: BlocBuilder<ExtensionBloc, ExtensionState>(
-            builder: (context, state) => switch (state) {
-              ExtensionInitial() => const Center(child: Text('Press refresh to load')),
-              ExtensionLoading() => const Center(child: CircularProgressIndicator()),
-              ExtensionLoaded() => () {
-                final allExtensions = _applyFilter(state.extensions);
-                final onlineExtensions = allExtensions.where((e) => e.isOnline).toList();
-                final total = allExtensions.length;
-                final online = onlineExtensions.length;
-                final offline = total - online;
+            builder: (context, state) {
+              final isLoading = state is ExtensionLoading;
+              
+              return switch (state) {
+                ExtensionInitial() => const Center(child: Text('Press refresh to load')),
+                ExtensionLoading() => const Center(child: CircularProgressIndicator()),
+                ExtensionLoaded() => () {
+                  final allExtensions = _applyFilter(state.extensions);
+                  final onlineExtensions = allExtensions.where((e) => e.isOnline).toList();
+                  final total = allExtensions.length;
+                  final online = onlineExtensions.length;
+                  final offline = total - online;
 
-                return Column(
-                  children: [
-                    _buildDashboard(total, online, offline),
-                    _buildSearchBar(),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          _buildList(allExtensions),
-                          _buildList(onlineExtensions),
-                        ],
+                  return Column(
+                    children: [
+                      _buildDashboard(total, online, offline),
+                      _buildSearchBar(),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            _buildList(allExtensions),
+                            _buildList(onlineExtensions),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }(),
-              ExtensionError() => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => bloc.add(LoadExtensions()),
-                      child: const Text('Retry'),
-                    ),
-                  ],
+                    ],
+                  );
+                }(),
+                ExtensionError() => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: ${state.message}', style: const TextStyle(color: Colors.red)),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => bloc.add(LoadExtensions()),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              };
             },
           ),
         ),
@@ -261,17 +269,24 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
 
   Widget _buildStatCard(String title, String value, Color color) {
     return Expanded(
-      child: Card(
-        elevation: 4,
-        color: color.withValues(alpha: 0.1),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color)),
-              Text(title, style: TextStyle(color: color)),
-            ],
-          ),
+      child: ModernCard(
+        backgroundColor: color.withOpacity(0.1),
+        borderColor: color.withOpacity(0.3),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            Text(
+              title,
+              style: TextStyle(color: color),
+            ),
+          ],
         ),
       ),
     );
@@ -282,11 +297,14 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
       return const Center(child: Text('No extensions found'));
     }
     return ListView.builder(
+      key: const PageStorageKey('extensions_list'),
       itemCount: extensions.length,
       itemBuilder: (context, index) {
         final ext = extensions[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        return ModernCard(
+          key: ValueKey('extension_${ext.name}'),
+          backgroundColor: ext.isOnline ? Colors.green.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
+          borderColor: ext.isOnline ? Colors.green.withOpacity(0.2) : Colors.grey.withOpacity(0.2),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: ext.isOnline ? Colors.green : Colors.grey,
@@ -316,9 +334,17 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
                   ),
               ],
             ),
-            trailing: ext.isOnline
-                ? const Icon(Icons.check_circle, color: Colors.green)
-                : const Icon(Icons.cancel, color: Colors.grey),
+            trailing: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: ext.isOnline ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                ext.isOnline ? Icons.check_circle : Icons.cancel,
+                color: ext.isOnline ? Colors.green : Colors.grey,
+              ),
+            ),
             onTap: () => context.push('/extension', extra: ext),
           ),
         );

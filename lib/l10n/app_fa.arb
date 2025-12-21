@@ -146,6 +146,11 @@
     "description": "Dashboard page title"
   },
 
+  "dashboardQuickTip": "برای مشاهده اطلاعات جزئی و مدیریت سیستم PBX روی کارت‌ها کلیک کنید",
+  "@dashboardQuickTip": {
+    "description": "Quick tip shown on dashboard"
+  },
+
   "extensions": "داخلی‌ها",
   "@extensions": {
     "description": "Extensions page title"

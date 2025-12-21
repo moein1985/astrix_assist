@@ -96,6 +96,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get dashboard => 'داشبورد';
 
   @override
+  String get dashboardQuickTip =>
+      'برای مشاهده اطلاعات جزئی و مدیریت سیستم PBX روی کارت‌ها کلیک کنید';
+
+  @override
   String get extensions => 'داخلی‌ها';
 
   @override

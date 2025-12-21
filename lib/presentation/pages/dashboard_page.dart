@@ -10,8 +10,11 @@ import '../../domain/services/server_manager.dart';
 import '../blocs/dashboard_bloc.dart';
 import '../blocs/dashboard_event.dart';
 import '../blocs/dashboard_state.dart';
+import '../widgets/modern_card.dart';
+import '../widgets/quick_tip_card.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
+import '../widgets/help_icon_button.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -80,8 +83,8 @@ class _DashboardPageState extends State<DashboardPage> {
           appBar: AppBar(
             title: Text(l10n.dashboard),
             actions: [
-              const ConnectionStatusWidget(),
-              const ThemeToggleButton(),
+              ConnectionStatusWidget(),
+              ThemeToggleButton(),
               IconButton(
                 icon: const Icon(Icons.timer_outlined),
                 tooltip: l10n.autoRefresh,
@@ -100,33 +103,52 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
           body: BlocBuilder<DashboardBloc, DashboardState>(
-            builder: (context, state) => switch (state) {
-              DashboardInitial() => const SizedBox.shrink(),
-              DashboardLoading() => const Center(child: CircularProgressIndicator()),
-              DashboardLoaded() => RefreshIndicator(
-                onRefresh: () async => bloc.add(RefreshDashboard()),
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildStatsGrid(state, l10n),
-                    const SizedBox(height: 24),
-                    _buildRecentCallsSection(state, l10n),
-                  ],
-                ),
-              ),
-              DashboardError() => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('${l10n.error}: ${state.message}', style: const TextStyle(color: Colors.red)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => bloc.add(LoadDashboard()),
-                      child: Text(l10n.retryButton),
+            builder: (context, state) {
+              final isLoading = state is DashboardLoading;
+              
+              return Stack(
+                children: [
+                  switch (state) {
+                    DashboardInitial() => const SizedBox.shrink(),
+                    DashboardLoading() => const Center(child: CircularProgressIndicator()),
+                    DashboardLoaded() => RefreshIndicator(
+                      onRefresh: () async => bloc.add(RefreshDashboard()),
+                      child: ListView(
+                        key: const PageStorageKey('dashboard_list'),
+                        padding: const EdgeInsets.all(16),
+                        children: [
+                          _buildStatsGrid(state, l10n),
+                          const SizedBox(height: 24),
+                          _buildRecentCallsSection(state, l10n),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                    DashboardError() => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('${l10n.error}: ${state.message}', style: const TextStyle(color: Colors.red)),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () => bloc.add(LoadDashboard()),
+                            child: Text(l10n.retryButton),
+                          ),
+                        ],
+                      ),
+                    ),
+                  },
+                  if (isLoading)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.transparent,
+                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                      ),
+                    ),
+                ],
+              );
             },
           ),
         ),
@@ -166,6 +188,12 @@ class _DashboardPageState extends State<DashboardPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Quick Tip Card
+        QuickTipCard(
+          tip: l10n.dashboardQuickTip ?? 'برای مشاهده جزئیات بیشتر روی کارت‌ها کلیک کنید',
+        ),
+        const SizedBox(height: 16),
+        
         Row(
           children: [
             const Icon(Icons.bar_chart, size: 24),
@@ -222,37 +250,35 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildStatCard(String title, String value, String subtitle, IconData icon, Color color) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+    return ModernCard(
+      backgroundColor: color.withOpacity(0.1),
+      borderColor: color.withOpacity(0.3),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
-            Text(
-              value,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
-            ),
-            Text(
-              subtitle,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          Text(
+            value,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
+          ),
+          Text(
+            subtitle,
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          ),
+        ],
       ),
     );
   }
@@ -329,7 +355,16 @@ class _DashboardPageState extends State<DashboardPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(l10n.autoRefresh),
+                      Row(
+                        children: [
+                          Text(l10n.autoRefresh),
+                          const SizedBox(width: 8),
+                          HelpIconButton(
+                            title: 'Auto Refresh Settings',
+                            content: 'Enable automatic refresh to keep dashboard data up to date. Set the interval in seconds.',
+                          ),
+                        ],
+                      ),
                       Switch(
                         value: enabled,
                         onChanged: (val) => setModalState(() => enabled = val),

@@ -9,6 +9,8 @@ import '../blocs/queue_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/pause_reason_dialog.dart';
+import '../widgets/modern_card.dart';
+import '../widgets/help_icon_button.dart';
 
 class QueuesPage extends StatefulWidget {
   const QueuesPage({super.key});
@@ -90,89 +92,124 @@ class _QueuesPageState extends State<QueuesPage> {
                 return const Center(child: Text('No queues found'));
               }
               return ListView.builder(
+                key: const PageStorageKey('queues_list'),
                 itemCount: state.queues.length,
                 itemBuilder: (context, index) {
                   final q = state.queues[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.queue, color: Colors.blue),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  q.queue,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  return ModernCard(
+                    key: ValueKey('queue_${q.queue}'),
+                    backgroundColor: q.calls > 0 ? Colors.orange.withOpacity(0.05) : Colors.green.withOpacity(0.05),
+                    borderColor: q.calls > 0 ? Colors.orange.withOpacity(0.2) : Colors.green.withOpacity(0.2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              q.calls > 0 ? Icons.queue_music : Icons.queue,
+                              color: q.calls > 0 ? Colors.orange : Colors.green,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                q.queue,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: q.calls > 0 ? Colors.orange.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${q.calls} waiting',
+                                style: TextStyle(
+                                  color: q.calls > 0 ? Colors.orange : Colors.green,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            _buildStatItem('Avg Wait', '${q.holdTime}s', Colors.blue),
+                            _buildStatItem('Talk', '${q.talkTime}s', Colors.green),
+                            _buildStatItem('Done', '${q.completed}', Colors.purple),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (q.members.isNotEmpty) ...[
+                          const Text('Agents:'),
                           const SizedBox(height: 6),
-                          Text('Waiting: ${q.calls} | Avg Wait: ${q.holdTime}s | Talk: ${q.talkTime}s | Done: ${q.completed}'),
-                          const SizedBox(height: 8),
-                          if (q.members.isNotEmpty) ...[
-                            const Text('Agents:'),
-                            const SizedBox(height: 6),
-                            ...q.members.map((m) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: Row(
-                                  children: [
-                                    Icon(
+                          ...q.members.map((m) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: _memberColor(m.state).withOpacity(0.2),
+                                    child: Icon(
                                       Icons.person,
-                                      size: 18,
+                                      size: 16,
                                       color: _memberColor(m.state),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: InkWell(
-                                        onTap: () => context.push(
-                                          '/agent/${Uri.encodeComponent(m.interface)}?name=${Uri.encodeComponent(m.name)}',
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${m.name} • ${m.state}',
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                decoration: TextDecoration.underline,
-                                              ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () => context.push(
+                                        '/agent/${Uri.encodeComponent(m.interface)}?name=${Uri.encodeComponent(m.name)}',
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${m.name} • ${m.state}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              decoration: TextDecoration.underline,
                                             ),
-                                            if (m.paused)
-                                              Text(
+                                          ),
+                                          if (m.paused)
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
                                                 'توقف',
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.red[700],
                                                 ),
                                               ),
-                                          ],
-                                        ),
+                                            ),
+                                        ],
                                       ),
                                     ),
-                                    IconButton(
-                                      icon: Icon(
-                                        m.paused ? Icons.play_arrow : Icons.pause,
-                                        size: 20,
-                                        color: m.paused ? Colors.green : Colors.orange,
-                                      ),
-                                      tooltip: m.paused ? 'فعال‌سازی' : 'توقف',
-                                      onPressed: () => _toggleAgentPause(context, q.queue, m.name, m.interface, m.paused),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      m.paused ? Icons.play_arrow : Icons.pause,
+                                      size: 20,
+                                      color: m.paused ? Colors.green : Colors.orange,
                                     ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ] else
-                            const Text('No agents reported'),
-                        ],
-                      ),
+                                    tooltip: m.paused ? 'فعال‌سازی' : 'توقف',
+                                    onPressed: () => _toggleAgentPause(context, q.queue, m.name, m.interface, m.paused),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ] else
+                          const Text('No agents reported'),
+                      ],
                     ),
                   );
                 },
@@ -277,6 +314,37 @@ class _QueuesPageState extends State<QueuesPage> {
       default:
         return Colors.grey;
     }
+  }
+
+  Widget _buildStatItem(String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: color.withOpacity(0.8),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _toggleAgentPause(BuildContext context, String queue, String agentName, String interface, bool currentlyPaused) async {
