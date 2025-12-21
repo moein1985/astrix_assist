@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 
+/// @deprecated This class is deprecated and will be removed.
+/// Use AmiListenClient for direct AMI connections and SshService for recordings.
+/// Backend Proxy is no longer needed after architectural refactoring.
 class AmiApi {
   AmiApi._();
 

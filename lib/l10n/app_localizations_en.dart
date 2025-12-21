@@ -166,6 +166,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get callHistory => 'Call History';
 
   @override
+  String get listenAndRecord => 'Listen & Record';
+
+  @override
   String get noActiveCalls => 'No active calls';
 
   @override
@@ -413,4 +416,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentLanguagePersian => 'فارسی';
+
+  @override
+  String get sshSettings => 'SSH Settings';
+
+  @override
+  String get sshHost => 'SSH Host';
+
+  @override
+  String get sshPort => 'SSH Port';
+
+  @override
+  String get sshUsername => 'SSH Username';
+
+  @override
+  String get sshPassword => 'SSH Password';
+
+  @override
+  String get sshAuthMethod => 'Authentication Method';
+
+  @override
+  String get authPassword => 'Password';
+
+  @override
+  String get authPrivateKey => 'Private Key';
+
+  @override
+  String get recordingsPath => 'Recordings Path';
+
+  @override
+  String get testConnection => 'Test Connection';
+
+  @override
+  String get connectionSuccessful => 'Connection Successful!';
+
+  @override
+  String get connectionFailed => 'Connection Failed';
+
+  @override
+  String get downloadRecording => 'Download Recording';
+
+  @override
+  String get recordingNotFound => 'Recording not found';
+
+  @override
+  String get downloading => 'Downloading...';
+
+  @override
+  String get spyPhone => 'Spy Phone';
+
+  @override
+  String get targetExtension => 'Target Extension';
+
+  @override
+  String get listenerExtension => 'Listener Extension:';
+
+  @override
+  String get enterExtension => 'Please enter an extension number';
+
+  @override
+  String get listeningStarted => 'Listening started successfully';
+
+  @override
+  String get startListening => 'Start Listening';
+
+  @override
+  String get connecting => 'Connecting...';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get backspace => 'Backspace';
 }

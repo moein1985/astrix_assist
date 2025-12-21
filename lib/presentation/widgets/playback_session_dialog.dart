@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/ami_api.dart';
 
+/// @deprecated This widget is no longer needed after removing Backend Proxy.
+/// Playback functionality now uses direct AMI connection via AmiListenClient.
 class PlaybackSessionDialog extends StatefulWidget {
   final String jobId;
 

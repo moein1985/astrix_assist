@@ -22,6 +22,14 @@ class AppConfig {
   static const String defaultDbHost = '192.168.85.88';
   static const int defaultDbPort = 3306;
   static const String defaultDbUser = 'root';
-  static const String defaultDbPassword = '';
+  static const String defaultDbPassword = '123456';
   static const String defaultDbName = 'asteriskcdrdb';
+  
+  /// Default SSH connection settings (for downloading recordings)
+  static const String defaultSshHost = '192.168.85.88';
+  static const int defaultSshPort = 22;
+  static const String defaultSshUsername = 'root';
+  static const String defaultSshPassword = ''; // Will be set by user
+  static const String defaultRecordingsPath = '/var/spool/asterisk/monitor';
 }
+

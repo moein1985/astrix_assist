@@ -1,14 +1,17 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/injection_container.dart';
-import '../../core/ami_api.dart';
+import '../../core/ssh_service.dart';
+import '../../core/ssh_config.dart';
+import '../../core/app_config.dart';
+import '../../core/ami_listen_client.dart';
 import '../blocs/cdr_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/recording_player.dart';
-import '../widgets/playback_session_dialog.dart';
 
 class CdrPage extends StatefulWidget {
   const CdrPage({super.key});
@@ -37,25 +40,28 @@ class _CdrPageState extends State<CdrPage> {
     _initBloc();
   }
 
-  /// Fetch a recording stream URL via the configured `AmiApi` (mock or real backend).
-  Future<String?> _fetchRecordingUrl(String uniqueId) async {
+  /// Download recording via SSH and return local file path
+  Future<String?> _downloadRecording(String uniqueId, String callDate) async {
     try {
-      final res = await AmiApi.getRecordingMeta(uniqueId);
-      if (res.statusCode == 200 && res.data != null) {
-        final url = (res.data as Map<String, dynamic>)['url'] as String?;
-        if (url != null && url.isNotEmpty) return url;
-      }
-    } catch (_) {}
+      // Load SSH config from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final sshConfig = SshConfig(
+        host: prefs.getString('ssh_host') ?? AppConfig.defaultSshHost,
+        port: prefs.getInt('ssh_port') ?? AppConfig.defaultSshPort,
+        username: prefs.getString('ssh_username') ?? AppConfig.defaultSshUsername,
+        password: prefs.getString('ssh_password'),
+        recordingsPath: prefs.getString('ssh_recordings_path') ?? AppConfig.defaultRecordingsPath,
+      );
 
-    // fallback: get list and return first item's url
-    try {
-      final res2 = await AmiApi.getRecordings();
-      if (res2.statusCode == 200 && res2.data is List && (res2.data as List).isNotEmpty) {
-        final first = (res2.data as List).first as Map<String, dynamic>;
-        return first['url'] as String?;
+      final sshService = SshService(sshConfig);
+      final file = await sshService.downloadRecordingByUniqueId(uniqueId, callDate);
+      
+      if (file != null) {
+        return file.path;
       }
-    } catch (_) {}
-
+    } catch (e) {
+      debugPrint('Error downloading recording: $e');
+    }
     return null;
   }
 
@@ -219,20 +225,36 @@ class _CdrPageState extends State<CdrPage> {
                               final navigator = Navigator.of(context);
                               final messenger = ScaffoldMessenger.of(context);
                               final l10nLocal = l10n;
-                              // Use uniqueid or userfield as recording id
-                              final id = record.userfield.isNotEmpty ? record.userfield : record.uniqueid;
-                              final url = await _fetchRecordingUrl(id);
-                              if (url != null && url.isNotEmpty) {
+                              
+                              // Show loading
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                              
+                              // Download recording via SSH
+                              final filePath = await _downloadRecording(record.uniqueid, record.callDate);
+                              
+                              if (!mounted) return;
+                              navigator.pop(); // Close loading
+                              
+                              if (filePath != null && filePath.isNotEmpty) {
                                 if (!mounted) return;
                                 navigator.push(
                                   MaterialPageRoute(
-                                    builder: (_) => RecordingPlayerPage(url: url, title: '${record.src} -> ${record.dst}'),
+                                    builder: (_) => RecordingPlayerPage(
+                                      url: 'file://$filePath',
+                                      title: '${record.src} -> ${record.dst}',
+                                    ),
                                   ),
                                 );
                               } else {
                                 if (!mounted) return;
                                 messenger.showSnackBar(
-                                  SnackBar(content: Text(l10nLocal.noRecords)),
+                                  SnackBar(content: Text(l10nLocal.recordingNotFound)),
                                 );
                               }
                             },
@@ -244,22 +266,45 @@ class _CdrPageState extends State<CdrPage> {
                             onPressed: () async {
                               final ctx = context;
                               final messenger = ScaffoldMessenger.of(ctx);
-                              final id = record.userfield.isNotEmpty ? record.userfield : record.uniqueid;
+                              
+                              // Show loading
+                              showDialog(
+                                context: ctx,
+                                barrierDismissible: false,
+                                builder: (context) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                              
                               try {
-                                final res = await AmiApi.originatePlayback({'recordingId': id});
-                                final jobId = res.data['jobId']?.toString();
-                                if (jobId != null) {
-                                  if (!ctx.mounted) return;
-                                  await showDialog(
-                                    context: ctx,
-                                    barrierDismissible: false,
-                                    builder: (_) => PlaybackSessionDialog(jobId: jobId),
+                                // Download recording first
+                                final filePath = await _downloadRecording(record.uniqueid, record.callDate);
+                                
+                                if (!ctx.mounted) return;
+                                Navigator.pop(ctx); // Close loading
+                                
+                                if (filePath != null) {
+                                  // Use AmiListenClient to originate playback
+                                  final amiClient = sl<AmiListenClient>();
+                                  await amiClient.originatePlayback(
+                                    targetExtension: '9999', // داخلی مشرف
+                                    recordingPath: filePath,
+                                  );
+                                  
+                                  messenger.showSnackBar(
+                                    const SnackBar(content: Text('Playback started on supervisor phone')),
                                   );
                                 } else {
-                                  messenger.showSnackBar(const SnackBar(content: Text('Playback start failed')));
+                                  messenger.showSnackBar(
+                                    const SnackBar(content: Text('Recording not found')),
+                                  );
                                 }
                               } catch (e) {
-                                messenger.showSnackBar(SnackBar(content: Text('Error starting playback: $e')));
+                                if (!ctx.mounted) return;
+                                Navigator.pop(ctx); // Close loading if still open
+                                messenger.showSnackBar(
+                                  SnackBar(content: Text('Error starting playback: $e')),
+                                );
                               }
                             },
                           ),

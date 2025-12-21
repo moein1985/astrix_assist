@@ -261,6 +261,11 @@
     "description": "Call history section title"
   },
 
+  "listenAndRecord": "شنود و ضبط",
+  "@listenAndRecord": {
+    "description": "Listen and record calls section title"
+  },
+
   "noActiveCalls": "تماس فعالی وجود ندارد",
   "@noActiveCalls": {
     "description": "Message when no active calls"
@@ -669,5 +674,129 @@
   "currentLanguagePersian": "فارسی",
   "@currentLanguagePersian": {
     "description": "Current language display for Persian"
-  }
+  },
+
+  "sshSettings": "تنظیمات SSH",
+  "@sshSettings": {
+    "description": "SSH settings section title"
+  },
+
+  "sshHost": "آدرس سرور SSH",
+  "@sshHost": {
+    "description": "SSH host label"
+  },
+
+  "sshPort": "پورت SSH",
+  "@sshPort": {
+    "description": "SSH port label"
+  },
+
+  "sshUsername": "نام کاربری SSH",
+  "@sshUsername": {
+    "description": "SSH username label"
+  },
+
+  "sshPassword": "رمز عبور SSH",
+  "@sshPassword": {
+    "description": "SSH password label"
+  },
+
+  "sshAuthMethod": "روش احراز هویت",
+  "@sshAuthMethod": {
+    "description": "SSH authentication method label"
+  },
+
+  "authPassword": "رمز عبور",
+  "@authPassword": {
+    "description": "Password authentication method"
+  },
+
+  "authPrivateKey": "کلید خصوصی",
+  "@authPrivateKey": {
+    "description": "Private key authentication method"
+  },
+
+  "recordingsPath": "مسیر فایل‌های ضبط",
+  "@recordingsPath": {
+    "description": "Path to recordings on server"
+  },
+
+  "testConnection": "تست اتصال",
+  "@testConnection": {
+    "description": "Test connection button"
+  },
+
+  "connectionSuccessful": "اتصال موفقیت‌آمیز!",
+  "@connectionSuccessful": {
+    "description": "Connection test success message"
+  },
+
+  "connectionFailed": "اتصال ناموفق",
+  "@connectionFailed": {
+    "description": "Connection test failure message"
+  },
+
+  "downloadRecording": "دانلود ضبط",
+  "@downloadRecording": {
+    "description": "Download recording button"
+  },
+
+  "recordingNotFound": "فایل ضبط یافت نشد",
+  "@recordingNotFound": {
+    "description": "Recording file not found message"
+  },
+
+  "downloading": "در حال دانلود...",
+  "@downloading": {
+    "description": "Downloading status"
+  },
+
+  "spyPhone": "تلفن جاسوسی",
+  "@spyPhone": {
+    "description": "Spy Phone page title"
+  },
+
+  "targetExtension": "داخلی هدف",
+  "@targetExtension": {
+    "description": "Label for target extension to spy on"
+  },
+
+  "listenerExtension": "داخلی شنونده:",
+  "@listenerExtension": {
+    "description": "Label for listener extension number"
+  },
+
+  "enterExtension": "لطفا شماره داخلی را وارد کنید",
+  "@enterExtension": {
+    "description": "Error message when extension is empty"
+  },
+
+  "listeningStarted": "گوش دادن با موفقیت شروع شد",
+  "@listeningStarted": {
+    "description": "Success message when ChanSpy starts"
+  },
+
+  "startListening": "شروع گوش دادن",
+  "@startListening": {
+    "description": "Button to start listening/spying"
+  },
+
+  "connecting": "در حال اتصال...",
+  "@connecting": {
+    "description": "Connection in progress"
+  },
+
+  "clear": "پاک کن",
+  "@clear": {
+    "description": "Clear button for dialpad"
+  },
+
+  "backspace": "برگشت",
+  "@backspace": {
+    "description": "Backspace button for dialpad"
+  },
+
+  "error": "خطا",
+  "@error": {
+    "description": "Generic error label"  }
 }

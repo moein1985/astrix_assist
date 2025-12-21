@@ -166,6 +166,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get callHistory => 'تاریخچه تماس‌ها';
 
   @override
+  String get listenAndRecord => 'شنود و ضبط';
+
+  @override
   String get noActiveCalls => 'تماس فعالی وجود ندارد';
 
   @override
@@ -412,4 +415,76 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get currentLanguagePersian => 'فارسی';
+
+  @override
+  String get sshSettings => 'تنظیمات SSH';
+
+  @override
+  String get sshHost => 'آدرس سرور SSH';
+
+  @override
+  String get sshPort => 'پورت SSH';
+
+  @override
+  String get sshUsername => 'نام کاربری SSH';
+
+  @override
+  String get sshPassword => 'رمز عبور SSH';
+
+  @override
+  String get sshAuthMethod => 'روش احراز هویت';
+
+  @override
+  String get authPassword => 'رمز عبور';
+
+  @override
+  String get authPrivateKey => 'کلید خصوصی';
+
+  @override
+  String get recordingsPath => 'مسیر فایل‌های ضبط';
+
+  @override
+  String get testConnection => 'تست اتصال';
+
+  @override
+  String get connectionSuccessful => 'اتصال موفقیت‌آمیز!';
+
+  @override
+  String get connectionFailed => 'اتصال ناموفق';
+
+  @override
+  String get downloadRecording => 'دانلود ضبط';
+
+  @override
+  String get recordingNotFound => 'فایل ضبط یافت نشد';
+
+  @override
+  String get downloading => 'در حال دانلود...';
+
+  @override
+  String get spyPhone => 'تلفن جاسوسی';
+
+  @override
+  String get targetExtension => 'داخلی هدف';
+
+  @override
+  String get listenerExtension => 'داخلی شنونده:';
+
+  @override
+  String get enterExtension => 'لطفا شماره داخلی را وارد کنید';
+
+  @override
+  String get listeningStarted => 'گوش دادن با موفقیت شروع شد';
+
+  @override
+  String get startListening => 'شروع گوش دادن';
+
+  @override
+  String get connecting => 'در حال اتصال...';
+
+  @override
+  String get clear => 'پاک کن';
+
+  @override
+  String get backspace => 'برگشت';
 }

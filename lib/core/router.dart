@@ -10,6 +10,8 @@ import '../presentation/pages/cdr_page.dart';
 import '../presentation/pages/agent_detail_page.dart';
 import '../presentation/pages/trunks_page.dart';
 import '../presentation/pages/parking_page.dart';
+import '../presentation/pages/ami_listen_example.dart';
+import '../presentation/pages/spy_phone_page.dart';
 import '../domain/entities/extension.dart';
 import '../presentation/pages/originate_page.dart';
 import '../presentation/widgets/main_shell.dart';
@@ -89,6 +91,14 @@ final GoRouter router = GoRouter(
           builder: (context, state) => const SettingsPage(),
         ),
         GoRoute(path: '/cdr', builder: (context, state) => const CdrPage()),
+        GoRoute(
+          path: '/ami-listen',
+          builder: (context, state) => const AmiListenExample(),
+        ),
+        GoRoute(
+          path: '/spy-phone',
+          builder: (context, state) => const SpyPhonePage(),
+        ),
       ],
     ),
   ],

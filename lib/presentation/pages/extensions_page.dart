@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/app_localizations.dart';
-import '../../core/ami_api.dart';
+import '../../core/ami_listen_client.dart';
 import '../../core/refresh_settings.dart';
 import '../../core/injection_container.dart';
 import '../blocs/extension_bloc.dart';
@@ -12,7 +12,6 @@ import '../../domain/entities/extension.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/modern_card.dart';
-import '../widgets/listen_session_dialog.dart';
 import '../widgets/listen_consent_dialog.dart';
 
 class ExtensionsPage extends StatefulWidget {
@@ -394,17 +393,18 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
     if (should != true) return;
 
     try {
-      final res = await AmiApi.originateListen({'target': target});
-      final jobId = res.data['jobId']?.toString();
-      if (jobId != null) {
-        // Open a dialog to show job status and allow stopping the listen session
-        if (!mounted) return;
-        await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) => ListenSessionDialog(jobId: jobId),
-        );
-      }
+      // استفاده مستقیم از AmiListenClient
+      final amiClient = sl<AmiListenClient>();
+      
+      // شروع شنود
+      await amiClient.originateListen(
+        targetChannel: target,
+        listenerExtension: '9999', // داخلی برای شنود
+      );
+      
+      messenger.showSnackBar(
+        SnackBar(content: Text('Listen session started for $target')),
+      );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Error starting listen: $e')));
     }

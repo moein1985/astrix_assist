@@ -410,6 +410,12 @@ abstract class AppLocalizations {
   /// **'Call History'**
   String get callHistory;
 
+  /// Listen and record calls section title
+  ///
+  /// In en, this message translates to:
+  /// **'Listen & Record'**
+  String get listenAndRecord;
+
   /// Message when no active calls
   ///
   /// In en, this message translates to:
@@ -668,7 +674,7 @@ abstract class AppLocalizations {
   /// **'Loading...'**
   String get loading;
 
-  /// Error text
+  /// Generic error label
   ///
   /// In en, this message translates to:
   /// **'Error'**
@@ -901,6 +907,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'فارسی'**
   String get currentLanguagePersian;
+
+  /// SSH settings section title
+  ///
+  /// In en, this message translates to:
+  /// **'SSH Settings'**
+  String get sshSettings;
+
+  /// SSH host label
+  ///
+  /// In en, this message translates to:
+  /// **'SSH Host'**
+  String get sshHost;
+
+  /// SSH port label
+  ///
+  /// In en, this message translates to:
+  /// **'SSH Port'**
+  String get sshPort;
+
+  /// SSH username label
+  ///
+  /// In en, this message translates to:
+  /// **'SSH Username'**
+  String get sshUsername;
+
+  /// SSH password label
+  ///
+  /// In en, this message translates to:
+  /// **'SSH Password'**
+  String get sshPassword;
+
+  /// SSH authentication method label
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication Method'**
+  String get sshAuthMethod;
+
+  /// Password authentication method
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authPassword;
+
+  /// Private key authentication method
+  ///
+  /// In en, this message translates to:
+  /// **'Private Key'**
+  String get authPrivateKey;
+
+  /// Path to recordings on server
+  ///
+  /// In en, this message translates to:
+  /// **'Recordings Path'**
+  String get recordingsPath;
+
+  /// Test connection button
+  ///
+  /// In en, this message translates to:
+  /// **'Test Connection'**
+  String get testConnection;
+
+  /// Connection test success message
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Successful!'**
+  String get connectionSuccessful;
+
+  /// Connection test failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Failed'**
+  String get connectionFailed;
+
+  /// Download recording button
+  ///
+  /// In en, this message translates to:
+  /// **'Download Recording'**
+  String get downloadRecording;
+
+  /// Recording file not found message
+  ///
+  /// In en, this message translates to:
+  /// **'Recording not found'**
+  String get recordingNotFound;
+
+  /// Downloading status
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading...'**
+  String get downloading;
+
+  /// Spy Phone page title
+  ///
+  /// In en, this message translates to:
+  /// **'Spy Phone'**
+  String get spyPhone;
+
+  /// Label for target extension to spy on
+  ///
+  /// In en, this message translates to:
+  /// **'Target Extension'**
+  String get targetExtension;
+
+  /// Label for listener extension number
+  ///
+  /// In en, this message translates to:
+  /// **'Listener Extension:'**
+  String get listenerExtension;
+
+  /// Error message when extension is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an extension number'**
+  String get enterExtension;
+
+  /// Success message when ChanSpy starts
+  ///
+  /// In en, this message translates to:
+  /// **'Listening started successfully'**
+  String get listeningStarted;
+
+  /// Button to start listening/spying
+  ///
+  /// In en, this message translates to:
+  /// **'Start Listening'**
+  String get startListening;
+
+  /// Connection in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get connecting;
+
+  /// Clear button for dialpad
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// Backspace button for dialpad
+  ///
+  /// In en, this message translates to:
+  /// **'Backspace'**
+  String get backspace;
 }
 
 class _AppLocalizationsDelegate

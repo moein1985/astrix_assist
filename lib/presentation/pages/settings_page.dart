@@ -2,10 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme_manager.dart';
 import '../../core/locale_manager.dart';
 import '../../core/background_service_manager.dart';
+import '../../core/ssh_config.dart';
+import '../../core/ssh_service.dart';
+import '../../core/app_config.dart';
 import '../../domain/services/server_manager.dart';
 import '../widgets/theme_toggle_button.dart';
 
@@ -20,12 +24,15 @@ class _SettingsPageState extends State<SettingsPage> {
   String? _currentServerName;
   bool _notificationsEnabled = true;
   bool _backgroundServiceEnabled = false;
+  SshConfig _sshConfig = SshConfig.defaultConfig;
+  final _secureStorage = const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
     _loadCurrentServer();
     _loadNotificationSettings();
+    _loadSshSettings();
   }
 
   Future<void> _loadCurrentServer() async {
@@ -45,6 +52,59 @@ class _SettingsPageState extends State<SettingsPage> {
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
       _backgroundServiceEnabled =
           prefs.getBool('background_service_enabled') ?? false;
+    });
+  }
+
+  Future<void> _loadSshSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final sshJson = prefs.getString('ssh_config');
+    
+    if (sshJson != null) {
+      try {
+        setState(() {
+          _sshConfig = SshConfig.fromJson(
+            Map<String, dynamic>.from(
+              // Simple JSON parsing
+              <String, dynamic>{
+                'host': prefs.getString('ssh_host') ?? AppConfig.defaultSshHost,
+                'port': prefs.getInt('ssh_port') ?? AppConfig.defaultSshPort,
+                'username': prefs.getString('ssh_username') ?? AppConfig.defaultSshUsername,
+                'authMethod': prefs.getString('ssh_auth_method') ?? 'password',
+                'recordingsPath': prefs.getString('ssh_recordings_path') ?? AppConfig.defaultRecordingsPath,
+              },
+            ),
+          );
+        });
+        
+        // Load password from secure storage
+        final password = await _secureStorage.read(key: 'ssh_password');
+        if (password != null) {
+          setState(() {
+            _sshConfig = _sshConfig.copyWith(password: password);
+          });
+        }
+      } catch (e) {
+        // Use default if parsing fails
+      }
+    }
+  }
+
+  Future<void> _saveSshSettings(SshConfig config) async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    await prefs.setString('ssh_host', config.host);
+    await prefs.setInt('ssh_port', config.port);
+    await prefs.setString('ssh_username', config.username);
+    await prefs.setString('ssh_auth_method', config.authMethod);
+    await prefs.setString('ssh_recordings_path', config.recordingsPath);
+    
+    // Save password securely
+    if (config.password != null) {
+      await _secureStorage.write(key: 'ssh_password', value: config.password);
+    }
+    
+    setState(() {
+      _sshConfig = config;
     });
   }
 
@@ -127,6 +187,17 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               subtitle: Text(l10n.returnToServerSelection),
               onTap: () => _disconnectAndGoToLogin(),
+            ),
+            const Divider(),
+            
+            // SSH Settings Section
+            _buildSection(l10n.sshSettings),
+            ListTile(
+              leading: const Icon(Icons.key),
+              title: Text(l10n.sshSettings),
+              subtitle: Text('${_sshConfig.username}@${_sshConfig.host}:${_sshConfig.port}'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _showSshSettingsDialog(),
             ),
             const Divider(),
             
@@ -372,4 +443,142 @@ class _SettingsPageState extends State<SettingsPage> {
       ],
     );
   }
-}
+  void _showSshSettingsDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final isRTL = LocaleManager.isFarsi();
+    
+    final hostController = TextEditingController(text: _sshConfig.host);
+    final portController = TextEditingController(text: _sshConfig.port.toString());
+    final usernameController = TextEditingController(text: _sshConfig.username);
+    final passwordController = TextEditingController(text: _sshConfig.password ?? '');
+    final pathController = TextEditingController(text: _sshConfig.recordingsPath);
+    String authMethod = _sshConfig.authMethod;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Directionality(
+        textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+        child: AlertDialog(
+          title: Text(l10n.sshSettings),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: hostController,
+                  decoration: InputDecoration(
+                    labelText: l10n.sshHost,
+                    prefixIcon: const Icon(Icons.computer),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: portController,
+                  decoration: InputDecoration(
+                    labelText: l10n.sshPort,
+                    prefixIcon: const Icon(Icons.numbers),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: usernameController,
+                  decoration: InputDecoration(
+                    labelText: l10n.sshUsername,
+                    prefixIcon: const Icon(Icons.person),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: l10n.sshPassword,
+                    prefixIcon: const Icon(Icons.lock),
+                  ),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: pathController,
+                  decoration: InputDecoration(
+                    labelText: l10n.recordingsPath,
+                    prefixIcon: const Icon(Icons.folder),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    // Test connection
+                    final testConfig = SshConfig(
+                      host: hostController.text,
+                      port: int.tryParse(portController.text) ?? 22,
+                      username: usernameController.text,
+                      password: passwordController.text,
+                      recordingsPath: pathController.text,
+                    );
+                    
+                    showDialog(
+                      context: dialogContext,
+                      barrierDismissible: false,
+                      builder: (context) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                    
+                    final service = SshService(testConfig);
+                    final success = await service.testConnection();
+                    
+                    if (dialogContext.mounted) {
+                      Navigator.pop(dialogContext); // Close loading
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            success ? l10n.connectionSuccessful : l10n.connectionFailed,
+                          ),
+                          backgroundColor: success ? Colors.green : Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.wifi_tethering),
+                  label: Text(l10n.testConnection),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () async {
+                final newConfig = SshConfig(
+                  host: hostController.text,
+                  port: int.tryParse(portController.text) ?? 22,
+                  username: usernameController.text,
+                  password: passwordController.text,
+                  authMethod: authMethod,
+                  recordingsPath: pathController.text,
+                );
+                
+                await _saveSshSettings(newConfig);
+                
+                if (dialogContext.mounted) {
+                  Navigator.pop(dialogContext);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.saved),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
+      ),
+    );
+  }}

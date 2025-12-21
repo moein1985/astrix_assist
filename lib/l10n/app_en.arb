@@ -261,6 +261,11 @@
     "description": "Call history section title"
   },
 
+  "listenAndRecord": "Listen & Record",
+  "@listenAndRecord": {
+    "description": "Listen and record calls section title"
+  },
+
   "noActiveCalls": "No active calls",
   "@noActiveCalls": {
     "description": "Message when no active calls"
@@ -669,5 +674,129 @@
   "currentLanguagePersian": "فارسی",
   "@currentLanguagePersian": {
     "description": "Current language display for Persian"
-  }
+  },
+
+  "sshSettings": "SSH Settings",
+  "@sshSettings": {
+    "description": "SSH settings section title"
+  },
+
+  "sshHost": "SSH Host",
+  "@sshHost": {
+    "description": "SSH host label"
+  },
+
+  "sshPort": "SSH Port",
+  "@sshPort": {
+    "description": "SSH port label"
+  },
+
+  "sshUsername": "SSH Username",
+  "@sshUsername": {
+    "description": "SSH username label"
+  },
+
+  "sshPassword": "SSH Password",
+  "@sshPassword": {
+    "description": "SSH password label"
+  },
+
+  "sshAuthMethod": "Authentication Method",
+  "@sshAuthMethod": {
+    "description": "SSH authentication method label"
+  },
+
+  "authPassword": "Password",
+  "@authPassword": {
+    "description": "Password authentication method"
+  },
+
+  "authPrivateKey": "Private Key",
+  "@authPrivateKey": {
+    "description": "Private key authentication method"
+  },
+
+  "recordingsPath": "Recordings Path",
+  "@recordingsPath": {
+    "description": "Path to recordings on server"
+  },
+
+  "testConnection": "Test Connection",
+  "@testConnection": {
+    "description": "Test connection button"
+  },
+
+  "connectionSuccessful": "Connection Successful!",
+  "@connectionSuccessful": {
+    "description": "Connection test success message"
+  },
+
+  "connectionFailed": "Connection Failed",
+  "@connectionFailed": {
+    "description": "Connection test failure message"
+  },
+
+  "downloadRecording": "Download Recording",
+  "@downloadRecording": {
+    "description": "Download recording button"
+  },
+
+  "recordingNotFound": "Recording not found",
+  "@recordingNotFound": {
+    "description": "Recording file not found message"
+  },
+
+  "downloading": "Downloading...",
+  "@downloading": {
+    "description": "Downloading status"
+  },
+
+  "spyPhone": "Spy Phone",
+  "@spyPhone": {
+    "description": "Spy Phone page title"
+  },
+
+  "targetExtension": "Target Extension",
+  "@targetExtension": {
+    "description": "Label for target extension to spy on"
+  },
+
+  "listenerExtension": "Listener Extension:",
+  "@listenerExtension": {
+    "description": "Label for listener extension number"
+  },
+
+  "enterExtension": "Please enter an extension number",
+  "@enterExtension": {
+    "description": "Error message when extension is empty"
+  },
+
+  "listeningStarted": "Listening started successfully",
+  "@listeningStarted": {
+    "description": "Success message when ChanSpy starts"
+  },
+
+  "startListening": "Start Listening",
+  "@startListening": {
+    "description": "Button to start listening/spying"
+  },
+
+  "connecting": "Connecting...",
+  "@connecting": {
+    "description": "Connection in progress"
+  },
+
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button for dialpad"
+  },
+
+  "backspace": "Backspace",
+  "@backspace": {
+    "description": "Backspace button for dialpad"
+  },
+
+  "error": "Error",
+  "@error": {
+    "description": "Generic error label"  }
 }
