@@ -10,7 +10,7 @@
 class AppConfig {
   /// Set to `true` to use Mock repositories (fake data)
   /// Set to `false` to use Real repositories (Asterisk AMI)
-  static const bool useMockRepositories = true;
+  static const bool useMockRepositories = false;
   
   /// Default Asterisk AMI connection settings
   static const String defaultAmiHost = '192.168.85.88';

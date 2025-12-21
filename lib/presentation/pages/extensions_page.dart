@@ -13,6 +13,7 @@ import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/modern_card.dart';
 import '../widgets/listen_session_dialog.dart';
+import '../widgets/listen_consent_dialog.dart';
 
 class ExtensionsPage extends StatefulWidget {
   const ExtensionsPage({super.key});
@@ -371,6 +372,11 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
   Future<void> _onListenPressed(String target) async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
+    
+    // Check consent first
+    final hasConsent = await ListenConsentDialog.showConsentDialog(context, target);
+    if (!hasConsent || !mounted) return;
+    
     final title = 'Listen Live';
     final confirmLabel = 'Confirm';
     final cancelLabel = l10n.cancel;

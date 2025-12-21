@@ -11,6 +11,8 @@ import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/call_duration_widget.dart';
 import '../widgets/transfer_dialog.dart';
+import '../widgets/listen_session_dialog.dart';
+import '../widgets/listen_consent_dialog.dart';
 
 class ActiveCallsPage extends StatefulWidget {
   const ActiveCallsPage({super.key});
@@ -243,6 +245,11 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
   Future<void> _onListenPressed(String target) async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
+    
+    // Check consent first
+    final hasConsent = await ListenConsentDialog.showConsentDialog(context, target);
+    if (!hasConsent || !mounted) return;
+    
     final title = 'Listen Live';
     final confirmLabel = 'Confirm';
     final cancelLabel = l10n.cancel;
@@ -263,14 +270,14 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
       final res = await AmiApi.originateListen({'target': target});
       final jobId = res.data['jobId']?.toString();
       if (jobId != null) {
-        messenger.showSnackBar(SnackBar(content: Text('Listening... (job: $jobId)')));
-        await for (final job in AmiApi.pollJob(jobId)) {
-          final status = job['status'] as String?;
-          if (status != null) {
-            messenger.showSnackBar(SnackBar(content: Text('Status: $status')));
-            if (status == 'listening' || status == 'stopped') break;
-          }
-        }
+        // Open dialog to show status and allow stopping the listen session
+        final ctx = context;
+        if (!ctx.mounted) return;
+        await showDialog(
+          context: ctx,
+          barrierDismissible: false,
+          builder: (ctx2) => ListenSessionDialog(jobId: jobId),
+        );
       }
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Error starting listen: $e')));

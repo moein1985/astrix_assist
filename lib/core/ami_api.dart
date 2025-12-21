@@ -11,7 +11,10 @@ class AmiApi {
   static final Dio _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 5),
-  ))..options.headers['Authorization'] = 'Bearer test-token';
+  ))..options.headers.addAll({
+    'Authorization': 'Bearer test-token',
+    'x-user-role': 'supervisor',
+  });
 
   static Future<Response> getRecordings() => _dio.get('/recordings');
 

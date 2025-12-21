@@ -8,6 +8,7 @@ import '../blocs/cdr_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/recording_player.dart';
+import '../widgets/playback_session_dialog.dart';
 
 class CdrPage extends StatefulWidget {
   const CdrPage({super.key});
@@ -208,7 +209,7 @@ class _CdrPageState extends State<CdrPage> {
                           ),
                         ],
                       ),
-                      trailing: Row(
+                          trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
@@ -233,6 +234,32 @@ class _CdrPageState extends State<CdrPage> {
                                 messenger.showSnackBar(
                                   SnackBar(content: Text(l10nLocal.noRecords)),
                                 );
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            tooltip: 'Play on Supervisor',
+                            icon: const Icon(Icons.cast),
+                            onPressed: () async {
+                              final ctx = context;
+                              final messenger = ScaffoldMessenger.of(ctx);
+                              final id = record.userfield.isNotEmpty ? record.userfield : record.uniqueid;
+                              try {
+                                final res = await AmiApi.originatePlayback({'recordingId': id});
+                                final jobId = res.data['jobId']?.toString();
+                                if (jobId != null) {
+                                  if (!ctx.mounted) return;
+                                  await showDialog(
+                                    context: ctx,
+                                    barrierDismissible: false,
+                                    builder: (_) => PlaybackSessionDialog(jobId: jobId),
+                                  );
+                                } else {
+                                  messenger.showSnackBar(const SnackBar(content: Text('Playback start failed')));
+                                }
+                              } catch (e) {
+                                messenger.showSnackBar(SnackBar(content: Text('Error starting playback: $e')));
                               }
                             },
                           ),
