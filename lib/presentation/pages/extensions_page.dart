@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/refresh_settings.dart';
 import '../../core/injection_container.dart';
 import '../blocs/extension_bloc.dart';
@@ -167,7 +168,7 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
         controller: _searchController,
         onChanged: (value) => setState(() => _query = value),
         decoration: InputDecoration(
-          hintText: 'جستجو بر اساس شماره یا IP',
+          hintText: AppLocalizations.of(context)!.searchByExtensionOrIp,
           prefixIcon: const Icon(Icons.search),
           suffixIcon: _query.isNotEmpty
               ? IconButton(

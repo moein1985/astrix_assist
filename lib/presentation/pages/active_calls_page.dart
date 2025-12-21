@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/refresh_settings.dart';
 import '../../core/injection_container.dart';
+import '../../l10n/app_localizations.dart';
 import '../blocs/active_call_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
@@ -58,6 +59,7 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bloc = _bloc;
     if (bloc == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -66,7 +68,7 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
       value: bloc,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('تماس‌های فعال'),
+          title: Text(l10n.activeCalls),
           actions: [
             const ConnectionStatusWidget(),
             const ThemeToggleButton(),

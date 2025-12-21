@@ -196,6 +196,61 @@
     "description": "Offline status text"
   },
 
+  "connectionConnected": "Connected",
+  "@connectionConnected": {
+    "description": "Connection status: connected"
+  },
+
+  "connectionConnecting": "Connecting...",
+  "@connectionConnecting": {
+    "description": "Connection status: connecting"
+  },
+
+  "connectionError": "Error",
+  "@connectionError": {
+    "description": "Connection status: error"
+  },
+
+  "connectionDisconnected": "Disconnected",
+  "@connectionDisconnected": {
+    "description": "Connection status: disconnected"
+  },
+
+  "serverInfoTitle": "Server Info",
+  "@serverInfoTitle": {
+    "description": "Server details dialog title"
+  },
+
+  "serverLabelStatus": "Status",
+  "@serverLabelStatus": {
+    "description": "Label for server status"
+  },
+
+  "serverLabelAddress": "Address",
+  "@serverLabelAddress": {
+    "description": "Label for server address"
+  },
+
+  "serverLabelPort": "Port",
+  "@serverLabelPort": {
+    "description": "Label for server port"
+  },
+
+  "serverLabelUsername": "Username",
+  "@serverLabelUsername": {
+    "description": "Label for server username"
+  },
+
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+
+  "searchByExtensionOrIp": "Search by extension or IP",
+  "@searchByExtensionOrIp": {
+    "description": "Search bar hint for extensions"
+  },
+
   "recentCalls": "Recent Calls",
   "@recentCalls": {
     "description": "Recent calls section title"
@@ -459,5 +514,160 @@
   "system": "System",
   "@system": {
     "description": "System theme text"
+  },
+
+  "englishLanguage": "English",
+  "@englishLanguage": {
+    "description": "English language option"
+  },
+
+  "persianLanguage": "فارسی",
+  "@persianLanguage": {
+    "description": "Persian language option"
+  },
+
+  "englishSubtitle": "English",
+  "@englishSubtitle": {
+    "description": "English language subtitle"
+  },
+
+  "persianSubtitle": "Persian",
+  "@persianSubtitle": {
+    "description": "Persian language subtitle"
+  },
+
+  "backgroundServiceEnabled": "Background service enabled",
+  "@backgroundServiceEnabled": {
+    "description": "Background service enabled message"
+  },
+
+  "backgroundServiceDisabled": "Background service disabled",
+  "@backgroundServiceDisabled": {
+    "description": "Background service disabled message"
+  },
+
+  "server": "Server",
+  "@server": {
+    "description": "Server section title"
+  },
+
+  "currentServer": "Current Server",
+  "@currentServer": {
+    "description": "Current server label"
+  },
+
+  "noServerConnected": "No server connected",
+  "@noServerConnected": {
+    "description": "No server connected message"
+  },
+
+  "disconnect": "Disconnect",
+  "@disconnect": {
+    "description": "Disconnect button text"
+  },
+
+  "returnToServerSelection": "Return to server selection",
+  "@returnToServerSelection": {
+    "description": "Return to server selection subtitle"
+  },
+
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications section title"
+  },
+
+  "localNotifications": "Local Notifications",
+  "@localNotifications": {
+    "description": "Local notifications label"
+  },
+
+  "receiveNotificationsForEvents": "Receive notifications for system events",
+  "@receiveNotificationsForEvents": {
+    "description": "Receive notifications subtitle"
+  },
+
+  "backgroundService": "Background Service",
+  "@backgroundService": {
+    "description": "Background service label"
+  },
+
+  "checkServerStatusInBackground": "Check server status in background",
+  "@checkServerStatusInBackground": {
+    "description": "Check server status subtitle"
+  },
+
+  "information": "Information",
+  "@information": {
+    "description": "Information label"
+  },
+
+  "queuesCheckedEvery5Minutes": "Queues are checked every 5 minutes",
+  "@queuesCheckedEvery5Minutes": {
+    "description": "Queues checked information"
+  },
+
+  "about": "About",
+  "@about": {
+    "description": "About section title"
+  },
+
+  "version": "Version",
+  "@version": {
+    "description": "Version label"
+  },
+
+  "asteriskIssabelManagement": "Asterisk/Issabel Management",
+  "@asteriskIssabelManagement": {
+    "description": "Asterisk/Issabel management subtitle"
+  },
+
+  "selectServer": "Select Server",
+  "@selectServer": {
+    "description": "Select server dialog title"
+  },
+
+  "noServersSaved": "No servers saved",
+  "@noServersSaved": {
+    "description": "No servers saved message"
+  },
+
+  "manageAsteriskIssabelViaAMI": "Manage Asterisk and Issabel servers via AMI",
+  "@manageAsteriskIssabelViaAMI": {
+    "description": "About dialog description"
+  },
+
+  "features": "Features:",
+  "@features": {
+    "description": "Features label"
+  },
+
+  "extensionsManagement": "• Extensions Management",
+  "@extensionsManagement": {
+    "description": "Extensions management feature"
+  },
+
+  "activeCallsMonitoring": "• Active Calls Monitoring",
+  "@activeCallsMonitoring": {
+    "description": "Active calls monitoring feature"
+  },
+
+  "queueManagement": "• Queue Management",
+  "@queueManagement": {
+    "description": "Queue management feature"
+  },
+
+  "originateCalls": "• Originate Calls",
+  "@originateCalls": {
+    "description": "Originate calls feature"
+  },
+
+  "currentLanguageEnglish": "English",
+  "@currentLanguageEnglish": {
+    "description": "Current language display for English"
+  },
+
+  "currentLanguagePersian": "فارسی",
+  "@currentLanguagePersian": {
+    "description": "Current language display for Persian"
   }
 }

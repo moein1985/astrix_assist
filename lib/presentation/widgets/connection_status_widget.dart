@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import '../../data/datasources/ami_datasource.dart';
 
 class ConnectionStatusWidget extends StatefulWidget {
@@ -30,6 +31,7 @@ class _ConnectionStatusWidgetState extends State<ConnectionStatusWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: _showServerDetails,
       borderRadius: BorderRadius.circular(8),
@@ -45,7 +47,7 @@ class _ConnectionStatusWidgetState extends State<ConnectionStatusWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _serverName ?? 'سرور',
+                  _serverName ?? l10n.server,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -54,7 +56,7 @@ class _ConnectionStatusWidgetState extends State<ConnectionStatusWidget> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  _getStatusText(),
+                  _getStatusText(l10n),
                   style: TextStyle(
                     fontSize: 10,
                     color: _getStatusColor(),
@@ -99,20 +101,21 @@ class _ConnectionStatusWidgetState extends State<ConnectionStatusWidget> {
     }
   }
 
-  String _getStatusText() {
+  String _getStatusText(AppLocalizations l10n) {
     switch (_status) {
       case ConnectionStatus.connected:
-        return 'متصل';
+        return l10n.connectionConnected;
       case ConnectionStatus.connecting:
-        return 'در حال اتصال...';
+        return l10n.connectionConnecting;
       case ConnectionStatus.error:
-        return 'خطا';
+        return l10n.connectionError;
       case ConnectionStatus.disconnected:
-        return 'قطع شده';
+        return l10n.connectionDisconnected;
     }
   }
 
   void _showServerDetails() async {
+    final l10n = AppLocalizations.of(context)!;
     final prefs = await SharedPreferences.getInstance();
     final host = prefs.getString('ip') ?? 'N/A';
     final port = prefs.getString('port') ?? '5038';
@@ -123,28 +126,28 @@ class _ConnectionStatusWidgetState extends State<ConnectionStatusWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+            title: Row(
           children: [
             _buildStatusIcon(),
             const SizedBox(width: 12),
-            const Text('اطلاعات سرور'),
+            Text(l10n.serverInfoTitle),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoRow('وضعیت', _getStatusText()),
+            _buildInfoRow(l10n.serverLabelStatus, _getStatusText(l10n)),
             const Divider(),
-            _buildInfoRow('آدرس', host),
-            _buildInfoRow('پورت', port),
-            _buildInfoRow('نام کاربری', username),
+            _buildInfoRow(l10n.serverLabelAddress, host),
+            _buildInfoRow(l10n.serverLabelPort, port),
+            _buildInfoRow(l10n.serverLabelUsername, username),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('بستن'),
+            child: Text(l10n.close),
           ),
         ],
       ),

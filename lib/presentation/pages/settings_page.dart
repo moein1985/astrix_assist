@@ -54,6 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _setBackgroundServiceEnabled(bool value) async {
+    final l10n = AppLocalizations.of(context)!;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('background_service_enabled', value);
     setState(() => _backgroundServiceEnabled = value);
@@ -63,9 +64,9 @@ class _SettingsPageState extends State<SettingsPage> {
       await BackgroundServiceManager().scheduleQueueStatusCheck();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('سرویس پس‌زمینه فعال شد'),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(l10n.backgroundServiceEnabled),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -73,9 +74,9 @@ class _SettingsPageState extends State<SettingsPage> {
       await BackgroundServiceManager().cancelAllBackgroundTasks();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('سرویس پس‌زمینه غیرفعال شد'),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(l10n.backgroundServiceDisabled),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -102,50 +103,50 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               leading: const Icon(Icons.language),
               title: Text(l10n.language),
-              subtitle: Text(LocaleManager.isEnglish() ? 'English' : 'فارسی'),
+              subtitle: Text(LocaleManager.isEnglish() ? l10n.currentLanguageEnglish : l10n.currentLanguagePersian),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => _showLanguageDialog(),
             ),
             const Divider(),
             
             // Server Section
-            _buildSection(isRTL ? 'سرور' : 'Server'),
+            _buildSection(l10n.server),
             ListTile(
               leading: const Icon(Icons.dns),
-              title: Text(isRTL ? 'سرور فعلی' : 'Current Server'),
-              subtitle: Text(_currentServerName ?? (isRTL ? 'هیچ سروری متصل نیست' : 'No server connected')),
+              title: Text(l10n.currentServer),
+              subtitle: Text(_currentServerName ?? l10n.noServerConnected),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => _showChangeServerDialog(),
             ),
             ListTile(
               leading: const Icon(Icons.exit_to_app, color: Colors.orange),
               title: Text(
-                isRTL ? 'قطع اتصال' : 'Disconnect',
+                l10n.disconnect,
                 style: const TextStyle(color: Colors.orange),
               ),
-              subtitle: Text(isRTL ? 'بازگشت به صفحه انتخاب سرور' : 'Return to server selection'),
+              subtitle: Text(l10n.returnToServerSelection),
               onTap: () => _disconnectAndGoToLogin(),
             ),
             const Divider(),
             
             // Notifications Section
-            _buildSection(isRTL ? 'اطلاع‌رسانی' : 'Notifications'),
+            _buildSection(l10n.notifications),
             SwitchListTile(
-              title: Text(isRTL ? 'اطلاع‌رسانی‌های محلی' : 'Local Notifications'),
-              subtitle: Text(isRTL ? 'دریافت اطلاع‌رسانی برای رویدادهای سیستم' : 'Receive notifications for system events'),
+              title: Text(l10n.localNotifications),
+              subtitle: Text(l10n.receiveNotificationsForEvents),
               value: _notificationsEnabled,
               onChanged: _setNotificationsEnabled,
             ),
             SwitchListTile(
-              title: Text(isRTL ? 'سرویس پس‌زمینه' : 'Background Service'),
-              subtitle: Text(isRTL ? 'بررسی وضعیت سرور در پس‌زمینه' : 'Check server status in background'),
+              title: Text(l10n.backgroundService),
+              subtitle: Text(l10n.checkServerStatusInBackground),
               value: _backgroundServiceEnabled,
               onChanged: _setBackgroundServiceEnabled,
             ),
             if (_backgroundServiceEnabled)
               ListTile(
-                title: Text(isRTL ? 'اطلاعات' : 'Information'),
-                subtitle: Text(isRTL ? 'هر 5 دقیقه صف‌ها بررسی می‌شود' : 'Queues are checked every 5 minutes'),
+                title: Text(l10n.information),
+                subtitle: Text(l10n.queuesCheckedEvery5Minutes),
               ),
             const Divider(),
             
@@ -174,16 +175,16 @@ class _SettingsPageState extends State<SettingsPage> {
             const Divider(),
             
             // About Section
-            _buildSection(isRTL ? 'درباره برنامه' : 'About'),
+            _buildSection(l10n.about),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: Text(isRTL ? 'نسخه' : 'Version'),
+              title: Text(l10n.version),
               subtitle: const Text('0.1.0'),
             ),
             ListTile(
               leading: const Icon(Icons.code),
               title: const Text('Astrix Assist'),
-              subtitle: Text(isRTL ? 'مدیریت سرورهای Asterisk/Issabel' : 'Asterisk/Issabel Management'),
+              subtitle: Text(l10n.asteriskIssabelManagement),
               onTap: () => _showAboutDialog(),
             ),
             const Divider(height: 32),
@@ -236,7 +237,7 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<String>(
-                title: const Text('English'),
+                title: Text(l10n.englishLanguage),
                 value: 'en',
                 groupValue: LocaleManager.locale.value.languageCode,
                 onChanged: (value) {
@@ -246,7 +247,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
               RadioListTile<String>(
-                title: const Text('فارسی'),
+                title: Text(l10n.persianLanguage),
                 value: 'fa',
                 groupValue: LocaleManager.locale.value.languageCode,
                 onChanged: (value) {
@@ -301,6 +302,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _showChangeServerDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final servers = await ServerManager.loadServers();
     final isRTL = LocaleManager.isFarsi();
     if (!mounted) return;
@@ -310,13 +312,13 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (context) => Directionality(
         textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          title: Text(isRTL ? 'انتخاب سرور' : 'Select Server'),
+          title: Text(l10n.selectServer),
           content: SizedBox(
             width: double.maxFinite,
             child: servers.isEmpty
                 ? Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Text(isRTL ? 'هیچ سروری ذخیره نشده است' : 'No servers saved'),
+                    child: Text(l10n.noServersSaved),
                   )
                 : ListView.builder(
                     shrinkWrap: true,
@@ -351,7 +353,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showAboutDialog() {
-    final isRTL = LocaleManager.isFarsi();
+    final l10n = AppLocalizations.of(context)!;
     
     showAboutDialog(
       context: context,
@@ -359,15 +361,13 @@ class _SettingsPageState extends State<SettingsPage> {
       applicationVersion: '0.1.0',
       applicationIcon: const Icon(Icons.phone_in_talk, size: 48),
       children: [
-        Text(isRTL 
-          ? 'مدیریت سرورهای Asterisk و Issabel از طریق AMI'
-          : 'Manage Asterisk and Issabel servers via AMI'),
+        Text(l10n.manageAsteriskIssabelViaAMI),
         const SizedBox(height: 16),
-        Text(isRTL ? 'ویژگی‌ها:' : 'Features:'),
-        Text(isRTL ? '• مدیریت داخلی‌ها' : '• Extensions Management'),
-        Text(isRTL ? '• مشاهده تماس‌های فعال' : '• Active Calls Monitoring'),
-        Text(isRTL ? '• مدیریت صف‌ها' : '• Queue Management'),
-        Text(isRTL ? '• برقراری تماس' : '• Originate Calls'),
+        Text(l10n.features),
+        Text(l10n.extensionsManagement),
+        Text(l10n.activeCallsMonitoring),
+        Text(l10n.queueManagement),
+        Text(l10n.originateCalls),
       ],
     );
   }
