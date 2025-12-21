@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../l10n/app_localizations.dart';
+import '../../core/ami_api.dart';
 import '../../core/refresh_settings.dart';
 import '../../core/injection_container.dart';
 import '../blocs/extension_bloc.dart';
@@ -167,7 +169,7 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
         controller: _searchController,
         onChanged: (value) => setState(() => _query = value),
         decoration: InputDecoration(
-          hintText: 'جستجو بر اساس شماره یا IP',
+          hintText: AppLocalizations.of(context)!.searchByExtensionOrIp,
           prefixIcon: const Icon(Icons.search),
           suffixIcon: _query.isNotEmpty
               ? IconButton(
@@ -330,16 +332,27 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
                   ),
               ],
             ),
-            trailing: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: ext.isOnline ? Colors.green.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                ext.isOnline ? Icons.check_circle : Icons.cancel,
-                color: ext.isOnline ? Colors.green : Colors.grey,
-              ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: ext.isOnline ? Colors.green.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    ext.isOnline ? Icons.check_circle : Icons.cancel,
+                    color: ext.isOnline ? Colors.green : Colors.grey,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.hearing),
+                  tooltip: 'Listen Live',
+                  onPressed: ext.isOnline ? () => _onListenPressed(ext.name) : null,
+                ),
+              ],
             ),
             onTap: () => context.push('/extension', extra: ext),
           ),
@@ -352,5 +365,42 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
     if (latency < 100) return Colors.green;
     if (latency < 200) return Colors.orange;
     return Colors.red;
+  }
+
+  Future<void> _onListenPressed(String target) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final title = 'Listen Live';
+    final confirmLabel = 'Confirm';
+    final cancelLabel = l10n.cancel;
+    final should = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text('$confirmLabel: $target'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(cancelLabel)),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(confirmLabel)),
+        ],
+      ),
+    );
+    if (should != true) return;
+
+    try {
+      final res = await AmiApi.originateListen({'target': target});
+      final jobId = res.data['jobId']?.toString();
+      if (jobId != null) {
+        messenger.showSnackBar(SnackBar(content: Text('Listening... (job: $jobId)')));
+        await for (final job in AmiApi.pollJob(jobId)) {
+          final status = job['status'] as String?;
+          if (status != null) {
+            messenger.showSnackBar(SnackBar(content: Text('Status: $status')));
+            if (status == 'listening' || status == 'stopped') break;
+          }
+        }
+      }
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error starting listen: $e')));
+    }
   }
 }

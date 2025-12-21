@@ -6,7 +6,6 @@ import '../../l10n/app_localizations.dart';
 import '../../core/refresh_settings.dart';
 import '../../core/injection_container.dart';
 import '../../core/locale_manager.dart';
-import '../../domain/services/server_manager.dart';
 import '../blocs/dashboard_bloc.dart';
 import '../blocs/dashboard_event.dart';
 import '../blocs/dashboard_state.dart';
@@ -14,7 +13,7 @@ import '../widgets/modern_card.dart';
 import '../widgets/quick_tip_card.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
-import '../widgets/help_icon_button.dart';
+// Removed unused imports after cleanup
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -201,13 +200,13 @@ class _DashboardPageState extends State<DashboardPage> {
                             // Call History Section
                             _buildDashboardSection(
                               context,
-                              l10n.callHistory ?? 'Call History',
+                              l10n.callHistory,
                               Icons.history,
                               Colors.purple,
                               [
                                 _buildSectionCard(
                                   context,
-                                  l10n.callHistory ?? 'Call History',
+                                  l10n.callHistory,
                                   Icons.history,
                                   Colors.purple.shade100,
                                   () => context.push('/cdr'),
@@ -262,32 +261,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  void _showLogoutDialog(BuildContext context, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.logout),
-        content: Text(l10n.logoutConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await ServerManager.clearActiveServer();
-              if (context.mounted) {
-                context.go('/');
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(l10n.logout, style: const TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
+  
 
   Widget _buildStatsGrid(DashboardLoaded state, AppLocalizations l10n) {
     final stats = state.stats;
@@ -443,78 +417,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  Future<void> _showRefreshSettings() async {
-    final l10n = AppLocalizations.of(context)!;
-    final newSettings = await showModalBottomSheet<RefreshSettings>(
-      context: context,
-      builder: (context) {
-        bool enabled = _autoRefreshEnabled;
-        double seconds = _refreshSeconds.toDouble();
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(l10n.autoRefresh),
-                          const SizedBox(width: 8),
-                          HelpIconButton(
-                            title: 'Auto Refresh Settings',
-                            content: 'Enable automatic refresh to keep dashboard data up to date. Set the interval in seconds.',
-                          ),
-                        ],
-                      ),
-                      Switch(
-                        value: enabled,
-                        onChanged: (val) => setModalState(() => enabled = val),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text('${l10n.interval}: ${seconds.round()} ${l10n.seconds}'),
-                  Slider(
-                    min: 5,
-                    max: 60,
-                    divisions: 11,
-                    value: seconds,
-                    onChanged: (val) => setModalState(() => seconds = val),
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(
-                          RefreshSettings(enabled: enabled, intervalSeconds: seconds.round()),
-                        );
-                      },
-                      child: Text(l10n.save),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-
-    if (newSettings != null) {
-      await RefreshSettings.save(newSettings);
-      setState(() {
-        _autoRefreshEnabled = newSettings.enabled;
-        _refreshSeconds = newSettings.intervalSeconds;
-      });
-      _startTimer();
-    }
-  }
+  
 
   String _formatBytes(String bytes) {
     final value = int.tryParse(bytes) ?? 0;

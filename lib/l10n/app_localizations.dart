@@ -332,6 +332,72 @@ abstract class AppLocalizations {
   /// **'Offline'**
   String get offline;
 
+  /// Connection status: connected
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get connectionConnected;
+
+  /// Connection status: connecting
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get connectionConnecting;
+
+  /// Connection status: error
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get connectionError;
+
+  /// Connection status: disconnected
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected'**
+  String get connectionDisconnected;
+
+  /// Server details dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Server Info'**
+  String get serverInfoTitle;
+
+  /// Label for server status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get serverLabelStatus;
+
+  /// Label for server address
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get serverLabelAddress;
+
+  /// Label for server port
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get serverLabelPort;
+
+  /// Label for server username
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get serverLabelUsername;
+
+  /// Close button text
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Search bar hint for extensions
+  ///
+  /// In en, this message translates to:
+  /// **'Search by extension or IP'**
+  String get searchByExtensionOrIp;
+
   /// Recent calls section title
   ///
   /// In en, this message translates to:
@@ -649,6 +715,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System'**
   String get system;
+
+  /// English language option
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get englishLanguage;
+
+  /// Persian language option
+  ///
+  /// In en, this message translates to:
+  /// **'فارسی'**
+  String get persianLanguage;
+
+  /// English language subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get englishSubtitle;
+
+  /// Persian language subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Persian'**
+  String get persianSubtitle;
+
+  /// Background service enabled message
+  ///
+  /// In en, this message translates to:
+  /// **'Background service enabled'**
+  String get backgroundServiceEnabled;
+
+  /// Background service disabled message
+  ///
+  /// In en, this message translates to:
+  /// **'Background service disabled'**
+  String get backgroundServiceDisabled;
+
+  /// Server section title
+  ///
+  /// In en, this message translates to:
+  /// **'Server'**
+  String get server;
+
+  /// Current server label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Server'**
+  String get currentServer;
+
+  /// No server connected message
+  ///
+  /// In en, this message translates to:
+  /// **'No server connected'**
+  String get noServerConnected;
+
+  /// Disconnect button text
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get disconnect;
+
+  /// Return to server selection subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Return to server selection'**
+  String get returnToServerSelection;
+
+  /// Notifications section title
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// Local notifications label
+  ///
+  /// In en, this message translates to:
+  /// **'Local Notifications'**
+  String get localNotifications;
+
+  /// Receive notifications subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Receive notifications for system events'**
+  String get receiveNotificationsForEvents;
+
+  /// Background service label
+  ///
+  /// In en, this message translates to:
+  /// **'Background Service'**
+  String get backgroundService;
+
+  /// Check server status subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Check server status in background'**
+  String get checkServerStatusInBackground;
+
+  /// Information label
+  ///
+  /// In en, this message translates to:
+  /// **'Information'**
+  String get information;
+
+  /// Queues checked information
+  ///
+  /// In en, this message translates to:
+  /// **'Queues are checked every 5 minutes'**
+  String get queuesCheckedEvery5Minutes;
+
+  /// About section title
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// Version label
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// Asterisk/Issabel management subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Asterisk/Issabel Management'**
+  String get asteriskIssabelManagement;
+
+  /// Select server dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Server'**
+  String get selectServer;
+
+  /// No servers saved message
+  ///
+  /// In en, this message translates to:
+  /// **'No servers saved'**
+  String get noServersSaved;
+
+  /// About dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Asterisk and Issabel servers via AMI'**
+  String get manageAsteriskIssabelViaAMI;
+
+  /// Features label
+  ///
+  /// In en, this message translates to:
+  /// **'Features:'**
+  String get features;
+
+  /// Extensions management feature
+  ///
+  /// In en, this message translates to:
+  /// **'• Extensions Management'**
+  String get extensionsManagement;
+
+  /// Active calls monitoring feature
+  ///
+  /// In en, this message translates to:
+  /// **'• Active Calls Monitoring'**
+  String get activeCallsMonitoring;
+
+  /// Queue management feature
+  ///
+  /// In en, this message translates to:
+  /// **'• Queue Management'**
+  String get queueManagement;
+
+  /// Originate calls feature
+  ///
+  /// In en, this message translates to:
+  /// **'• Originate Calls'**
+  String get originateCalls;
+
+  /// Current language display for English
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get currentLanguageEnglish;
+
+  /// Current language display for Persian
+  ///
+  /// In en, this message translates to:
+  /// **'فارسی'**
+  String get currentLanguagePersian;
 }
 
 class _AppLocalizationsDelegate

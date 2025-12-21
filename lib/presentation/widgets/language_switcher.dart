@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/locale_manager.dart';
@@ -41,8 +42,8 @@ class LanguageSwitcher extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<String>(
-                title: const Text('English'),
-                subtitle: const Text('English'),
+                title: Text(l10n.englishLanguage),
+                subtitle: Text(l10n.englishSubtitle),
                 value: 'en',
                 groupValue: LocaleManager.locale.value.languageCode,
                 onChanged: (value) {
@@ -51,8 +52,8 @@ class LanguageSwitcher extends StatelessWidget {
                 },
               ),
               RadioListTile<String>(
-                title: const Text('فارسی'),
-                subtitle: const Text('Persian'),
+                title: Text(l10n.persianLanguage),
+                subtitle: Text(l10n.persianSubtitle),
                 value: 'fa',
                 groupValue: LocaleManager.locale.value.languageCode,
                 onChanged: (value) {

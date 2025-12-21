@@ -127,6 +127,39 @@ class AppLocalizationsFa extends AppLocalizations {
   String get offline => 'آفلاین';
 
   @override
+  String get connectionConnected => 'متصل';
+
+  @override
+  String get connectionConnecting => 'در حال اتصال...';
+
+  @override
+  String get connectionError => 'خطا';
+
+  @override
+  String get connectionDisconnected => 'قطع شده';
+
+  @override
+  String get serverInfoTitle => 'اطلاعات سرور';
+
+  @override
+  String get serverLabelStatus => 'وضعیت';
+
+  @override
+  String get serverLabelAddress => 'آدرس';
+
+  @override
+  String get serverLabelPort => 'پورت';
+
+  @override
+  String get serverLabelUsername => 'نام کاربری';
+
+  @override
+  String get close => 'بستن';
+
+  @override
+  String get searchByExtensionOrIp => 'جستجو بر اساس شماره یا IP';
+
+  @override
   String get recentCalls => 'تماس‌های اخیر';
 
   @override
@@ -284,4 +317,99 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get system => 'سیستم';
+
+  @override
+  String get englishLanguage => 'English';
+
+  @override
+  String get persianLanguage => 'فارسی';
+
+  @override
+  String get englishSubtitle => 'English';
+
+  @override
+  String get persianSubtitle => 'Persian';
+
+  @override
+  String get backgroundServiceEnabled => 'سرویس پس‌زمینه فعال شد';
+
+  @override
+  String get backgroundServiceDisabled => 'سرویس پس‌زمینه غیرفعال شد';
+
+  @override
+  String get server => 'سرور';
+
+  @override
+  String get currentServer => 'سرور فعلی';
+
+  @override
+  String get noServerConnected => 'هیچ سروری متصل نیست';
+
+  @override
+  String get disconnect => 'قطع اتصال';
+
+  @override
+  String get returnToServerSelection => 'بازگشت به صفحه انتخاب سرور';
+
+  @override
+  String get notifications => 'اطلاع‌رسانی';
+
+  @override
+  String get localNotifications => 'اطلاع‌رسانی‌های محلی';
+
+  @override
+  String get receiveNotificationsForEvents =>
+      'دریافت اطلاع‌رسانی برای رویدادهای سیستم';
+
+  @override
+  String get backgroundService => 'سرویس پس‌زمینه';
+
+  @override
+  String get checkServerStatusInBackground => 'بررسی وضعیت سرور در پس‌زمینه';
+
+  @override
+  String get information => 'اطلاعات';
+
+  @override
+  String get queuesCheckedEvery5Minutes => 'هر 5 دقیقه صف‌ها بررسی می‌شود';
+
+  @override
+  String get about => 'درباره برنامه';
+
+  @override
+  String get version => 'نسخه';
+
+  @override
+  String get asteriskIssabelManagement => 'مدیریت سرورهای Asterisk/Issabel';
+
+  @override
+  String get selectServer => 'انتخاب سرور';
+
+  @override
+  String get noServersSaved => 'هیچ سروری ذخیره نشده است';
+
+  @override
+  String get manageAsteriskIssabelViaAMI =>
+      'مدیریت سرورهای Asterisk و Issabel از طریق AMI';
+
+  @override
+  String get features => 'ویژگی‌ها:';
+
+  @override
+  String get extensionsManagement => '• مدیریت داخلی‌ها';
+
+  @override
+  String get activeCallsMonitoring => '• مشاهده تماس‌های فعال';
+
+  @override
+  String get queueManagement => '• مدیریت صف‌ها';
+
+  @override
+  String get originateCalls => '• برقراری تماس';
+
+  @override
+  String get currentLanguageEnglish => 'English';
+
+  @override
+  String get currentLanguagePersian => 'فارسی';
 }

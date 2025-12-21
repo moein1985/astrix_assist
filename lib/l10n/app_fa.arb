@@ -196,6 +196,61 @@
     "description": "Offline status text"
   },
 
+  "connectionConnected": "متصل",
+  "@connectionConnected": {
+    "description": "Connection status: connected"
+  },
+
+  "connectionConnecting": "در حال اتصال...",
+  "@connectionConnecting": {
+    "description": "Connection status: connecting"
+  },
+
+  "connectionError": "خطا",
+  "@connectionError": {
+    "description": "Connection status: error"
+  },
+
+  "connectionDisconnected": "قطع شده",
+  "@connectionDisconnected": {
+    "description": "Connection status: disconnected"
+  },
+
+  "serverInfoTitle": "اطلاعات سرور",
+  "@serverInfoTitle": {
+    "description": "Server details dialog title"
+  },
+
+  "serverLabelStatus": "وضعیت",
+  "@serverLabelStatus": {
+    "description": "Label for server status"
+  },
+
+  "serverLabelAddress": "آدرس",
+  "@serverLabelAddress": {
+    "description": "Label for server address"
+  },
+
+  "serverLabelPort": "پورت",
+  "@serverLabelPort": {
+    "description": "Label for server port"
+  },
+
+  "serverLabelUsername": "نام کاربری",
+  "@serverLabelUsername": {
+    "description": "Label for server username"
+  },
+
+  "close": "بستن",
+  "@close": {
+    "description": "Close button text"
+  },
+
+  "searchByExtensionOrIp": "جستجو بر اساس شماره یا IP",
+  "@searchByExtensionOrIp": {
+    "description": "Search bar hint for extensions"
+  },
+
   "recentCalls": "تماس‌های اخیر",
   "@recentCalls": {
     "description": "Recent calls section title"
@@ -459,5 +514,160 @@
   "system": "سیستم",
   "@system": {
     "description": "System theme text"
+  },
+
+  "englishLanguage": "English",
+  "@englishLanguage": {
+    "description": "English language option"
+  },
+
+  "persianLanguage": "فارسی",
+  "@persianLanguage": {
+    "description": "Persian language option"
+  },
+
+  "englishSubtitle": "English",
+  "@englishSubtitle": {
+    "description": "English language subtitle"
+  },
+
+  "persianSubtitle": "Persian",
+  "@persianSubtitle": {
+    "description": "Persian language subtitle"
+  },
+
+  "backgroundServiceEnabled": "سرویس پس‌زمینه فعال شد",
+  "@backgroundServiceEnabled": {
+    "description": "Background service enabled message"
+  },
+
+  "backgroundServiceDisabled": "سرویس پس‌زمینه غیرفعال شد",
+  "@backgroundServiceDisabled": {
+    "description": "Background service disabled message"
+  },
+
+  "server": "سرور",
+  "@server": {
+    "description": "Server section title"
+  },
+
+  "currentServer": "سرور فعلی",
+  "@currentServer": {
+    "description": "Current server label"
+  },
+
+  "noServerConnected": "هیچ سروری متصل نیست",
+  "@noServerConnected": {
+    "description": "No server connected message"
+  },
+
+  "disconnect": "قطع اتصال",
+  "@disconnect": {
+    "description": "Disconnect button text"
+  },
+
+  "returnToServerSelection": "بازگشت به صفحه انتخاب سرور",
+  "@returnToServerSelection": {
+    "description": "Return to server selection subtitle"
+  },
+
+  "notifications": "اطلاع‌رسانی",
+  "@notifications": {
+    "description": "Notifications section title"
+  },
+
+  "localNotifications": "اطلاع‌رسانی‌های محلی",
+  "@localNotifications": {
+    "description": "Local notifications label"
+  },
+
+  "receiveNotificationsForEvents": "دریافت اطلاع‌رسانی برای رویدادهای سیستم",
+  "@receiveNotificationsForEvents": {
+    "description": "Receive notifications subtitle"
+  },
+
+  "backgroundService": "سرویس پس‌زمینه",
+  "@backgroundService": {
+    "description": "Background service label"
+  },
+
+  "checkServerStatusInBackground": "بررسی وضعیت سرور در پس‌زمینه",
+  "@checkServerStatusInBackground": {
+    "description": "Check server status subtitle"
+  },
+
+  "information": "اطلاعات",
+  "@information": {
+    "description": "Information label"
+  },
+
+  "queuesCheckedEvery5Minutes": "هر 5 دقیقه صف‌ها بررسی می‌شود",
+  "@queuesCheckedEvery5Minutes": {
+    "description": "Queues checked information"
+  },
+
+  "about": "درباره برنامه",
+  "@about": {
+    "description": "About section title"
+  },
+
+  "version": "نسخه",
+  "@version": {
+    "description": "Version label"
+  },
+
+  "asteriskIssabelManagement": "مدیریت سرورهای Asterisk/Issabel",
+  "@asteriskIssabelManagement": {
+    "description": "Asterisk/Issabel management subtitle"
+  },
+
+  "selectServer": "انتخاب سرور",
+  "@selectServer": {
+    "description": "Select server dialog title"
+  },
+
+  "noServersSaved": "هیچ سروری ذخیره نشده است",
+  "@noServersSaved": {
+    "description": "No servers saved message"
+  },
+
+  "manageAsteriskIssabelViaAMI": "مدیریت سرورهای Asterisk و Issabel از طریق AMI",
+  "@manageAsteriskIssabelViaAMI": {
+    "description": "About dialog description"
+  },
+
+  "features": "ویژگی‌ها:",
+  "@features": {
+    "description": "Features label"
+  },
+
+  "extensionsManagement": "• مدیریت داخلی‌ها",
+  "@extensionsManagement": {
+    "description": "Extensions management feature"
+  },
+
+  "activeCallsMonitoring": "• مشاهده تماس‌های فعال",
+  "@activeCallsMonitoring": {
+    "description": "Active calls monitoring feature"
+  },
+
+  "queueManagement": "• مدیریت صف‌ها",
+  "@queueManagement": {
+    "description": "Queue management feature"
+  },
+
+  "originateCalls": "• برقراری تماس",
+  "@originateCalls": {
+    "description": "Originate calls feature"
+  },
+
+  "currentLanguageEnglish": "English",
+  "@currentLanguageEnglish": {
+    "description": "Current language display for English"
+  },
+
+  "currentLanguagePersian": "فارسی",
+  "@currentLanguagePersian": {
+    "description": "Current language display for Persian"
   }
 }

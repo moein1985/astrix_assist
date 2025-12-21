@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/injection_container.dart';
+import '../../core/ami_api.dart';
 import '../blocs/cdr_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
+import '../widgets/recording_player.dart';
 
 class CdrPage extends StatefulWidget {
   const CdrPage({super.key});
@@ -32,6 +34,28 @@ class _CdrPageState extends State<CdrPage> {
     _endDate = DateTime.now();
     _startDate = _endDate!.subtract(const Duration(days: 7));
     _initBloc();
+  }
+
+  /// Fetch a recording stream URL via the configured `AmiApi` (mock or real backend).
+  Future<String?> _fetchRecordingUrl(String uniqueId) async {
+    try {
+      final res = await AmiApi.getRecordingMeta(uniqueId);
+      if (res.statusCode == 200 && res.data != null) {
+        final url = (res.data as Map<String, dynamic>)['url'] as String?;
+        if (url != null && url.isNotEmpty) return url;
+      }
+    } catch (_) {}
+
+    // fallback: get list and return first item's url
+    try {
+      final res2 = await AmiApi.getRecordings();
+      if (res2.statusCode == 200 && res2.data is List && (res2.data as List).isNotEmpty) {
+        final first = (res2.data as List).first as Map<String, dynamic>;
+        return first['url'] as String?;
+      }
+    } catch (_) {}
+
+    return null;
   }
 
   Future<void> _initBloc() async {
@@ -184,14 +208,45 @@ class _CdrPageState extends State<CdrPage> {
                           ),
                         ],
                       ),
-                      trailing: Text(
-                        _translateDisposition(record.disposition, l10n),
-                        style: TextStyle(
-                          color: _getDispositionColor(
-                            record.disposition,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Play recording',
+                            icon: const Icon(Icons.play_arrow),
+                            onPressed: () async {
+                              final navigator = Navigator.of(context);
+                              final messenger = ScaffoldMessenger.of(context);
+                              final l10nLocal = l10n;
+                              // Use uniqueid or userfield as recording id
+                              final id = record.userfield.isNotEmpty ? record.userfield : record.uniqueid;
+                              final url = await _fetchRecordingUrl(id);
+                              if (url != null && url.isNotEmpty) {
+                                if (!mounted) return;
+                                navigator.push(
+                                  MaterialPageRoute(
+                                    builder: (_) => RecordingPlayerPage(url: url, title: '${record.src} -> ${record.dst}'),
+                                  ),
+                                );
+                              } else {
+                                if (!mounted) return;
+                                messenger.showSnackBar(
+                                  SnackBar(content: Text(l10nLocal.noRecords)),
+                                );
+                              }
+                            },
                           ),
-                          fontWeight: FontWeight.bold,
-                        ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _translateDisposition(record.disposition, l10n),
+                            style: TextStyle(
+                              color: _getDispositionColor(
+                                record.disposition,
+                              ),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );

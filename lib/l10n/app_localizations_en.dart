@@ -127,6 +127,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offline => 'Offline';
 
   @override
+  String get connectionConnected => 'Connected';
+
+  @override
+  String get connectionConnecting => 'Connecting...';
+
+  @override
+  String get connectionError => 'Error';
+
+  @override
+  String get connectionDisconnected => 'Disconnected';
+
+  @override
+  String get serverInfoTitle => 'Server Info';
+
+  @override
+  String get serverLabelStatus => 'Status';
+
+  @override
+  String get serverLabelAddress => 'Address';
+
+  @override
+  String get serverLabelPort => 'Port';
+
+  @override
+  String get serverLabelUsername => 'Username';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get searchByExtensionOrIp => 'Search by extension or IP';
+
+  @override
   String get recentCalls => 'Recent Calls';
 
   @override
@@ -284,4 +317,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get system => 'System';
+
+  @override
+  String get englishLanguage => 'English';
+
+  @override
+  String get persianLanguage => 'فارسی';
+
+  @override
+  String get englishSubtitle => 'English';
+
+  @override
+  String get persianSubtitle => 'Persian';
+
+  @override
+  String get backgroundServiceEnabled => 'Background service enabled';
+
+  @override
+  String get backgroundServiceDisabled => 'Background service disabled';
+
+  @override
+  String get server => 'Server';
+
+  @override
+  String get currentServer => 'Current Server';
+
+  @override
+  String get noServerConnected => 'No server connected';
+
+  @override
+  String get disconnect => 'Disconnect';
+
+  @override
+  String get returnToServerSelection => 'Return to server selection';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get localNotifications => 'Local Notifications';
+
+  @override
+  String get receiveNotificationsForEvents =>
+      'Receive notifications for system events';
+
+  @override
+  String get backgroundService => 'Background Service';
+
+  @override
+  String get checkServerStatusInBackground =>
+      'Check server status in background';
+
+  @override
+  String get information => 'Information';
+
+  @override
+  String get queuesCheckedEvery5Minutes => 'Queues are checked every 5 minutes';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get asteriskIssabelManagement => 'Asterisk/Issabel Management';
+
+  @override
+  String get selectServer => 'Select Server';
+
+  @override
+  String get noServersSaved => 'No servers saved';
+
+  @override
+  String get manageAsteriskIssabelViaAMI =>
+      'Manage Asterisk and Issabel servers via AMI';
+
+  @override
+  String get features => 'Features:';
+
+  @override
+  String get extensionsManagement => '• Extensions Management';
+
+  @override
+  String get activeCallsMonitoring => '• Active Calls Monitoring';
+
+  @override
+  String get queueManagement => '• Queue Management';
+
+  @override
+  String get originateCalls => '• Originate Calls';
+
+  @override
+  String get currentLanguageEnglish => 'English';
+
+  @override
+  String get currentLanguagePersian => 'فارسی';
 }
