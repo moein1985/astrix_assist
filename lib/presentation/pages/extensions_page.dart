@@ -12,6 +12,7 @@ import '../../domain/entities/extension.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/modern_card.dart';
+import '../widgets/listen_session_dialog.dart';
 
 class ExtensionsPage extends StatefulWidget {
   const ExtensionsPage({super.key});
@@ -390,14 +391,13 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
       final res = await AmiApi.originateListen({'target': target});
       final jobId = res.data['jobId']?.toString();
       if (jobId != null) {
-        messenger.showSnackBar(SnackBar(content: Text('Listening... (job: $jobId)')));
-        await for (final job in AmiApi.pollJob(jobId)) {
-          final status = job['status'] as String?;
-          if (status != null) {
-            messenger.showSnackBar(SnackBar(content: Text('Status: $status')));
-            if (status == 'listening' || status == 'stopped') break;
-          }
-        }
+        // Open a dialog to show job status and allow stopping the listen session
+        if (!mounted) return;
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => ListenSessionDialog(jobId: jobId),
+        );
       }
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Error starting listen: $e')));

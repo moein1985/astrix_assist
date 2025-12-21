@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:dio/dio.dart';
 
 class AmiApi {
   AmiApi._();
 
+  static final String _defaultBase = const String.fromEnvironment('AMI_PROXY_URL', defaultValue: 'http://10.0.2.2:8081');
+  static final String _baseUrl = Platform.environment['AMI_PROXY_URL'] ?? _defaultBase;
+
   static final Dio _dio = Dio(BaseOptions(
-    baseUrl: const String.fromEnvironment('AMI_PROXY_URL', defaultValue: 'http://10.0.2.2:8081'),
+    baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 5),
   ))..options.headers['Authorization'] = 'Bearer test-token';
 
