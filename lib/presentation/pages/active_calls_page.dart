@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/refresh_settings.dart';
 import '../../core/injection_container.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/ami_api.dart';
 import '../blocs/active_call_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
@@ -121,6 +122,11 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
                             tooltip: 'قطع',
                             onPressed: () => bloc.add(HangupCall(call.channel)),
                           ),
+                              IconButton(
+                                icon: const Icon(Icons.hearing, color: Colors.black87),
+                                tooltip: 'Listen Live',
+                                onPressed: () => _onListenPressed(call.channel),
+                              ),
                         ],
                       ),
                     ),
@@ -231,6 +237,43 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _onListenPressed(String target) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final title = 'Listen Live';
+    final confirmLabel = 'Confirm';
+    final cancelLabel = l10n.cancel;
+    final should = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text('$confirmLabel: $target'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(cancelLabel)),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(confirmLabel)),
+        ],
+      ),
+    );
+    if (should != true) return;
+
+    try {
+      final res = await AmiApi.originateListen({'target': target});
+      final jobId = res.data['jobId']?.toString();
+      if (jobId != null) {
+        messenger.showSnackBar(SnackBar(content: Text('Listening... (job: $jobId)')));
+        await for (final job in AmiApi.pollJob(jobId)) {
+          final status = job['status'] as String?;
+          if (status != null) {
+            messenger.showSnackBar(SnackBar(content: Text('Status: $status')));
+            if (status == 'listening' || status == 'stopped') break;
+          }
+        }
+      }
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error starting listen: $e')));
     }
   }
 }
