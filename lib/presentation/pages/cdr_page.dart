@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/injection_container.dart';
-import 'package:dio/dio.dart';
+import '../../core/ami_api.dart';
 import '../blocs/cdr_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
@@ -36,27 +36,25 @@ class _CdrPageState extends State<CdrPage> {
     _initBloc();
   }
 
-  /// Fetch a recording stream URL from the mock backend by CDR uniqueid or userfield
+  /// Fetch a recording stream URL via the configured `AmiApi` (mock or real backend).
   Future<String?> _fetchRecordingUrl(String uniqueId) async {
-    // Default mock server base. On Android emulator use 10.0.2.2
-    final base = 'http://10.0.2.2:8080';
-    final dio = Dio();
     try {
-      final res = await dio.get('$base/recordings/$uniqueId');
+      final res = await AmiApi.getRecordingMeta(uniqueId);
       if (res.statusCode == 200 && res.data != null) {
-        final url = res.data['url'] as String?;
-        return url;
+        final url = (res.data as Map<String, dynamic>)['url'] as String?;
+        if (url != null && url.isNotEmpty) return url;
       }
-    } catch (e) {
-      // fallback: try /recordings to get first item
-      try {
-        final res2 = await dio.get('$base/recordings');
-        if (res2.statusCode == 200 && res2.data is List && (res2.data as List).isNotEmpty) {
-          final first = (res2.data as List).first as Map<String, dynamic>;
-          return first['url'] as String?;
-        }
-      } catch (_) {}
-    }
+    } catch (_) {}
+
+    // fallback: get list and return first item's url
+    try {
+      final res2 = await AmiApi.getRecordings();
+      if (res2.statusCode == 200 && res2.data is List && (res2.data as List).isNotEmpty) {
+        final first = (res2.data as List).first as Map<String, dynamic>;
+        return first['url'] as String?;
+      }
+    } catch (_) {}
+
     return null;
   }
 
