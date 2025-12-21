@@ -39,20 +39,11 @@ final sl = GetIt.instance;
 void setupDependencies() {
   // جلوگیری از ثبت مجدد
   if (sl.isRegistered<IExtensionRepository>()) {
-    print('⚠️ [DI] Dependencies already registered, skipping...');
     return;
   }
   
   // استفاده از AppConfig برای تعیین Mock یا Real
   const useMock = AppConfig.useMockRepositories;
-  
-  print('🎯 [DI] USE_MOCK = $useMock');
-  
-  if (useMock) {
-    print('✅ [DI] Using MOCK repositories');
-  } else {
-    print('❌ [DI] Using REAL repositories (Asterisk AMI)');
-  }
 
   // Data layer
   sl.registerFactory(

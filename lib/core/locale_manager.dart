@@ -15,20 +15,17 @@ class LocaleManager {
       await prefs.setString(_localeKey, 'en');
       await prefs.setBool(_localeInitKey, true);
       locale.value = const Locale('en', '');
-      print('🌐 [Locale] First run - Setting English as default');
       return;
     }
     
     final languageCode = prefs.getString(_localeKey) ?? 'en';
     locale.value = Locale(languageCode, '');
-    print('🌐 [Locale] Loaded: $languageCode');
   }
 
   static Future<void> setLocale(Locale newLocale) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_localeKey, newLocale.languageCode);
     locale.value = newLocale;
-    print('🌐 [Locale] Changed to: ${newLocale.languageCode}');
   }
   
   /// Force reset to English (for debugging)

@@ -21,10 +21,10 @@ class QuickTipCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final bgColor = backgroundColor ?? colorScheme.primary.withOpacity(0.1);
-    final brdColor = borderColor ?? colorScheme.primary.withOpacity(0.3);
+    final bgColor = backgroundColor ?? colorScheme.primary.withValues(alpha: 0.1);
+    final brdColor = borderColor ?? colorScheme.primary.withValues(alpha: 0.3);
     final icnColor = iconColor ?? colorScheme.primary;
-    final txtColor = textColor ?? colorScheme.onSurface.withOpacity(0.8);
+    final txtColor = textColor ?? colorScheme.onSurface.withValues(alpha: 0.8);
 
     return Container(
       padding: const EdgeInsets.all(12),

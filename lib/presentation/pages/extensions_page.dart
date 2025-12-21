@@ -10,9 +10,6 @@ import '../../domain/entities/extension.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/modern_card.dart';
-import '../widgets/collapsible_section.dart';
-import '../widgets/quick_tip_card.dart';
-import '../widgets/help_icon_button.dart';
 
 class ExtensionsPage extends StatefulWidget {
   const ExtensionsPage({super.key});
@@ -106,7 +103,6 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
           ),
           body: BlocBuilder<ExtensionBloc, ExtensionState>(
             builder: (context, state) {
-              final isLoading = state is ExtensionLoading;
               
               return switch (state) {
                 ExtensionInitial() => const Center(child: Text('Press refresh to load')),
@@ -270,8 +266,8 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
   Widget _buildStatCard(String title, String value, Color color) {
     return Expanded(
       child: ModernCard(
-        backgroundColor: color.withOpacity(0.1),
-        borderColor: color.withOpacity(0.3),
+        backgroundColor: color.withValues(alpha: 0.1),
+        borderColor: color.withValues(alpha: 0.3),
         child: Column(
           children: [
             Text(
@@ -303,8 +299,8 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
         final ext = extensions[index];
         return ModernCard(
           key: ValueKey('extension_${ext.name}'),
-          backgroundColor: ext.isOnline ? Colors.green.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
-          borderColor: ext.isOnline ? Colors.green.withOpacity(0.2) : Colors.grey.withOpacity(0.2),
+          backgroundColor: ext.isOnline ? Colors.green.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.05),
+          borderColor: ext.isOnline ? Colors.green.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.2),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: ext.isOnline ? Colors.green : Colors.grey,
@@ -337,7 +333,7 @@ class _ExtensionsPageState extends State<ExtensionsPage> {
             trailing: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: ext.isOnline ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                color: ext.isOnline ? Colors.green.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(

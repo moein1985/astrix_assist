@@ -51,7 +51,7 @@ class HelpIconButton extends StatelessWidget {
       icon: Icon(
         icon,
         size: iconSize,
-        color: iconColor ?? colorScheme.onSurface.withOpacity(0.6),
+        color: iconColor ?? colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       onPressed: () => _showHelpDialog(context),
       padding: EdgeInsets.zero,

@@ -10,7 +10,6 @@ import '../widgets/theme_toggle_button.dart';
 import '../widgets/connection_status_widget.dart';
 import '../widgets/pause_reason_dialog.dart';
 import '../widgets/modern_card.dart';
-import '../widgets/help_icon_button.dart';
 
 class QueuesPage extends StatefulWidget {
   const QueuesPage({super.key});
@@ -98,8 +97,8 @@ class _QueuesPageState extends State<QueuesPage> {
                   final q = state.queues[index];
                   return ModernCard(
                     key: ValueKey('queue_${q.queue}'),
-                    backgroundColor: q.calls > 0 ? Colors.orange.withOpacity(0.05) : Colors.green.withOpacity(0.05),
-                    borderColor: q.calls > 0 ? Colors.orange.withOpacity(0.2) : Colors.green.withOpacity(0.2),
+                    backgroundColor: q.calls > 0 ? Colors.orange.withValues(alpha: 0.05) : Colors.green.withValues(alpha: 0.05),
+                    borderColor: q.calls > 0 ? Colors.orange.withValues(alpha: 0.2) : Colors.green.withValues(alpha: 0.2),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -119,7 +118,7 @@ class _QueuesPageState extends State<QueuesPage> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: q.calls > 0 ? Colors.orange.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                                color: q.calls > 0 ? Colors.orange.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -152,7 +151,7 @@ class _QueuesPageState extends State<QueuesPage> {
                                 children: [
                                   CircleAvatar(
                                     radius: 12,
-                                    backgroundColor: _memberColor(m.state).withOpacity(0.2),
+                                    backgroundColor: _memberColor(m.state).withValues(alpha: 0.2),
                                     child: Icon(
                                       Icons.person,
                                       size: 16,
@@ -179,7 +178,7 @@ class _QueuesPageState extends State<QueuesPage> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                               decoration: BoxDecoration(
-                                                color: Colors.red.withOpacity(0.1),
+                                                color: Colors.red.withValues(alpha: 0.1),
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
                                               child: Text(
@@ -321,7 +320,7 @@ class _QueuesPageState extends State<QueuesPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
@@ -338,7 +337,7 @@ class _QueuesPageState extends State<QueuesPage> {
               label,
               style: TextStyle(
                 fontSize: 10,
-                color: color.withOpacity(0.8),
+                color: color.withValues(alpha: 0.8),
               ),
             ),
           ],

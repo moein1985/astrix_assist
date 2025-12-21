@@ -278,6 +278,12 @@ abstract class AppLocalizations {
   /// **'Click on cards to view detailed information and manage your PBX system'**
   String get dashboardQuickTip;
 
+  /// System resources section title
+  ///
+  /// In en, this message translates to:
+  /// **'System Resources'**
+  String get systemResources;
+
   /// Extensions page title
   ///
   /// In en, this message translates to:

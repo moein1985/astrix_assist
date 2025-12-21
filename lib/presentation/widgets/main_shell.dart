@@ -60,7 +60,7 @@ class _MainShellState extends State<MainShell> {
     if (isMobile) {
       return Scaffold(
         body: widget.child,
-        bottomNavigationBar: BottomNavigationBar(
+        bottomNavigationBar: _currentIndex == 0 ? null : BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: _onNavigation,
           type: BottomNavigationBarType.fixed,

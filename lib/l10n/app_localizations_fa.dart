@@ -100,6 +100,9 @@ class AppLocalizationsFa extends AppLocalizations {
       'برای مشاهده اطلاعات جزئی و مدیریت سیستم PBX روی کارت‌ها کلیک کنید';
 
   @override
+  String get systemResources => 'منابع سیستم';
+
+  @override
   String get extensions => 'داخلی‌ها';
 
   @override

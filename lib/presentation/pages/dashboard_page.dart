@@ -113,14 +113,110 @@ class _DashboardPageState extends State<DashboardPage> {
                     DashboardLoading() => const Center(child: CircularProgressIndicator()),
                     DashboardLoaded() => RefreshIndicator(
                       onRefresh: () async => bloc.add(RefreshDashboard()),
-                      child: ListView(
-                        key: const PageStorageKey('dashboard_list'),
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
-                        children: [
-                          _buildStatsGrid(state, l10n),
-                          const SizedBox(height: 24),
-                          _buildRecentCallsSection(state, l10n),
-                        ],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // System Resources Card (if available)
+                            if (state.systemResource != null) ...[
+                              Card(
+                                elevation: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.router, color: Theme.of(context).colorScheme.primary),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            l10n.systemResources,
+                                            style: Theme.of(context).textTheme.titleLarge,
+                                          ),
+                                        ],
+                                      ),
+                                      const Divider(height: 24),
+                                      _buildInfoRow('Version', state.systemResource!.version),
+                                      _buildInfoRow('Uptime', state.systemResource!.uptime),
+                                      _buildInfoRow('Platform', state.systemResource!.platform),
+                                      _buildInfoRow('Board', state.systemResource!.boardName),
+                                      _buildInfoRow('Architecture', state.systemResource!.architectureName),
+                                      const SizedBox(height: 16),
+                                      _buildProgressRow(
+                                        'CPU Load',
+                                        state.systemResource!.cpuLoad,
+                                        Theme.of(context).colorScheme.primary,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _buildMemoryRow(
+                                        'Memory',
+                                        state.systemResource!.freeMemory,
+                                        state.systemResource!.totalMemory,
+                                        Theme.of(context).colorScheme.secondary,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _buildMemoryRow(
+                                        'Storage',
+                                        state.systemResource!.freeHddSpace,
+                                        state.systemResource!.totalHddSpace,
+                                        Colors.orange,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+
+                            // Quick Tip
+                            QuickTipCard(
+                              tip: l10n.dashboardQuickTip,
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Stats Grid
+                            _buildStatsGrid(state, l10n),
+                            const SizedBox(height: 24),
+
+                            // Menu Sections
+                            _buildDashboardSection(
+                              context,
+                              l10n.extensions,
+                              Icons.phone,
+                              Colors.blue,
+                              [
+                                _buildSectionCard(
+                                  context,
+                                  l10n.extensions,
+                                  Icons.phone,
+                                  Colors.blue.shade100,
+                                  () => context.push('/extensions'),
+                                ),
+                                _buildSectionCard(
+                                  context,
+                                  l10n.queues,
+                                  Icons.queue,
+                                  Colors.green.shade100,
+                                  () => context.push('/queues'),
+                                ),
+                                _buildSectionCard(
+                                  context,
+                                  l10n.settings,
+                                  Icons.settings,
+                                  Colors.grey.shade100,
+                                  () => context.push('/settings'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Recent Calls
+                            _buildRecentCallsSection(state, l10n),
+                          ],
+                        ),
                       ),
                     ),
                     DashboardError() => Center(
@@ -190,7 +286,7 @@ class _DashboardPageState extends State<DashboardPage> {
       children: [
         // Quick Tip Card
         QuickTipCard(
-          tip: l10n.dashboardQuickTip ?? 'برای مشاهده جزئیات بیشتر روی کارت‌ها کلیک کنید',
+          tip: l10n.dashboardQuickTip,
         ),
         const SizedBox(height: 16),
         
@@ -251,8 +347,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Widget _buildStatCard(String title, String value, String subtitle, IconData icon, Color color) {
     return ModernCard(
-      backgroundColor: color.withOpacity(0.1),
-      borderColor: color.withOpacity(0.3),
+      backgroundColor: color.withValues(alpha: 0.1),
+      borderColor: color.withValues(alpha: 0.3),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -408,5 +504,164 @@ class _DashboardPageState extends State<DashboardPage> {
       });
       _startTimer();
     }
+  }
+
+  String _formatBytes(String bytes) {
+    final value = int.tryParse(bytes) ?? 0;
+    if (value < 1024) return '$value B';
+    if (value < 1048576) return '${(value / 1024).toStringAsFixed(1)} KB';
+    if (value < 1073741824) return '${(value / 1048576).toStringAsFixed(1)} MB';
+    return '${(value / 1073741824).toStringAsFixed(2)} GB';
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressRow(String label, String percentage, Color color) {
+    final value = double.tryParse(percentage) ?? 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+            Text('$percentage%'),
+          ],
+        ),
+        const SizedBox(height: 4),
+        LinearProgressIndicator(
+          value: value / 100,
+          backgroundColor: color.withValues(alpha: 0.2),
+          valueColor: AlwaysStoppedAnimation<Color>(color),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMemoryRow(
+    String label,
+    String free,
+    String total,
+    Color color,
+  ) {
+    final freeBytes = int.tryParse(free) ?? 0;
+    final totalBytes = int.tryParse(total) ?? 1;
+    final usedBytes = totalBytes - freeBytes;
+    final percentage = (usedBytes / totalBytes * 100).toStringAsFixed(1);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+            Text(
+              '${_formatBytes(usedBytes.toString())} / ${_formatBytes(total)}',
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        LinearProgressIndicator(
+          value: usedBytes / totalBytes,
+          backgroundColor: color.withValues(alpha: 0.2),
+          valueColor: AlwaysStoppedAnimation<Color>(color),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          '$percentage% used',
+          style: const TextStyle(fontSize: 11, color: Colors.grey),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDashboardSection(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    List<Widget> cards,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 3,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 1.0,
+          children: cards,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color backgroundColor,
+    VoidCallback onTap,
+  ) {
+    return Card(
+      elevation: 1,
+      color: backgroundColor,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 24, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 4),
+              Flexible(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

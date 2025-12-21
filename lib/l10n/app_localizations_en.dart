@@ -100,6 +100,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Click on cards to view detailed information and manage your PBX system';
 
   @override
+  String get systemResources => 'System Resources';
+
+  @override
   String get extensions => 'Extensions';
 
   @override
