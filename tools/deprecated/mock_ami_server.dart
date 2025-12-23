@@ -98,6 +98,16 @@ class MockAmiServer {
     final username = data['Username'];
     final secret = data['Secret'];
     final actionId = data['ActionID'] ?? '';
+    
+    // Validate username and secret (accept any for testing)
+    if (username == null || secret == null || username.isEmpty || secret.isEmpty) {
+      final response = 'Response: Error\r\n'
+          'ActionID: $actionId\r\n'
+          'Message: Missing credentials\r\n'
+          '\r\n';
+      client.write(response);
+      return;
+    }
 
     // Accept any credentials for testing
     final response = 'Response: Success\r\n'

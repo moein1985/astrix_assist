@@ -18,7 +18,10 @@ class CdrBloc extends Bloc<CdrEvent, CdrState> {
     required this.exportCdrToCsvUseCase,
   }) : super(CdrInitial()) {
     on<LoadCdrRecords>((event, emit) async {
+      logger.i('📞 LoadCdrRecords event received with: startDate=${event.startDate}, endDate=${event.endDate}, src=${event.src}, dst=${event.dst}, disposition=${event.disposition}, limit=${event.limit}');
       emit(CdrLoading());
+      logger.d('⏳ CdrLoading state emitted, calling use case...');
+      
       final result = await getCdrRecordsUseCase(
         startDate: event.startDate,
         endDate: event.endDate,
@@ -27,18 +30,26 @@ class CdrBloc extends Bloc<CdrEvent, CdrState> {
         disposition: event.disposition,
         limit: event.limit,
       );
+      
+      logger.d('📦 Use case returned result: ${result.runtimeType}');
       switch (result) {
         case Success(:final data):
           final records = data;
-          logger.i('Loaded ${records.length} CDR records');
+          logger.i('✅ Loaded ${records.length} CDR records');
+          if (records.isEmpty) {
+            logger.w('⚠️ No CDR records found - list is empty');
+          } else {
+            logger.d('📋 First CDR: ${records.first.callDate} ${records.first.src} -> ${records.first.dst}');
+          }
           emit(CdrLoaded(records));
         case Failure(:final message):
-          logger.e('CDR load error: $message');
+          logger.e('❌ CDR load error: $message');
           emit(CdrError(message));
       }
     });
 
     on<FilterCdrRecords>((event, emit) async {
+      logger.i('🔍 FilterCdrRecords event received');
       emit(CdrLoading());
       final result = await getCdrRecordsUseCase(
         startDate: event.startDate,
@@ -51,10 +62,10 @@ class CdrBloc extends Bloc<CdrEvent, CdrState> {
       switch (result) {
         case Success(:final data):
           final records = data;
-          logger.i('Filtered ${records.length} CDR records');
+          logger.i('✅ Filtered ${records.length} CDR records');
           emit(CdrLoaded(records));
         case Failure(:final message):
-          logger.e('CDR filter error: $message');
+          logger.e('❌ CDR filter error: $message');
           emit(CdrError(message));
       }
     });

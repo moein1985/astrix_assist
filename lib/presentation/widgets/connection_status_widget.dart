@@ -117,32 +117,70 @@ class _ConnectionStatusWidgetState extends State<ConnectionStatusWidget> {
   void _showServerDetails() async {
     final l10n = AppLocalizations.of(context)!;
     final prefs = await SharedPreferences.getInstance();
-    final host = prefs.getString('ip') ?? 'N/A';
-    final port = prefs.getString('port') ?? '5038';
-    final username = prefs.getString('username') ?? 'N/A';
+    
+    // AMI Settings
+    final amiHost = prefs.getString('ami_host') ?? prefs.getString('ip') ?? 'N/A';
+    final amiPort = prefs.getInt('ami_port')?.toString() ?? prefs.getString('port') ?? '5038';
+    final amiUsername = prefs.getString('ami_username') ?? prefs.getString('username') ?? 'N/A';
+    
+    // SSH Settings
+    final sshHost = prefs.getString('ssh_host') ?? 'N/A';
+    final sshPort = prefs.getInt('ssh_port')?.toString() ?? '22';
+    final sshUsername = prefs.getString('ssh_username') ?? 'N/A';
 
     if (!mounted) return;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-            title: Row(
+        title: Row(
           children: [
             _buildStatusIcon(),
             const SizedBox(width: 12),
             Text(l10n.serverInfoTitle),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoRow(l10n.serverLabelStatus, _getStatusText(l10n)),
-            const Divider(),
-            _buildInfoRow(l10n.serverLabelAddress, host),
-            _buildInfoRow(l10n.serverLabelPort, port),
-            _buildInfoRow(l10n.serverLabelUsername, username),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInfoRow(l10n.serverLabelStatus, _getStatusText(l10n)),
+              const Divider(),
+              // AMI Section
+              const Text(
+                'AMI Connection',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildInfoRow(l10n.serverLabelAddress, amiHost),
+              _buildInfoRow(l10n.serverLabelPort, amiPort),
+              _buildInfoRow(l10n.serverLabelUsername, amiUsername),
+              const Divider(),
+              // SSH Section
+              const Text(
+                'SSH Connection',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildInfoRow('SSH Host', sshHost),
+              _buildInfoRow('SSH Port', sshPort),
+              _buildInfoRow('SSH User', sshUsername),
+              const SizedBox(height: 8),
+              const Text(
+                '💡 SSH is used for CDR access and recordings',
+                style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(

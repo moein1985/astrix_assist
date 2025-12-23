@@ -214,12 +214,9 @@ class SshService {
     if (!_isConnected) await connect();
 
     try {
-      _logger.d('Executing: $command');
-      
       final result = await _client!.run(command);
       final output = String.fromCharCodes(result);
       
-      _logger.d('Command output: $output');
       return output.trim();
     } catch (e) {
       _logger.e('Error executing command: $e');

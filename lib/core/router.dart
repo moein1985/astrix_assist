@@ -6,6 +6,7 @@ import '../presentation/pages/queues_page.dart';
 import '../presentation/pages/extension_detail_page.dart';
 import '../presentation/pages/dashboard_page.dart';
 import '../presentation/pages/settings_page.dart';
+import '../presentation/pages/server_setup_page.dart';
 import '../presentation/pages/cdr_page.dart';
 import '../presentation/pages/agent_detail_page.dart';
 import '../presentation/pages/trunks_page.dart';
@@ -89,6 +90,10 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/settings',
           builder: (context, state) => const SettingsPage(),
+        ),
+        GoRoute(
+          path: '/settings/server-setup',
+          builder: (context, state) => const ServerSetupPage(),
         ),
         GoRoute(path: '/cdr', builder: (context, state) => const CdrPage()),
         GoRoute(

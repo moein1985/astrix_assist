@@ -242,16 +242,23 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
   }
 
   Future<void> _onListenPressed(String target) async {
+    print('🎧 Listen button pressed for target: $target');
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     
     // Check consent first
+    print('📋 Showing consent dialog...');
     final hasConsent = await ListenConsentDialog.showConsentDialog(context, target);
-    if (!hasConsent || !mounted) return;
+    print('📋 Consent result: $hasConsent');
+    if (!hasConsent || !mounted) {
+      print('❌ Consent denied or widget unmounted');
+      return;
+    }
     
     final title = 'Listen Live';
     final confirmLabel = 'Confirm';
     final cancelLabel = l10n.cancel;
+    print('📋 Showing confirmation dialog...');
     final should = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -263,11 +270,17 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
         ],
       ),
     );
-    if (should != true) return;
+    print('📋 Confirmation result: $should');
+    if (should != true) {
+      print('❌ User cancelled confirmation');
+      return;
+    }
 
     try {
+      print('🎧 Starting listen session for: $target');
       // استفاده مستقیم از AmiListenClient
       final amiClient = sl<AmiListenClient>();
+      print('📞 AMI client obtained, calling originateListen...');
       
       // فرض: target به فرمت SIP/1001 است
       // شنود را شروع کن
@@ -275,11 +288,13 @@ class _ActiveCallsPageState extends State<ActiveCallsPage> {
         targetChannel: target,
         listenerExtension: '9999', // داخلی برای شنود - باید از تنظیمات بیاید
       );
+      print('✅ Listen session started successfully');
       
       messenger.showSnackBar(
         SnackBar(content: Text('Listen session started for $target')),
       );
     } catch (e) {
+      print('❌ Error starting listen session: $e');
       messenger.showSnackBar(SnackBar(content: Text('Error starting listen: $e')));
     }
   }

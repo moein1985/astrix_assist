@@ -1,10 +1,10 @@
 import '../../domain/entities/cdr_record.dart';
 import '../../domain/repositories/icdr_repository.dart';
 import '../../core/result.dart';
-import '../datasources/cdr_datasource.dart';
+import '../datasources/ssh_cdr_datasource.dart';
 
 class CdrRepositoryImpl implements ICdrRepository {
-  final CdrDataSource dataSource;
+  final SshCdrDataSource dataSource;
 
   CdrRepositoryImpl(this.dataSource);
 

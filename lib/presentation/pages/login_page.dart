@@ -1,7 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/locale_manager.dart';
+import '../../core/ssh_config.dart';
+import '../../core/services/asterisk_ssh_manager.dart';
 import '../../domain/entities/server_config.dart';
 import '../../domain/services/server_manager.dart';
 import '../widgets/language_switcher.dart';
@@ -40,20 +44,191 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _connectToServer(ServerConfig config) async {
-    await ServerManager.setActiveServer(config.id);
-    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
     
-    // Navigate to dashboard after connection
-    if (mounted) {
-      context.go('/dashboard');
+    // Show loading dialog
+    if (!mounted) return;
+    String statusMessage = 'Connecting to server...';
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Center(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(statusMessage),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      void updateStatus(String message) {
+        statusMessage = message;
+        if (mounted) {
+          // Force update the dialog
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => Center(
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(message),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      }
+
+      // Step 1: Test SSH Connection
+      updateStatus('Testing SSH connection...');
+      final sshConfig = SshConfig(
+        host: config.host,
+        port: 22, // SSH port
+        username: config.username,
+        password: config.password,
+        authMethod: 'password',
+      );
+      
+      final sshManager = AsteriskSshManager(sshConfig);
+      await sshManager.connect();
+      
+      // Step 2: Check AMI Status
+      updateStatus('Checking AMI status...');
+      final amiStatus = await sshManager.checkAmi();
+      
+      String amiUsername = 'astrix_assist';
+      String amiPassword = 'A12321ssist';
+      
+      // Step 3: Setup AMI if needed
+      if (amiStatus.success && amiStatus.data != null) {
+        final data = amiStatus.data!;
+        if (!data.enabled || !data.userExists) {
+          updateStatus('Configuring AMI...');
+          final setupResult = await sshManager.setupAmi(
+            username: amiUsername,
+            password: amiPassword,
+          );
+          
+          if (!setupResult.success) {
+            throw Exception('AMI setup failed: ${setupResult.error ?? "Unknown error"}');
+          }
+        } else {
+          updateStatus('AMI already configured');
+        }
+      } else {
+        // If check fails, try to setup anyway
+        updateStatus('Setting up AMI...');
+        final setupResult = await sshManager.setupAmi(
+          username: amiUsername,
+          password: amiPassword,
+        );
+        
+        if (!setupResult.success) {
+          // Just warn, don't fail - user can configure manually
+          print('Warning: AMI auto-setup failed: ${setupResult.error}');
+        }
+      }
+      
+      // Step 4: Save SSH Config
+      updateStatus('Saving configuration...');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('ssh_host', config.host);
+      await prefs.setInt('ssh_port', 22);
+      await prefs.setString('ssh_username', config.username);
+      
+      const secureStorage = FlutterSecureStorage();
+      await secureStorage.write(key: 'ssh_password', value: config.password);
+      
+      // Step 5: Save AMI Config
+      await prefs.setString('ami_host', config.host);
+      await prefs.setInt('ami_port', 5038);
+      await prefs.setString('ami_username', amiUsername);
+      await secureStorage.write(key: 'ami_password', value: amiPassword);
+      
+      // Step 6: Save as active server
+      await ServerManager.setActiveServer(config.id);
+      
+      // Close loading dialog
+      if (mounted) {
+        Navigator.pop(context);
+      }
+      
+      // Navigate to dashboard
+      if (mounted) {
+        context.go('/dashboard');
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (mounted) {
+        Navigator.pop(context);
+      }
+      
+      // Show error
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.connectionError),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Connection failed. Please check:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('• SSH server is running on port 22'),
+                  const Text('• Username/password are correct'),
+                  const Text('• Server is reachable'),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Error details:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(e.toString(), style: const TextStyle(fontSize: 12)),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.close),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
   Future<void> _showAddEditDialog([ServerConfig? existing]) async {
     final nameController = TextEditingController(text: existing?.name ?? '');
     final hostController = TextEditingController(text: existing?.host ?? '');
-    final portController = TextEditingController(text: existing?.port.toString() ?? '5038');
-    final userController = TextEditingController(text: existing?.username ?? '');
+    final portController = TextEditingController(text: existing?.port.toString() ?? '22');
+    final userController = TextEditingController(text: existing?.username ?? 'root');
     final passController = TextEditingController(text: existing?.password ?? '');
     final formKey = GlobalKey<FormState>();
 
@@ -72,11 +247,34 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Info box
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Enter SSH (root) credentials.\nAMI will be auto-configured.',
+                            style: TextStyle(fontSize: 12, color: Colors.blue),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: nameController,
                     decoration: InputDecoration(
                       labelText: l10n.serverName,
                       prefixIcon: const Icon(Icons.label),
+                      helperText: 'e.g., Office PBX',
                     ),
                     validator: (v) => v == null || v.isEmpty ? l10n.nameRequired : null,
                   ),
@@ -84,8 +282,9 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: hostController,
                     decoration: InputDecoration(
-                      labelText: l10n.ipAddress,
+                      labelText: 'Server IP Address',
                       prefixIcon: const Icon(Icons.dns),
+                      helperText: 'e.g., 192.168.1.100',
                     ),
                     validator: (v) => v == null || v.isEmpty ? l10n.ipRequired : null,
                   ),
@@ -93,28 +292,33 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: portController,
                     decoration: InputDecoration(
-                      labelText: l10n.port,
+                      labelText: 'SSH Port',
                       prefixIcon: const Icon(Icons.settings_ethernet),
+                      helperText: 'Default: 22',
                     ),
                     keyboardType: TextInputType.number,
-                    validator: (v) => v == null || v.isEmpty ? l10n.portRequired : null,
+                    validator: (v) => v == null || v.isEmpty ? 'Port required' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: userController,
                     decoration: InputDecoration(
-                      labelText: l10n.username,
+                      labelText: 'SSH Username',
                       prefixIcon: const Icon(Icons.person),
+                      helperText: 'Usually "root"',
                     ),
+                    validator: (v) => v == null || v.isEmpty ? 'Username required' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: passController,
                     decoration: InputDecoration(
-                      labelText: l10n.password,
+                      labelText: 'SSH Password',
                       prefixIcon: const Icon(Icons.lock),
+                      helperText: 'Root password',
                     ),
                     obscureText: true,
+                    validator: (v) => v == null || v.isEmpty ? 'Password required' : null,
                   ),
                 ],
               ),
@@ -283,7 +487,7 @@ class _LoginPageState extends State<LoginPage> {
                                             const SizedBox(width: 4),
                                             Flexible(
                                               child: Text(
-                                                '${server.host}:${server.port}',
+                                                'SSH: ${server.host}:${server.port}',
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
@@ -299,6 +503,17 @@ class _LoginPageState extends State<LoginPage> {
                                                 server.username,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        const Row(
+                                          children: [
+                                            Icon(Icons.info_outline, size: 14, color: Colors.blue),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'AMI: Auto-configured',
+                                              style: TextStyle(fontSize: 11, color: Colors.blue),
                                             ),
                                           ],
                                         ),

@@ -1,5 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'app_config.dart';
+import 'ssh_config.dart';
+import 'services/asterisk_ssh_manager.dart';
+import 'ami_listen_client.dart';
 import '../domain/usecases/get_extensions_usecase.dart';
 import '../domain/usecases/pause_agent_usecase.dart';
 import '../domain/usecases/unpause_agent_usecase.dart';
@@ -15,7 +20,8 @@ import '../domain/usecases/hangup_call_usecase.dart';
 import '../domain/usecases/transfer_call_usecase.dart';
 import '../domain/usecases/originate_call_usecase.dart';
 import '../data/datasources/ami_datasource.dart';
-import '../data/datasources/cdr_datasource.dart';
+import '../data/datasources/ssh_cdr_datasource.dart';
+import '../data/datasources/ssh_system_datasource.dart';
 import '../data/repositories/extension_repository_impl.dart';
 import '../data/repositories/monitor_repository_impl.dart';
 import '../data/repositories/cdr_repository_impl.dart';
@@ -36,7 +42,7 @@ import '../presentation/blocs/active_call_bloc.dart';
 
 final sl = GetIt.instance;
 
-void setupDependencies() {
+Future<void> setupDependencies() async {
   // جلوگیری از ثبت مجدد
   if (sl.isRegistered<IExtensionRepository>()) {
     return;
@@ -45,23 +51,63 @@ void setupDependencies() {
   // استفاده از AppConfig برای تعیین Mock یا Real
   const useMock = AppConfig.useMockRepositories;
 
+  // Load saved settings
+  final prefs = await SharedPreferences.getInstance();
+  const secureStorage = FlutterSecureStorage();
+  
+  // SSH Config from saved settings or defaults
+  final sshHost = prefs.getString('ssh_host') ?? AppConfig.defaultSshHost;
+  final sshPort = prefs.getInt('ssh_port') ?? AppConfig.defaultSshPort;
+  final sshUsername = prefs.getString('ssh_username') ?? AppConfig.defaultSshUsername;
+  final sshPassword = await secureStorage.read(key: 'ssh_password') ?? '';
+  
+  // AMI Config from saved settings or defaults
+  final amiHost = prefs.getString('ami_host') ?? AppConfig.defaultAmiHost;
+  final amiPort = prefs.getInt('ami_port') ?? AppConfig.defaultAmiPort;
+  final amiUsername = prefs.getString('ami_username') ?? AppConfig.defaultAmiUsername;
+  final amiPassword = await secureStorage.read(key: 'ami_password') ?? AppConfig.defaultAmiSecret;
+
+  // SSH Config & Manager
+  sl.registerLazySingleton<SshConfig>(
+    () => SshConfig(
+      host: sshHost,
+      port: sshPort,
+      username: sshUsername,
+      authMethod: 'password',
+      password: sshPassword,
+    ),
+  );
+  
+  sl.registerLazySingleton<AsteriskSshManager>(
+    () => AsteriskSshManager(sl<SshConfig>()),
+  );
+
+  // AMI Listen Client
+  sl.registerLazySingleton<AmiListenClient>(
+    () => AmiListenClient(
+      host: amiHost,
+      port: amiPort,
+      username: amiUsername,
+      secret: amiPassword,
+    ),
+  );
+
   // Data layer
   sl.registerFactory(
     () => AmiDataSource(
-      host: AppConfig.defaultAmiHost,
-      port: AppConfig.defaultAmiPort,
-      username: AppConfig.defaultAmiUsername,
-      secret: AppConfig.defaultAmiSecret,
+      host: amiHost,
+      port: amiPort,
+      username: amiUsername,
+      secret: amiPassword,
     ),
   );
-  sl.registerFactory(
-    () => CdrDataSource(
-      host: AppConfig.defaultDbHost,
-      port: AppConfig.defaultDbPort,
-      user: AppConfig.defaultDbUser,
-      password: AppConfig.defaultDbPassword,
-      db: AppConfig.defaultDbName,
-    ),
+  
+  sl.registerFactory<SshCdrDataSource>(
+    () => SshCdrDataSource(sshManager: sl<AsteriskSshManager>()),
+  );
+  
+  sl.registerFactory<SshSystemDataSource>(
+    () => SshSystemDataSource(sshManager: sl<AsteriskSshManager>()),
   );
 
   // Repositories با شرط
@@ -83,7 +129,7 @@ void setupDependencies() {
       () => MonitorRepositoryImpl(sl<AmiDataSource>()),
     );
     sl.registerLazySingleton<ICdrRepository>(
-      () => CdrRepositoryImpl(sl<CdrDataSource>()),
+      () => CdrRepositoryImpl(sl<SshCdrDataSource>()),
     );
   }
 

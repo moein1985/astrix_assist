@@ -37,13 +37,13 @@ class AmiListenClient {
   /// Connect to Asterisk AMI
   Future<void> connect() async {
     if (_socket != null) {
-      logger.w('Already connected or connecting, disconnecting first...');
+      logger.w('⚠️ Already connected or connecting, disconnecting first...');
       await disconnect();
       await Future.delayed(Duration(milliseconds: 200));
     }
     
     try {
-      logger.i('🔌 Connecting to AMI at $host:$port for Listen/Playback');
+      logger.i('🔌 Connecting to AMI Listen Client at $host:$port (user: $username)');
       _socket = await Socket.connect(
         host,
         port,

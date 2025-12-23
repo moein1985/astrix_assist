@@ -235,8 +235,16 @@ class _CdrPageState extends State<CdrPage> {
                                 ),
                               );
                               
-                              // Download recording via SSH
-                              final filePath = await _downloadRecording(record.uniqueid, record.callDate);
+                              String? filePath;
+                              String? errorMessage;
+                              
+                              try {
+                                // Download recording via SSH
+                                filePath = await _downloadRecording(record.uniqueid, record.callDate);
+                              } catch (e) {
+                                errorMessage = e.toString();
+                                debugPrint('Play button error: $e');
+                              }
                               
                               if (!mounted) return;
                               navigator.pop(); // Close loading
@@ -253,8 +261,14 @@ class _CdrPageState extends State<CdrPage> {
                                 );
                               } else {
                                 if (!mounted) return;
+                                final message = errorMessage != null 
+                                    ? 'Connection failed: $errorMessage'
+                                    : l10nLocal.recordingNotFound;
                                 messenger.showSnackBar(
-                                  SnackBar(content: Text(l10nLocal.recordingNotFound)),
+                                  SnackBar(
+                                    content: Text(message),
+                                    duration: const Duration(seconds: 5),
+                                  ),
                                 );
                               }
                             },

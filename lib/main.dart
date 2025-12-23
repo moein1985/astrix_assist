@@ -15,7 +15,7 @@ Future<void> main() async {
   await LocaleManager.load();
   
   // Setup dependencies (uses AppConfig.useMockRepositories)
-  setupDependencies();
+  await setupDependencies();
 
   // Initialize notification service
   await NotificationService().initialize();

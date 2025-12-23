@@ -18,14 +18,11 @@ class AppConfig {
   static const String defaultAmiUsername = 'moein_api';
   static const String defaultAmiSecret = '123456';
   
-  /// Default MySQL/CDR connection settings
-  static const String defaultDbHost = '192.168.85.88';
-  static const int defaultDbPort = 3306;
-  static const String defaultDbUser = 'root';
-  static const String defaultDbPassword = '123456';
-  static const String defaultDbName = 'asteriskcdrdb';
-  
-  /// Default SSH connection settings (for downloading recordings)
+  /// Default SSH connection settings (replaces MySQL access)
+  /// SSH is used for:
+  /// - CDR retrieval via Python script
+  /// - Downloading call recordings
+  /// - System info and AMI auto-setup
   static const String defaultSshHost = '192.168.85.88';
   static const int defaultSshPort = 22;
   static const String defaultSshUsername = 'root';

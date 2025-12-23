@@ -6,7 +6,7 @@ import 'package:astrix_assist/core/app_config.dart';
 /// 
 /// This shows how to integrate the AMI client with Flutter UI
 class AmiListenExample extends StatefulWidget {
-  const AmiListenExample({Key? key}) : super(key: key);
+  const AmiListenExample({super.key});
 
   @override
   State<AmiListenExample> createState() => _AmiListenExampleState();
