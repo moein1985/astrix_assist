@@ -344,11 +344,23 @@ abstract class AppLocalizations {
   /// **'Connecting...'**
   String get connectionConnecting;
 
-  /// Connection status: error
+  /// SSH connection error message
   ///
   /// In en, this message translates to:
-  /// **'Error'**
+  /// **'Connection Error'**
   String get connectionError;
+
+  /// SSH authentication error message
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication Failed'**
+  String get authenticationError;
+
+  /// Generic unexpected error message
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected Error'**
+  String get unexpectedError;
 
   /// Connection status: disconnected
   ///

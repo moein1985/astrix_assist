@@ -4,9 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/injection_container.dart';
-import '../../core/ssh_service.dart';
-import '../../core/ssh_config.dart';
-import '../../core/app_config.dart';
+import '../../core/services/asterisk_ssh_manager.dart';
 import '../../core/ami_listen_client.dart';
 import '../blocs/cdr_bloc.dart';
 import '../widgets/theme_toggle_button.dart';
@@ -42,25 +40,12 @@ class _CdrPageState extends State<CdrPage> {
 
   /// Download recording via SSH and return local file path
   Future<String?> _downloadRecording(String uniqueId, String callDate) async {
-    try {
-      // Load SSH config from SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      final sshConfig = SshConfig(
-        host: prefs.getString('ssh_host') ?? AppConfig.defaultSshHost,
-        port: prefs.getInt('ssh_port') ?? AppConfig.defaultSshPort,
-        username: prefs.getString('ssh_username') ?? AppConfig.defaultSshUsername,
-        password: prefs.getString('ssh_password'),
-        recordingsPath: prefs.getString('ssh_recordings_path') ?? AppConfig.defaultRecordingsPath,
-      );
-
-      final sshService = SshService(sshConfig);
-      final file = await sshService.downloadRecordingByUniqueId(uniqueId, callDate);
-      
-      if (file != null) {
-        return file.path;
-      }
-    } catch (e) {
-      debugPrint('Error downloading recording: $e');
+    // Use the same SSH connection from AsteriskSshManager (via GetIt)
+    final sshManager = sl<AsteriskSshManager>();
+    final file = await sshManager.sshService.downloadRecordingByUniqueId(uniqueId, callDate);
+    
+    if (file != null) {
+      return file.path;
     }
     return null;
   }
@@ -222,10 +207,6 @@ class _CdrPageState extends State<CdrPage> {
                             tooltip: 'Play recording',
                             icon: const Icon(Icons.play_arrow),
                             onPressed: () async {
-                              final navigator = Navigator.of(context);
-                              final messenger = ScaffoldMessenger.of(context);
-                              final l10nLocal = l10n;
-                              
                               // Show loading
                               showDialog(
                                 context: context,
@@ -242,16 +223,29 @@ class _CdrPageState extends State<CdrPage> {
                                 // Download recording via SSH
                                 filePath = await _downloadRecording(record.uniqueid, record.callDate);
                               } catch (e) {
-                                errorMessage = e.toString();
+                                // Detect error type and provide user-friendly message
+                                final errStr = e.toString().toLowerCase();
+                                if (errStr.contains('connection') || errStr.contains('socket') || errStr.contains('timeout')) {
+                                  errorMessage = l10n.connectionError;
+                                } else if (errStr.contains('auth') || errStr.contains('permission')) {
+                                  errorMessage = l10n.authenticationError;
+                                } else if (errStr.contains('not found') || errStr.contains('no such file')) {
+                                  errorMessage = l10n.recordingNotFound;
+                                } else {
+                                  errorMessage = '${l10n.unexpectedError}: ${e.toString().split('\n').first}';
+                                }
                                 debugPrint('Play button error: $e');
                               }
                               
+                              // Close loading dialog safely (use rootNavigator for dialogs)
+                              if (mounted && context.mounted) {
+                                Navigator.of(context, rootNavigator: true).pop();
+                              }
+                              
                               if (!mounted) return;
-                              navigator.pop(); // Close loading
                               
                               if (filePath != null && filePath.isNotEmpty) {
-                                if (!mounted) return;
-                                navigator.push(
+                                Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (_) => RecordingPlayerPage(
                                       url: 'file://$filePath',
@@ -260,14 +254,12 @@ class _CdrPageState extends State<CdrPage> {
                                   ),
                                 );
                               } else {
-                                if (!mounted) return;
-                                final message = errorMessage != null 
-                                    ? 'Connection failed: $errorMessage'
-                                    : l10nLocal.recordingNotFound;
-                                messenger.showSnackBar(
+                                final message = errorMessage ?? l10n.recordingNotFound;
+                                ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(message),
                                     duration: const Duration(seconds: 5),
+                                    backgroundColor: errorMessage != null ? Colors.red.shade700 : null,
                                   ),
                                 );
                               }
@@ -295,7 +287,7 @@ class _CdrPageState extends State<CdrPage> {
                                 final filePath = await _downloadRecording(record.uniqueid, record.callDate);
                                 
                                 if (!ctx.mounted) return;
-                                Navigator.pop(ctx); // Close loading
+                                Navigator.of(ctx, rootNavigator: true).pop(); // Close loading dialog
                                 
                                 if (filePath != null) {
                                   // Use AmiListenClient to originate playback
@@ -315,7 +307,7 @@ class _CdrPageState extends State<CdrPage> {
                                 }
                               } catch (e) {
                                 if (!ctx.mounted) return;
-                                Navigator.pop(ctx); // Close loading if still open
+                                Navigator.of(ctx, rootNavigator: true).pop(); // Close loading dialog if still open
                                 messenger.showSnackBar(
                                   SnackBar(content: Text('Error starting playback: $e')),
                                 );

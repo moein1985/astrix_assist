@@ -23,6 +23,9 @@ class AsteriskSshManager {
   AsteriskSshManager(this.config, [SshService? sshService]) {
     _sshService = sshService ?? SshService(config);
   }
+  
+  /// Get SSH service instance (for recording downloads)
+  SshService get sshService => _sshService;
 
   /// Connect to SSH server
   Future<void> connect() async {

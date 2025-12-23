@@ -133,7 +133,13 @@ class AppLocalizationsFa extends AppLocalizations {
   String get connectionConnecting => 'در حال اتصال...';
 
   @override
-  String get connectionError => 'خطا';
+  String get connectionError => 'خطا در اتصال';
+
+  @override
+  String get authenticationError => 'خطا در احراز هویت';
+
+  @override
+  String get unexpectedError => 'خطای غیرمنتظره';
 
   @override
   String get connectionDisconnected => 'قطع شده';

@@ -206,9 +206,19 @@
     "description": "Connection status: connecting"
   },
 
-  "connectionError": "Error",
+  "connectionError": "Connection Error",
   "@connectionError": {
-    "description": "Connection status: error"
+    "description": "SSH connection error message"
+  },
+
+  "authenticationError": "Authentication Failed",
+  "@authenticationError": {
+    "description": "SSH authentication error message"
+  },
+
+  "unexpectedError": "Unexpected Error",
+  "@unexpectedError": {
+    "description": "Generic unexpected error message"
   },
 
   "connectionDisconnected": "Disconnected",

@@ -133,7 +133,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connectionConnecting => 'Connecting...';
 
   @override
-  String get connectionError => 'Error';
+  String get connectionError => 'Connection Error';
+
+  @override
+  String get authenticationError => 'Authentication Failed';
+
+  @override
+  String get unexpectedError => 'Unexpected Error';
 
   @override
   String get connectionDisconnected => 'Disconnected';

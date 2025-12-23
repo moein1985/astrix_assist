@@ -206,9 +206,19 @@
     "description": "Connection status: connecting"
   },
 
-  "connectionError": "خطا",
+  "connectionError": "خطا در اتصال",
   "@connectionError": {
-    "description": "Connection status: error"
+    "description": "SSH connection error message"
+  },
+
+  "authenticationError": "خطا در احراز هویت",
+  "@authenticationError": {
+    "description": "SSH authentication error message"
+  },
+
+  "unexpectedError": "خطای غیرمنتظره",
+  "@unexpectedError": {
+    "description": "Generic unexpected error message"
   },
 
   "connectionDisconnected": "قطع شده",

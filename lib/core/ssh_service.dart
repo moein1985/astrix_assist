@@ -13,57 +13,174 @@ class SshService {
   SSHClient? _client;
   SftpClient? _sftp;
   bool _isConnected = false;
+  DateTime? _lastActivity;
+  Timer? _keepAliveTimer;
+
+  // Connection settings
+  static const Duration _connectionTimeout = Duration(seconds: 10);
+  static const Duration _keepAliveInterval = Duration(seconds: 30);
+  static const Duration _idleTimeout = Duration(minutes: 5);
+  static const int _maxRetries = 3;
 
   SshService(this.config);
 
-  /// اتصال به سرور SSH
-  Future<void> connect() async {
-    if (_isConnected && _client != null) {
-      _logger.d('SSH already connected');
-      return;
-    }
-
+  /// بررسی سلامت اتصال
+  Future<bool> isConnectionHealthy() async {
+    if (!_isConnected || _client == null) return false;
+    
     try {
-      _logger.i('Connecting to SSH: ${config.username}@${config.host}:${config.port}');
-
-      final socket = await SSHSocket.connect(
-        config.host,
-        config.port,
-        timeout: const Duration(seconds: 10),
-      );
-
-      if (config.authMethod == 'password') {
-        _client = SSHClient(
-          socket,
-          username: config.username,
-          onPasswordRequest: () => config.password ?? '',
-        );
-      } else {
-        // Private key authentication
-        _client = SSHClient(
-          socket,
-          username: config.username,
-          identities: SSHKeyPair.fromPem(config.privateKey!),
-        );
+      // اگر idle بیش از حد باشد، اتصال رو بست کن
+      if (_lastActivity != null && 
+          DateTime.now().difference(_lastActivity!) > _idleTimeout) {
+        _logger.w('Connection idle timeout, disconnecting');
+        await disconnect();
+        return false;
       }
-
-      _sftp = await _client!.sftp();
-      _isConnected = true;
       
-      _logger.i('SSH connected successfully');
+      // تست سریع با دستور echo
+      final result = await _client!.run('echo "test"');
+      return result.isNotEmpty;
     } catch (e) {
-      _logger.e('SSH connection failed: $e');
-      _isConnected = false;
+      _logger.w('Connection health check failed: $e');
+      return false;
+    }
+  }
+
+  /// شروع keep-alive برای جلوگیری از timeout
+  void _startKeepAlive() {
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = Timer.periodic(_keepAliveInterval, (timer) async {
+      if (_isConnected && _client != null) {
+        try {
+          await _client!.run('echo "keepalive"');
+          _logger.d('Keep-alive ping sent');
+        } catch (e) {
+          _logger.w('Keep-alive failed, connection may be dead: $e');
+        }
+      }
+    });
+  }
+
+  /// اجرای عملیات با مدیریت خودکار session
+  Future<T> _executeWithRecovery<T>(Future<T> Function() operation) async {
+    _lastActivity = DateTime.now();
+    
+    // اگر اتصال سالم نیست، reconnect کن
+    if (!await isConnectionHealthy()) {
+      _logger.i('Connection unhealthy, attempting reconnect');
+      await disconnect();
+      await connect();
+    }
+    
+    try {
+      return await operation();
+    } catch (e) {
+      // اگر خطای اتصال بود، یک بار reconnect و retry کن
+      if (_isConnectionError(e)) {
+        _logger.w('Connection error detected, attempting recovery: $e');
+        await disconnect();
+        await connect();
+        return await operation(); // یک بار دیگه امتحان کن
+      }
       rethrow;
     }
   }
 
+  /// بررسی اینکه آیا خطا مربوط به اتصال هست
+  bool _isConnectionError(dynamic error) {
+    final errorStr = error.toString().toLowerCase();
+    return errorStr.contains('socket') ||
+           errorStr.contains('connection') ||
+           errorStr.contains('timeout') ||
+           errorStr.contains('closed');
+  }
+
+  /// اتصال به سرور SSH با retry logic
+  Future<void> connect() async {
+    if (await isConnectionHealthy()) {
+      _logger.d('SSH already connected and healthy');
+      return;
+    }
+
+    // اگر اتصال قبلی داریم ولی سالم نیست، قطعش کن
+    if (_client != null) {
+      await disconnect();
+    }
+
+    int attempt = 0;
+    Exception? lastError;
+
+    while (attempt < _maxRetries) {
+      attempt++;
+      
+      try {
+        _logger.i('Connecting to SSH (attempt $attempt/$_maxRetries): ${config.username}@${config.host}:${config.port}');
+        
+        final socket = await SSHSocket.connect(
+          config.host,
+          config.port,
+          timeout: _connectionTimeout,
+        );
+
+        if (config.authMethod == 'password') {
+          _client = SSHClient(
+            socket,
+            username: config.username,
+            onPasswordRequest: () => config.password ?? '',
+          );
+        } else {
+          // Private key authentication
+          _client = SSHClient(
+            socket,
+            username: config.username,
+            identities: SSHKeyPair.fromPem(config.privateKey!),
+          );
+        }
+
+        _sftp = await _client!.sftp();
+        _isConnected = true;
+        _lastActivity = DateTime.now();
+        _startKeepAlive(); // شروع keep-alive
+        
+        _logger.i('SSH connection established successfully on attempt $attempt');
+        return;
+        
+      } catch (e) {
+        lastError = e is Exception ? e : Exception(e.toString());
+        _logger.w('SSH connection attempt $attempt failed: $e');
+        
+        _client = null;
+        _sftp = null;
+        _isConnected = false;
+        
+        // اگر آخرین تلاش نبود، کمی صبر کن (exponential backoff)
+        if (attempt < _maxRetries) {
+          final delay = Duration(milliseconds: 500 * (1 << (attempt - 1))); // 500ms, 1s, 2s
+          _logger.d('Waiting ${delay.inMilliseconds}ms before retry');
+          await Future.delayed(delay);
+        }
+      }
+    }
+
+    // اگر همه تلاش‌ها شکست خورد
+    _logger.e('Failed to connect to SSH server after $_maxRetries attempts');
+    throw lastError ?? Exception('SSH connection failed after $_maxRetries attempts');
+  }
+
   /// قطع اتصال
-  void disconnect() {
+  Future<void> disconnect() async {
     try {
+      _keepAliveTimer?.cancel();
+      _keepAliveTimer = null;
+      
       _sftp?.close();
       _client?.close();
+      
+      _sftp = null;
+      _client = null;
       _isConnected = false;
+      _lastActivity = null;
+      
       _logger.i('SSH disconnected');
     } catch (e) {
       _logger.e('Error disconnecting SSH: $e');
@@ -72,15 +189,10 @@ class SshService {
 
   /// بررسی وجود فایل در سرور
   Future<bool> fileExists(String remotePath) async {
-    if (!_isConnected) await connect();
-
-    try {
+    return await _executeWithRecovery(() async {
       final stat = await _sftp!.stat(remotePath);
       return !stat.isDirectory; // Check it's a file, not a directory
-    } catch (e) {
-      _logger.w('File not found: $remotePath - $e');
-      return false;
-    }
+    });
   }
 
   /// دریافت لیست فایل‌های ضبط شده در یک تاریخ خاص
@@ -88,11 +200,11 @@ class SshService {
   /// [date] به فرمت YYYY-MM-DD
   /// برمی‌گرداند: لیست نام فایل‌ها (فقط نام، نه مسیر کامل)
   Future<List<String>> listRecordings(String date) async {
-    if (!_isConnected) await connect();
-
-    try {
+    return await _executeWithRecovery(() async {
       // تبدیل تاریخ به فرمت مسیر: /var/spool/asterisk/monitor/2025/01/15/
-      final dateParts = date.split('-');
+      // Extract only date part (YYYY-MM-DD) if datetime is passed
+      final dateOnly = date.length > 10 ? date.substring(0, 10) : date;
+      final dateParts = dateOnly.split('-');
       if (dateParts.length != 3) {
         throw ArgumentError('Date must be in YYYY-MM-DD format');
       }
@@ -123,11 +235,7 @@ class SshService {
 
       _logger.i('Found ${recordings.length} recordings');
       return recordings;
-    } catch (e) {
-      _logger.e('Error listing recordings: $e');
-      // اگر پوشه وجود نداشت، لیست خالی برگردان
-      return [];
-    }
+    });
   }
 
   /// دانلود یک فایل ضبط شده
@@ -137,9 +245,7 @@ class SshService {
   /// 
   /// برمی‌گرداند: فایل دانلود شده
   Future<File> downloadRecording(String remotePath, {String? localPath}) async {
-    if (!_isConnected) await connect();
-
-    try {
+    return await _executeWithRecovery(() async {
       _logger.i('Downloading: $remotePath');
 
       // اگر مسیر محلی مشخص نشده، در temp ذخیره کن
@@ -150,7 +256,7 @@ class SshService {
       }
 
       // ایجاد پوشه در صورت عدم وجود
-      final localFile = File(localPath);
+      final localFile = File(localPath!);
       await localFile.parent.create(recursive: true);
 
       // دانلود فایل
@@ -167,17 +273,14 @@ class SshService {
 
       _logger.i('Downloaded successfully: $localPath');
       return localFile;
-    } catch (e) {
-      _logger.e('Error downloading file: $e');
-      rethrow;
-    }
+    });
   }
 
   /// دانلود فایل ضبط بر اساس uniqueid تماس
   /// 
   /// این متد خودکار مسیر فایل را پیدا می‌کند
   Future<File?> downloadRecordingByUniqueId(String uniqueid, String callDate) async {
-    try {
+    return await _executeWithRecovery(() async {
       // لیست فایل‌های آن روز
       final recordings = await listRecordings(callDate);
       
@@ -193,7 +296,9 @@ class SshService {
       }
 
       // ساخت مسیر کامل
-      final dateParts = callDate.split('-');
+      // Extract only date part (YYYY-MM-DD) if datetime is passed
+      final dateOnly = callDate.length > 10 ? callDate.substring(0, 10) : callDate;
+      final dateParts = dateOnly.split('-');
       final year = dateParts[0];
       final month = dateParts[1];
       final day = dateParts[2];
@@ -201,27 +306,19 @@ class SshService {
 
       // دانلود
       return await downloadRecording(remotePath);
-    } catch (e) {
-      _logger.e('Error downloading recording by uniqueid: $e');
-      return null;
-    }
+    });
   }
 
   /// اجرای یک دستور SSH در سرور
   /// 
   /// برای debugging و تست
   Future<String> executeCommand(String command) async {
-    if (!_isConnected) await connect();
-
-    try {
+    return await _executeWithRecovery(() async {
       final result = await _client!.run(command);
       final output = String.fromCharCodes(result);
       
       return output.trim();
-    } catch (e) {
-      _logger.e('Error executing command: $e');
-      rethrow;
-    }
+    });
   }
 
   /// تست اتصال
@@ -232,7 +329,7 @@ class SshService {
       // تست با لیست کردن پوشه recordings
       final output = await executeCommand('ls -la ${config.recordingsPath}');
       
-      disconnect();
+      await disconnect();
       
       return output.isNotEmpty;
     } catch (e) {
