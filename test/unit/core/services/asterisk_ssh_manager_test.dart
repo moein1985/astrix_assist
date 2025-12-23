@@ -41,12 +41,12 @@ void main() {
       verify(mockSshService.connect()).called(1);
     });
 
-    test('disconnect should call sshService.disconnect and reset state', () {
+    test('disconnect should call sshService.disconnect and reset state', () async {
       // Arrange
-      when(mockSshService.disconnect()).thenReturn(null);
+      when(mockSshService.disconnect()).thenAnswer((_) async {});
 
       // Act
-      sshManager.disconnect();
+      await sshManager.disconnect();
 
       // Assert
       verify(mockSshService.disconnect()).called(1);

@@ -58,6 +58,14 @@ class MockSshService extends _i1.Mock implements _i4.SshService {
           as bool);
 
   @override
+  _i5.Future<bool> isConnectionHealthy() =>
+      (super.noSuchMethod(
+            Invocation.method(#isConnectionHealthy, []),
+            returnValue: _i5.Future<bool>.value(false),
+          )
+          as _i5.Future<bool>);
+
+  @override
   _i5.Future<void> connect() =>
       (super.noSuchMethod(
             Invocation.method(#connect, []),
@@ -67,10 +75,13 @@ class MockSshService extends _i1.Mock implements _i4.SshService {
           as _i5.Future<void>);
 
   @override
-  void disconnect() => super.noSuchMethod(
-    Invocation.method(#disconnect, []),
-    returnValueForMissingStub: null,
-  );
+  _i5.Future<void> disconnect() =>
+      (super.noSuchMethod(
+            Invocation.method(#disconnect, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
 
   @override
   _i5.Future<bool> fileExists(String? remotePath) =>

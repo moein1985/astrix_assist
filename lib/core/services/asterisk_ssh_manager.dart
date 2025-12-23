@@ -34,8 +34,8 @@ class AsteriskSshManager {
   }
 
   /// Disconnect from SSH server
-  void disconnect() {
-    _sshService.disconnect();
+  Future<void> disconnect() async {
+    await _sshService.disconnect();
     _scriptDeployed = false;
     _deployedScriptPath = null;
   }

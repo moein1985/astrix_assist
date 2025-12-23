@@ -1,0 +1,452 @@
+[
+  {
+    "filename": "recording_0.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/23/recording_1766498841734.wav",
+    "size": "100000",
+    "duration": "30",
+    "date": "2025-12-23T06:07:21.734887",
+    "channel": "SIP/1000",
+    "extension": "0915511900"
+  },
+  {
+    "filename": "recording_1.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/23/recording_1766495241734.wav",
+    "size": "101000",
+    "duration": "31",
+    "date": "2025-12-23T05:07:21.734887",
+    "channel": "SIP/1001",
+    "extension": "0915511901"
+  },
+  {
+    "filename": "recording_2.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/23/recording_1766491641734.wav",
+    "size": "102000",
+    "duration": "32",
+    "date": "2025-12-23T04:07:21.734887",
+    "channel": "SIP/1002",
+    "extension": "0915511902"
+  },
+  {
+    "filename": "recording_3.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/23/recording_1766488041734.wav",
+    "size": "103000",
+    "duration": "33",
+    "date": "2025-12-23T03:07:21.734887",
+    "channel": "SIP/1003",
+    "extension": "0915511903"
+  },
+  {
+    "filename": "recording_4.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/23/recording_1766484441734.wav",
+    "size": "104000",
+    "duration": "34",
+    "date": "2025-12-23T02:07:21.734887",
+    "channel": "SIP/1004",
+    "extension": "0915511904"
+  },
+  {
+    "filename": "recording_5.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/23/recording_1766480841734.wav",
+    "size": "105000",
+    "duration": "35",
+    "date": "2025-12-23T01:07:21.734887",
+    "channel": "SIP/1005",
+    "extension": "0915511905"
+  },
+  {
+    "filename": "recording_6.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/23/recording_1766477241734.wav",
+    "size": "106000",
+    "duration": "36",
+    "date": "2025-12-23T00:07:21.734887",
+    "channel": "SIP/1006",
+    "extension": "0915511906"
+  },
+  {
+    "filename": "recording_7.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766473641734.wav",
+    "size": "107000",
+    "duration": "37",
+    "date": "2025-12-22T23:07:21.734887",
+    "channel": "SIP/1007",
+    "extension": "0915511907"
+  },
+  {
+    "filename": "recording_8.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766470041734.wav",
+    "size": "108000",
+    "duration": "38",
+    "date": "2025-12-22T22:07:21.734887",
+    "channel": "SIP/1008",
+    "extension": "0915511908"
+  },
+  {
+    "filename": "recording_9.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766466441734.wav",
+    "size": "109000",
+    "duration": "39",
+    "date": "2025-12-22T21:07:21.734887",
+    "channel": "SIP/1009",
+    "extension": "0915511909"
+  },
+  {
+    "filename": "recording_10.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766462841734.wav",
+    "size": "110000",
+    "duration": "40",
+    "date": "2025-12-22T20:07:21.734887",
+    "channel": "SIP/1000",
+    "extension": "09155119010"
+  },
+  {
+    "filename": "recording_11.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766459241734.wav",
+    "size": "111000",
+    "duration": "41",
+    "date": "2025-12-22T19:07:21.734887",
+    "channel": "SIP/1001",
+    "extension": "09155119011"
+  },
+  {
+    "filename": "recording_12.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766455641734.wav",
+    "size": "112000",
+    "duration": "42",
+    "date": "2025-12-22T18:07:21.734887",
+    "channel": "SIP/1002",
+    "extension": "09155119012"
+  },
+  {
+    "filename": "recording_13.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766452041734.wav",
+    "size": "113000",
+    "duration": "43",
+    "date": "2025-12-22T17:07:21.734887",
+    "channel": "SIP/1003",
+    "extension": "09155119013"
+  },
+  {
+    "filename": "recording_14.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766448441734.wav",
+    "size": "114000",
+    "duration": "44",
+    "date": "2025-12-22T16:07:21.734887",
+    "channel": "SIP/1004",
+    "extension": "09155119014"
+  },
+  {
+    "filename": "recording_15.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766444841734.wav",
+    "size": "115000",
+    "duration": "45",
+    "date": "2025-12-22T15:07:21.734887",
+    "channel": "SIP/1005",
+    "extension": "09155119015"
+  },
+  {
+    "filename": "recording_16.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766441241734.wav",
+    "size": "116000",
+    "duration": "46",
+    "date": "2025-12-22T14:07:21.734887",
+    "channel": "SIP/1006",
+    "extension": "09155119016"
+  },
+  {
+    "filename": "recording_17.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766437641734.wav",
+    "size": "117000",
+    "duration": "47",
+    "date": "2025-12-22T13:07:21.734887",
+    "channel": "SIP/1007",
+    "extension": "09155119017"
+  },
+  {
+    "filename": "recording_18.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766434041734.wav",
+    "size": "118000",
+    "duration": "48",
+    "date": "2025-12-22T12:07:21.734887",
+    "channel": "SIP/1008",
+    "extension": "09155119018"
+  },
+  {
+    "filename": "recording_19.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766430441734.wav",
+    "size": "119000",
+    "duration": "49",
+    "date": "2025-12-22T11:07:21.734887",
+    "channel": "SIP/1009",
+    "extension": "09155119019"
+  },
+  {
+    "filename": "recording_20.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766426841734.wav",
+    "size": "120000",
+    "duration": "50",
+    "date": "2025-12-22T10:07:21.734887",
+    "channel": "SIP/1000",
+    "extension": "09155119020"
+  },
+  {
+    "filename": "recording_21.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766423241734.wav",
+    "size": "121000",
+    "duration": "51",
+    "date": "2025-12-22T09:07:21.734887",
+    "channel": "SIP/1001",
+    "extension": "09155119021"
+  },
+  {
+    "filename": "recording_22.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766419641734.wav",
+    "size": "122000",
+    "duration": "52",
+    "date": "2025-12-22T08:07:21.734887",
+    "channel": "SIP/1002",
+    "extension": "09155119022"
+  },
+  {
+    "filename": "recording_23.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766416041734.wav",
+    "size": "123000",
+    "duration": "53",
+    "date": "2025-12-22T07:07:21.734887",
+    "channel": "SIP/1003",
+    "extension": "09155119023"
+  },
+  {
+    "filename": "recording_24.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766412441734.wav",
+    "size": "124000",
+    "duration": "54",
+    "date": "2025-12-22T06:07:21.734887",
+    "channel": "SIP/1004",
+    "extension": "09155119024"
+  },
+  {
+    "filename": "recording_25.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766408841734.wav",
+    "size": "125000",
+    "duration": "55",
+    "date": "2025-12-22T05:07:21.734887",
+    "channel": "SIP/1005",
+    "extension": "09155119025"
+  },
+  {
+    "filename": "recording_26.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766405241734.wav",
+    "size": "126000",
+    "duration": "56",
+    "date": "2025-12-22T04:07:21.734887",
+    "channel": "SIP/1006",
+    "extension": "09155119026"
+  },
+  {
+    "filename": "recording_27.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766401641734.wav",
+    "size": "127000",
+    "duration": "57",
+    "date": "2025-12-22T03:07:21.734887",
+    "channel": "SIP/1007",
+    "extension": "09155119027"
+  },
+  {
+    "filename": "recording_28.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766398041734.wav",
+    "size": "128000",
+    "duration": "58",
+    "date": "2025-12-22T02:07:21.734887",
+    "channel": "SIP/1008",
+    "extension": "09155119028"
+  },
+  {
+    "filename": "recording_29.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766394441734.wav",
+    "size": "129000",
+    "duration": "59",
+    "date": "2025-12-22T01:07:21.734887",
+    "channel": "SIP/1009",
+    "extension": "09155119029"
+  },
+  {
+    "filename": "recording_30.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/22/recording_1766390841734.wav",
+    "size": "130000",
+    "duration": "60",
+    "date": "2025-12-22T00:07:21.734887",
+    "channel": "SIP/1000",
+    "extension": "09155119030"
+  },
+  {
+    "filename": "recording_31.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766387241734.wav",
+    "size": "131000",
+    "duration": "61",
+    "date": "2025-12-21T23:07:21.734887",
+    "channel": "SIP/1001",
+    "extension": "09155119031"
+  },
+  {
+    "filename": "recording_32.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766383641734.wav",
+    "size": "132000",
+    "duration": "62",
+    "date": "2025-12-21T22:07:21.734887",
+    "channel": "SIP/1002",
+    "extension": "09155119032"
+  },
+  {
+    "filename": "recording_33.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766380041734.wav",
+    "size": "133000",
+    "duration": "63",
+    "date": "2025-12-21T21:07:21.734887",
+    "channel": "SIP/1003",
+    "extension": "09155119033"
+  },
+  {
+    "filename": "recording_34.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766376441734.wav",
+    "size": "134000",
+    "duration": "64",
+    "date": "2025-12-21T20:07:21.734887",
+    "channel": "SIP/1004",
+    "extension": "09155119034"
+  },
+  {
+    "filename": "recording_35.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766372841734.wav",
+    "size": "135000",
+    "duration": "65",
+    "date": "2025-12-21T19:07:21.734887",
+    "channel": "SIP/1005",
+    "extension": "09155119035"
+  },
+  {
+    "filename": "recording_36.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766369241734.wav",
+    "size": "136000",
+    "duration": "66",
+    "date": "2025-12-21T18:07:21.734887",
+    "channel": "SIP/1006",
+    "extension": "09155119036"
+  },
+  {
+    "filename": "recording_37.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766365641734.wav",
+    "size": "137000",
+    "duration": "67",
+    "date": "2025-12-21T17:07:21.734887",
+    "channel": "SIP/1007",
+    "extension": "09155119037"
+  },
+  {
+    "filename": "recording_38.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766362041734.wav",
+    "size": "138000",
+    "duration": "68",
+    "date": "2025-12-21T16:07:21.734887",
+    "channel": "SIP/1008",
+    "extension": "09155119038"
+  },
+  {
+    "filename": "recording_39.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766358441734.wav",
+    "size": "139000",
+    "duration": "69",
+    "date": "2025-12-21T15:07:21.734887",
+    "channel": "SIP/1009",
+    "extension": "09155119039"
+  },
+  {
+    "filename": "recording_40.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766354841734.wav",
+    "size": "140000",
+    "duration": "70",
+    "date": "2025-12-21T14:07:21.734887",
+    "channel": "SIP/1000",
+    "extension": "09155119040"
+  },
+  {
+    "filename": "recording_41.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766351241734.wav",
+    "size": "141000",
+    "duration": "71",
+    "date": "2025-12-21T13:07:21.734887",
+    "channel": "SIP/1001",
+    "extension": "09155119041"
+  },
+  {
+    "filename": "recording_42.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766347641734.wav",
+    "size": "142000",
+    "duration": "72",
+    "date": "2025-12-21T12:07:21.734887",
+    "channel": "SIP/1002",
+    "extension": "09155119042"
+  },
+  {
+    "filename": "recording_43.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766344041734.wav",
+    "size": "143000",
+    "duration": "73",
+    "date": "2025-12-21T11:07:21.734887",
+    "channel": "SIP/1003",
+    "extension": "09155119043"
+  },
+  {
+    "filename": "recording_44.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766340441734.wav",
+    "size": "144000",
+    "duration": "74",
+    "date": "2025-12-21T10:07:21.734887",
+    "channel": "SIP/1004",
+    "extension": "09155119044"
+  },
+  {
+    "filename": "recording_45.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766336841736.wav",
+    "size": "145000",
+    "duration": "75",
+    "date": "2025-12-21T09:07:21.736072",
+    "channel": "SIP/1005",
+    "extension": "09155119045"
+  },
+  {
+    "filename": "recording_46.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766333241736.wav",
+    "size": "146000",
+    "duration": "76",
+    "date": "2025-12-21T08:07:21.736072",
+    "channel": "SIP/1006",
+    "extension": "09155119046"
+  },
+  {
+    "filename": "recording_47.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766329641736.wav",
+    "size": "147000",
+    "duration": "77",
+    "date": "2025-12-21T07:07:21.736072",
+    "channel": "SIP/1007",
+    "extension": "09155119047"
+  },
+  {
+    "filename": "recording_48.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766326041736.wav",
+    "size": "148000",
+    "duration": "78",
+    "date": "2025-12-21T06:07:21.736072",
+    "channel": "SIP/1008",
+    "extension": "09155119048"
+  },
+  {
+    "filename": "recording_49.wav",
+    "path": "/var/spool/asterisk/monitor/2025/12/21/recording_1766322441736.wav",
+    "size": "149000",
+    "duration": "79",
+    "date": "2025-12-21T05:07:21.736072",
+    "channel": "SIP/1009",
+    "extension": "09155119049"
+  }
+]

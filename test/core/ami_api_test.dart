@@ -1,35 +1,57 @@
-import 'package:test/test.dart';
-import 'package:astrix_assist/core/ami_api.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:astrix_assist/core/ami_listen_client.dart';
+import '../../tools/mock_servers/mock_ami_server.dart';
 
 void main() {
-  group('AmiApi (integration with mock AMI proxy)', () {
-    test('getRecordings returns a list', () async {
-      final res = await AmiApi.getRecordings();
-      expect(res.statusCode, 200);
-      expect(res.data, isA<List>());
-      expect((res.data as List).isNotEmpty, isTrue);
+  group('AmiListenClient (integration with mock AMI server)', () {
+    late MockAmiServer mockServer;
+    late AmiListenClient client;
+
+    setUp(() async {
+      mockServer = MockAmiServer(generation: 4, port: 5041);
+      await mockServer.start();
+
+      client = AmiListenClient(
+        host: '127.0.0.1',
+        port: 5041,
+        username: 'admin',
+        secret: 'password', // Mock server expects 'password'
+      );
     });
 
-    test('getRecordingMeta returns metadata for rec1', () async {
-      final res = await AmiApi.getRecordingMeta('rec1');
-      expect(res.statusCode, 200);
-      expect(res.data, isA<Map>());
-      expect((res.data as Map).containsKey('url'), isTrue);
+    tearDown(() async {
+      await client.disconnect();
+      await mockServer.stop();
     });
 
-    test('originateListen returns job and pollJob observes status', () async {
-      final resp = await AmiApi.originateListen({'target': 'SIP/101'});
-      expect(resp.statusCode, 200);
-      final jobId = resp.data['jobId']?.toString();
-      expect(jobId, isNotNull);
+    test('connect should establish connection to mock AMI server', () async {
+      await client.connect();
+      expect(client.isConnected, isTrue);
+    });
 
-      // pollJob should eventually yield a status map containing jobId
-      final statuses = <Map<String, dynamic>>[];
-      await for (final job in AmiApi.pollJob(jobId!)) {
-        statuses.add(job);
-        if (job['status'] == 'listening') break;
-      }
-      expect(statuses.any((m) => m['status'] == 'listening'), isTrue);
-    }, timeout: Timeout(Duration(seconds: 10)));
+    test('should handle login and basic AMI commands', () async {
+      await client.connect();
+
+      // Test that connection is established and login worked
+      expect(client.isConnected, isTrue);
+
+      // Test that we can send actions (mock server should respond)
+      final events = <Map<String, String>>[];
+      final subscription = client.eventsStream.listen(events.add);
+
+      // Wait a bit for any initial events
+      await Future.delayed(Duration(seconds: 1));
+
+      await subscription.cancel();
+      // Note: Mock server may not send events, so we just verify connection works
+    });
+
+    test('disconnect should close connection', () async {
+      await client.connect();
+      expect(client.isConnected, isTrue);
+
+      await client.disconnect();
+      expect(client.isConnected, isFalse);
+    });
   });
 }

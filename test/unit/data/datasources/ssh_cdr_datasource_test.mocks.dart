@@ -3,11 +3,12 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
+import 'dart:async' as _i6;
 
-import 'package:astrix_assist/core/services/asterisk_ssh_manager.dart' as _i4;
-import 'package:astrix_assist/core/services/script_models.dart' as _i3;
+import 'package:astrix_assist/core/services/asterisk_ssh_manager.dart' as _i5;
+import 'package:astrix_assist/core/services/script_models.dart' as _i4;
 import 'package:astrix_assist/core/ssh_config.dart' as _i2;
+import 'package:astrix_assist/core/ssh_service.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -30,9 +31,14 @@ class _FakeSshConfig_0 extends _i1.SmartFake implements _i2.SshConfig {
     : super(parent, parentInvocation);
 }
 
-class _FakeScriptResponse_1<T> extends _i1.SmartFake
-    implements _i3.ScriptResponse<T> {
-  _FakeScriptResponse_1(Object parent, Invocation parentInvocation)
+class _FakeSshService_1 extends _i1.SmartFake implements _i3.SshService {
+  _FakeSshService_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeScriptResponse_2<T> extends _i1.SmartFake
+    implements _i4.ScriptResponse<T> {
+  _FakeScriptResponse_2(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -40,7 +46,7 @@ class _FakeScriptResponse_1<T> extends _i1.SmartFake
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockAsteriskSshManager extends _i1.Mock
-    implements _i4.AsteriskSshManager {
+    implements _i5.AsteriskSshManager {
   MockAsteriskSshManager() {
     _i1.throwOnMissingStub(this);
   }
@@ -54,52 +60,66 @@ class MockAsteriskSshManager extends _i1.Mock
           as _i2.SshConfig);
 
   @override
-  _i5.Future<void> connect() =>
+  _i3.SshService get sshService =>
+      (super.noSuchMethod(
+            Invocation.getter(#sshService),
+            returnValue: _FakeSshService_1(
+              this,
+              Invocation.getter(#sshService),
+            ),
+          )
+          as _i3.SshService);
+
+  @override
+  _i6.Future<void> connect() =>
       (super.noSuchMethod(
             Invocation.method(#connect, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  void disconnect() => super.noSuchMethod(
-    Invocation.method(#disconnect, []),
-    returnValueForMissingStub: null,
-  );
+  _i6.Future<void> disconnect() =>
+      (super.noSuchMethod(
+            Invocation.method(#disconnect, []),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> ensureScriptDeployed() =>
+  _i6.Future<void> ensureScriptDeployed() =>
       (super.noSuchMethod(
             Invocation.method(#ensureScriptDeployed, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<_i3.ScriptResponse<_i3.SystemInfo>> getSystemInfo() =>
+  _i6.Future<_i4.ScriptResponse<_i4.SystemInfo>> getSystemInfo() =>
       (super.noSuchMethod(
             Invocation.method(#getSystemInfo, []),
-            returnValue: _i5.Future<_i3.ScriptResponse<_i3.SystemInfo>>.value(
-              _FakeScriptResponse_1<_i3.SystemInfo>(
+            returnValue: _i6.Future<_i4.ScriptResponse<_i4.SystemInfo>>.value(
+              _FakeScriptResponse_2<_i4.SystemInfo>(
                 this,
                 Invocation.method(#getSystemInfo, []),
               ),
             ),
           )
-          as _i5.Future<_i3.ScriptResponse<_i3.SystemInfo>>);
+          as _i6.Future<_i4.ScriptResponse<_i4.SystemInfo>>);
 
   @override
-  _i5.Future<_i3.ScriptResponse<_i3.CdrListResponse>> getCdrs({
+  _i6.Future<_i4.ScriptResponse<_i4.CdrListResponse>> getCdrs({
     int? days = 7,
     int? limit = 1000,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getCdrs, [], {#days: days, #limit: limit}),
             returnValue:
-                _i5.Future<_i3.ScriptResponse<_i3.CdrListResponse>>.value(
-                  _FakeScriptResponse_1<_i3.CdrListResponse>(
+                _i6.Future<_i4.ScriptResponse<_i4.CdrListResponse>>.value(
+                  _FakeScriptResponse_2<_i4.CdrListResponse>(
                     this,
                     Invocation.method(#getCdrs, [], {
                       #days: days,
@@ -108,41 +128,41 @@ class MockAsteriskSshManager extends _i1.Mock
                   ),
                 ),
           )
-          as _i5.Future<_i3.ScriptResponse<_i3.CdrListResponse>>);
+          as _i6.Future<_i4.ScriptResponse<_i4.CdrListResponse>>);
 
   @override
-  _i5.Future<_i3.ScriptResponse<_i3.RecordingsListResponse>> getRecordings({
+  _i6.Future<_i4.ScriptResponse<_i4.RecordingsListResponse>> getRecordings({
     int? days = 7,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getRecordings, [], {#days: days}),
             returnValue:
-                _i5.Future<
-                  _i3.ScriptResponse<_i3.RecordingsListResponse>
+                _i6.Future<
+                  _i4.ScriptResponse<_i4.RecordingsListResponse>
                 >.value(
-                  _FakeScriptResponse_1<_i3.RecordingsListResponse>(
+                  _FakeScriptResponse_2<_i4.RecordingsListResponse>(
                     this,
                     Invocation.method(#getRecordings, [], {#days: days}),
                   ),
                 ),
           )
-          as _i5.Future<_i3.ScriptResponse<_i3.RecordingsListResponse>>);
+          as _i6.Future<_i4.ScriptResponse<_i4.RecordingsListResponse>>);
 
   @override
-  _i5.Future<_i3.ScriptResponse<_i3.AmiStatus>> checkAmi() =>
+  _i6.Future<_i4.ScriptResponse<_i4.AmiStatus>> checkAmi() =>
       (super.noSuchMethod(
             Invocation.method(#checkAmi, []),
-            returnValue: _i5.Future<_i3.ScriptResponse<_i3.AmiStatus>>.value(
-              _FakeScriptResponse_1<_i3.AmiStatus>(
+            returnValue: _i6.Future<_i4.ScriptResponse<_i4.AmiStatus>>.value(
+              _FakeScriptResponse_2<_i4.AmiStatus>(
                 this,
                 Invocation.method(#checkAmi, []),
               ),
             ),
           )
-          as _i5.Future<_i3.ScriptResponse<_i3.AmiStatus>>);
+          as _i6.Future<_i4.ScriptResponse<_i4.AmiStatus>>);
 
   @override
-  _i5.Future<_i3.ScriptResponse<_i3.AmiCredentials>> setupAmi({
+  _i6.Future<_i4.ScriptResponse<_i4.AmiCredentials>> setupAmi({
     String? username = 'astrix_assist',
     String? password,
   }) =>
@@ -152,8 +172,8 @@ class MockAsteriskSshManager extends _i1.Mock
               #password: password,
             }),
             returnValue:
-                _i5.Future<_i3.ScriptResponse<_i3.AmiCredentials>>.value(
-                  _FakeScriptResponse_1<_i3.AmiCredentials>(
+                _i6.Future<_i4.ScriptResponse<_i4.AmiCredentials>>.value(
+                  _FakeScriptResponse_2<_i4.AmiCredentials>(
                     this,
                     Invocation.method(#setupAmi, [], {
                       #username: username,
@@ -162,10 +182,10 @@ class MockAsteriskSshManager extends _i1.Mock
                   ),
                 ),
           )
-          as _i5.Future<_i3.ScriptResponse<_i3.AmiCredentials>>);
+          as _i6.Future<_i4.ScriptResponse<_i4.AmiCredentials>>);
 
   @override
-  _i5.Future<dynamic> downloadRecording(
+  _i6.Future<dynamic> downloadRecording(
     String? remotePath, {
     String? localPath,
   }) =>
@@ -175,7 +195,7 @@ class MockAsteriskSshManager extends _i1.Mock
               [remotePath],
               {#localPath: localPath},
             ),
-            returnValue: _i5.Future<dynamic>.value(),
+            returnValue: _i6.Future<dynamic>.value(),
           )
-          as _i5.Future<dynamic>);
+          as _i6.Future<dynamic>);
 }

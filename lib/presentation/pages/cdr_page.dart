@@ -35,7 +35,14 @@ class _CdrPageState extends State<CdrPage> {
     // Default: last 7 days
     _endDate = DateTime.now();
     _startDate = _endDate!.subtract(const Duration(days: 7));
-    _initBloc();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_bloc == null) {
+      _initBloc();
+    }
   }
 
   /// Download recording via SSH and return local file path
@@ -51,6 +58,14 @@ class _CdrPageState extends State<CdrPage> {
   }
 
   Future<void> _initBloc() async {
+    // Check if bloc is already provided via BlocProvider
+    final providedBloc = BlocProvider.of<CdrBloc>(context, listen: false);
+    if (providedBloc != null) {
+      setState(() => _bloc = providedBloc);
+      _loadRecords();
+      return;
+    }
+
     // Use GetIt to get the bloc (which uses the correct repository based on AppConfig)
     final bloc = sl<CdrBloc>();
 
